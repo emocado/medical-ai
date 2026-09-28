@@ -1,0 +1,21 @@
+# Environment and Secrets
+.env
+.env.*
+*.pem
+*.key
+healthmate-*.json
+*-*.json
+credentials*.json
+!skills-lock.json
+!package*.json
+!tsconfig*.json
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
