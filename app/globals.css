@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 15, 23, 42; /* #0f172a - high contrast dark slate */
+  --background-rgb: 248, 250, 252; /* #f8fafc - light clean neutral */
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  font-size: 1.125rem; /* 18px minimum base font */
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Elderly-safe touch target guarantee */
+button, a, input, select, textarea {
+  min-height: 48px;
+  min-width: 48px;
+}
