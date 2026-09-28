@@ -37,7 +37,7 @@ export function Header({
                 key={l.code}
                 onClick={() => onLanguageChange(l.code)}
                 aria-pressed={currentLang === l.code}
-                className={`px-3 py-1 rounded-md text-base font-semibold min-h-[44px] transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-base font-bold min-h-[48px] min-w-[48px] flex items-center justify-center transition-colors ${
                   currentLang === l.code
                     ? "bg-white text-blue-950 shadow"
                     : "bg-blue-800 text-white hover:bg-blue-700"
