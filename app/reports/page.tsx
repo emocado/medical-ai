@@ -3,31 +3,37 @@
 import { useEffect, useState, useRef } from "react";
 import { Header } from "@/components/Header";
 import { ReportView } from "@/components/ReportView";
-import { getAllReports, saveReport } from "@/lib/db";
+import { ChatInterface } from "@/components/ChatInterface";
+import { getAllReports, saveReport, getAllPillRecords } from "@/lib/db";
 import { FileUp, Loader2, Plus, AlertCircle, History } from "lucide-react";
-import type { Language, ReportRecord } from "@/types";
+import type { Language, ReportRecord, PillRecord } from "@/types";
 
 export default function ReportsPage() {
   const [lang, setLang] = useState<Language>("en");
   const [reports, setReports] = useState<ReportRecord[]>([]);
+  const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    loadReports();
+    loadData();
   }, []);
 
-  async function loadReports() {
+  async function loadData() {
     try {
-      const records = await getAllReports();
-      setReports(records);
-      if (records.length > 0 && !selectedReportId) {
-        setSelectedReportId(records[0].id);
+      const [reportRecords, pillRecords] = await Promise.all([
+        getAllReports(),
+        getAllPillRecords(),
+      ]);
+      setReports(reportRecords);
+      setKnownPills(pillRecords);
+      if (reportRecords.length > 0 && !selectedReportId) {
+        setSelectedReportId(reportRecords[0].id);
       }
     } catch (err) {
-      console.error("Failed to load reports from IndexedDB:", err);
+      console.error("Failed to load initial data from IndexedDB:", err);
     }
   }
 
@@ -35,7 +41,6 @@ export default function ReportsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Reset input so same file can be selected again if desired
     e.target.value = "";
     setErrorMessage(null);
     setIsUploading(true);
@@ -75,7 +80,6 @@ export default function ReportsPage() {
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result as string;
-        // Strip data:mime/type;base64, prefix
         const base64 = result.split(",")[1];
         resolve(base64);
       };
@@ -182,13 +186,20 @@ export default function ReportsPage() {
         <ReportView report={activeReport} language={lang} />
       ) : (
         !isUploading && (
-          <div className="text-center py-10 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
+          <div className="text-center py-8 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
             <p className="text-lg font-medium text-slate-600">
-              No reports uploaded yet. Upload a report above to view your summary.
+              No reports uploaded yet. Upload a report above, or ask any health question below.
             </p>
           </div>
         )
       )}
+
+      {/* Chat Interface (with injected report + pills context) */}
+      <ChatInterface
+        language={lang}
+        latestReport={activeReport || null}
+        knownPills={knownPills}
+      />
     </div>
   );
 }
