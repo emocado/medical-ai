@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
-import { getAllReports, getAllMealRecords } from "@/lib/db";
+import { MealAdvisorModal } from "@/components/MealAdvisorModal";
+import { getAllReports, getAllMealRecords, getAllPillRecords } from "@/lib/db";
 import {
   Clock,
   FileText,
@@ -16,8 +17,9 @@ import {
   AlertCircle,
   ArrowRight,
   GitCompare,
+  Plus,
 } from "lucide-react";
-import type { Language, ReportRecord, MealRecord } from "@/types";
+import type { Language, ReportRecord, MealRecord, PillRecord } from "@/types";
 import type { DeltaComparisonResult } from "@/lib/delta-comparator";
 
 type TimelineItem =
@@ -28,10 +30,12 @@ export default function TimelinePage() {
   const [lang, setLang] = useState<Language>("en");
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [meals, setMeals] = useState<MealRecord[]>([]);
+  const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
   const [selectedReportIds, setSelectedReportIds] = useState<string[]>([]);
   const [isComparing, setIsComparing] = useState(false);
   const [deltaResult, setDeltaResult] = useState<DeltaComparisonResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isMealModalOpen, setIsMealModalOpen] = useState(false);
 
   useEffect(() => {
     loadTimelineData();
@@ -39,15 +43,21 @@ export default function TimelinePage() {
 
   async function loadTimelineData() {
     try {
-      const [allReports, allMeals] = await Promise.all([
+      const [allReports, allMeals, allPills] = await Promise.all([
         getAllReports(),
         getAllMealRecords(),
+        getAllPillRecords(),
       ]);
       setReports(allReports);
       setMeals(allMeals);
+      setKnownPills(allPills);
     } catch (err) {
       console.error("Failed to load timeline items:", err);
     }
+  }
+
+  function handleMealSaved(newMeal: MealRecord) {
+    setMeals((prev) => [newMeal, ...prev]);
   }
 
   function toggleReportSelection(id: string) {
@@ -56,7 +66,6 @@ export default function TimelinePage() {
         return prev.filter((rId) => rId !== id);
       }
       if (prev.length >= 2) {
-        // Replace oldest selection or keep to 2 max
         return [prev[1], id];
       }
       return [...prev, id];
@@ -99,7 +108,6 @@ export default function TimelinePage() {
     }
   }
 
-  // Combine and sort chronologically (newest first)
   const timelineItems: TimelineItem[] = [
     ...reports.map((r): TimelineItem => ({
       type: "report",
@@ -113,24 +121,31 @@ export default function TimelinePage() {
     })),
   ].sort((a, b) => b.timestamp - a.timestamp);
 
+  const latestReport = reports.length > 0 ? reports[0] : null;
+
   return (
     <div className="space-y-6">
       <Header currentLang={lang} onLanguageChange={setLang} title="Health Timeline" />
 
-      {/* Overview & Compare Prompt */}
+      {/* Overview & Actions */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Clock className="w-6 h-6 text-blue-800" aria-hidden="true" />
             Your Health Journey
           </h2>
-          <span className="text-base font-semibold text-slate-600">
-            {reports.length} {reports.length === 1 ? "report" : "reports"}
-          </span>
+          <button
+            onClick={() => setIsMealModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-base min-h-[48px] flex items-center gap-1.5 shadow-sm transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            <Utensils className="w-5 h-5" />
+            <span>Log Meal</span>
+          </button>
         </div>
 
         <p className="text-base text-slate-700 leading-relaxed">
-          Select any <strong>two reports</strong> to compare lab markers and track your health progression over time.
+          Track your past medical reports and meals. Select any <strong>two reports</strong> to compare lab markers and track your health progression over time.
         </p>
 
         {reports.length >= 2 && (
@@ -185,7 +200,6 @@ export default function TimelinePage() {
               Progression Comparison
             </h3>
 
-            {/* Progression Badge */}
             <span
               className={`px-3 py-1.5 rounded-full text-base font-black flex items-center gap-1.5 ${
                 deltaResult.progression === "improving"
@@ -343,13 +357,25 @@ export default function TimelinePage() {
                     </span>
                   </div>
 
-                  <p className="text-base text-slate-700 leading-relaxed">{m.analysis.advice}</p>
+                  <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
+                    {m.analysis.advice}
+                  </p>
                 </article>
               );
             }
           })
         )}
       </section>
+
+      {/* Meal Advisor Modal */}
+      <MealAdvisorModal
+        isOpen={isMealModalOpen}
+        onClose={() => setIsMealModalOpen(false)}
+        language={lang}
+        latestReport={latestReport}
+        knownPills={knownPills}
+        onMealSaved={handleMealSaved}
+      />
     </div>
   );
 }
