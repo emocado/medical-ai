@@ -1,51 +1,194 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Header } from "@/components/Header";
-import { initDB } from "@/lib/db";
-import { FileUp, MessageSquare } from "lucide-react";
-import type { Language } from "@/types";
+import { ReportView } from "@/components/ReportView";
+import { getAllReports, saveReport } from "@/lib/db";
+import { FileUp, Loader2, Plus, AlertCircle, History } from "lucide-react";
+import type { Language, ReportRecord } from "@/types";
 
 export default function ReportsPage() {
   const [lang, setLang] = useState<Language>("en");
-  const [isDbReady, setIsDbReady] = useState(false);
+  const [reports, setReports] = useState<ReportRecord[]>([]);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    initDB().then(() => setIsDbReady(true)).catch(console.error);
+    loadReports();
   }, []);
+
+  async function loadReports() {
+    try {
+      const records = await getAllReports();
+      setReports(records);
+      if (records.length > 0 && !selectedReportId) {
+        setSelectedReportId(records[0].id);
+      }
+    } catch (err) {
+      console.error("Failed to load reports from IndexedDB:", err);
+    }
+  }
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset input so same file can be selected again if desired
+    e.target.value = "";
+    setErrorMessage(null);
+    setIsUploading(true);
+
+    try {
+      const base64 = await fileToBase64(file);
+      const res = await fetch("/api/reports/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileBase64: base64,
+          mimeType: file.type || "application/octet-stream",
+          fileName: file.name,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server responded with ${res.status}`);
+      }
+
+      const analyzedReport: ReportRecord = await res.json();
+      await saveReport(analyzedReport);
+
+      setReports((prev) => [analyzedReport, ...prev]);
+      setSelectedReportId(analyzedReport.id);
+    } catch (err: any) {
+      console.error("Upload/analysis failed:", err);
+      setErrorMessage(err.message || "Failed to analyze report. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Strip data:mime/type;base64, prefix
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const activeReport = reports.find((r) => r.id === selectedReportId) || reports[0];
 
   return (
     <div className="space-y-6">
-      <Header currentLang={lang} onLanguageChange={setLang} title="Reports & Chat" />
+      <Header currentLang={lang} onLanguageChange={setLang} title="HealthMate Reports" />
 
-      <section className="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-sm space-y-4">
-        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-          <FileUp className="w-6 h-6 text-blue-700" />
-          Upload Medical Report
-        </h2>
-        <p className="text-base text-slate-700 leading-relaxed">
-          Upload a photo or PDF of your doctor&apos;s report or blood test. We will explain it in simple words.
-        </p>
-        <div className="border-3 border-dashed border-blue-300 rounded-xl p-8 text-center bg-blue-50/50">
-          <p className="text-base font-semibold text-blue-900">
-            Report upload ready
-          </p>
+      {/* Upload Action */}
+      <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <FileUp className="w-6 h-6 text-blue-800" aria-hidden="true" />
+            Upload Medical Report
+          </h2>
+          <span className="text-base text-slate-600 font-medium">Photo or PDF</span>
         </div>
-      </section>
 
-      <section className="bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-sm space-y-4">
-        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6 text-blue-700" />
-          Health Assistant Chat
-        </h2>
-        <p className="text-base text-slate-700">
-          Ask questions about your health and medical reports.
+        <p className="text-base text-slate-700 leading-relaxed">
+          Take a photo or upload your blood test, scan, or hospital discharge summary. We explain it simply in your language.
         </p>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,application/pdf"
+          onChange={handleFileSelect}
+          className="hidden"
+          id="report-file-input"
+          disabled={isUploading}
+        />
+
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className={`w-full py-4 px-6 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center space-x-3 transition-colors shadow-sm ${
+            isUploading
+              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+              : "bg-blue-800 hover:bg-blue-900 text-white active:bg-blue-950"
+          }`}
+        >
+          {isUploading ? (
+            <>
+              <Loader2 className="w-6 h-6 animate-spin text-blue-900" aria-hidden="true" />
+              <span>Analyzing your report with care...</span>
+            </>
+          ) : (
+            <>
+              <Plus className="w-6 h-6" aria-hidden="true" />
+              <span>Select or Photograph Report</span>
+            </>
+          )}
+        </button>
+
+        {errorMessage && (
+          <div
+            role="alert"
+            className="p-4 rounded-xl bg-red-50 border-2 border-red-300 text-red-900 flex items-start space-x-2"
+          >
+            <AlertCircle className="w-6 h-6 text-red-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <span className="text-base font-medium">{errorMessage}</span>
+          </div>
+        )}
       </section>
 
-      <div className="text-sm text-slate-500 text-center">
-        {isDbReady ? "Local database active (IndexedDB)" : "Initializing local database..."}
-      </div>
+      {/* Report History / Selector if multiple reports exist */}
+      {reports.length > 1 && (
+        <section
+          aria-label="Previous Reports"
+          className="bg-white p-4 rounded-2xl border-2 border-slate-200 space-y-2"
+        >
+          <div className="flex items-center space-x-2 text-slate-800 font-bold text-base mb-1">
+            <History className="w-5 h-5 text-blue-800" aria-hidden="true" />
+            <span>Select Report to View:</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
+            {reports.map((r) => (
+              <button
+                key={r.id}
+                role="tab"
+                aria-selected={r.id === activeReport?.id}
+                onClick={() => setSelectedReportId(r.id)}
+                className={`px-4 py-2 rounded-xl text-base font-semibold whitespace-nowrap min-h-[48px] border-2 transition-colors ${
+                  r.id === activeReport?.id
+                    ? "border-blue-800 bg-blue-100 text-blue-950"
+                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                {r.fileName.length > 18 ? `${r.fileName.slice(0, 16)}...` : r.fileName} ({r.date})
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Display Active Report */}
+      {activeReport ? (
+        <ReportView report={activeReport} language={lang} />
+      ) : (
+        !isUploading && (
+          <div className="text-center py-10 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
+            <p className="text-lg font-medium text-slate-600">
+              No reports uploaded yet. Upload a report above to view your summary.
+            </p>
+          </div>
+        )
+      )}
     </div>
   );
 }
