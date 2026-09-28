@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Bot, User, Sparkles } from "lucide-react";
+import { Send, Loader2, Bot, User, Sparkles, Mic } from "lucide-react";
+import { VoiceChatModal } from "./VoiceChatModal";
 import type { Language, ReportRecord, PillRecord } from "@/types";
 
 interface Message {
@@ -37,6 +38,7 @@ export function ChatInterface({
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -120,12 +122,14 @@ export function ChatInterface({
           <Bot className="w-7 h-7 text-blue-800" aria-hidden="true" />
           <h3 className="text-xl font-bold text-slate-900">Health Assistant Chat</h3>
         </div>
-        {latestReport && (
-          <span className="text-sm font-semibold bg-blue-100 text-blue-900 px-3 py-1 rounded-full flex items-center gap-1">
-            <Sparkles className="w-4 h-4 text-blue-700" />
-            Report Connected
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {latestReport && (
+            <span className="text-sm font-semibold bg-blue-100 text-blue-900 px-3 py-1 rounded-full flex items-center gap-1">
+              <Sparkles className="w-4 h-4 text-blue-700" />
+              Report Connected
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Messages Scroll Area */}
@@ -171,7 +175,7 @@ export function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input bar */}
+      {/* Input bar with Send and Microphone buttons */}
       <form onSubmit={handleSend} className="flex items-center gap-2 pt-2">
         <label htmlFor="chat-input" className="sr-only">
           Ask a health question
@@ -189,11 +193,23 @@ export function ChatInterface({
           disabled={isLoading}
           className="flex-1 px-4 py-3 border-2 border-slate-300 rounded-xl text-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-800 bg-slate-50 focus:bg-white min-h-[48px]"
         />
+
+        {/* Microphone Button for Gemini Live Voice Chat */}
+        <button
+          type="button"
+          onClick={() => setIsVoiceModalOpen(true)}
+          aria-label="Start full-duplex voice conversation with HealthMate"
+          className="px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm transition-colors active:bg-emerald-900"
+        >
+          <Mic className="w-5 h-5" aria-hidden="true" />
+        </button>
+
+        {/* Send Button */}
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
           aria-label="Send message"
-          className={`px-5 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg transition-colors ${
+          className={`px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg transition-colors ${
             isLoading || !input.trim()
               ? "bg-slate-200 text-slate-400 cursor-not-allowed"
               : "bg-blue-800 hover:bg-blue-900 text-white shadow-sm"
@@ -202,6 +218,15 @@ export function ChatInterface({
           <Send className="w-5 h-5" aria-hidden="true" />
         </button>
       </form>
+
+      {/* Gemini Live Voice Chat Modal */}
+      <VoiceChatModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        language={language}
+        latestReport={latestReport}
+        knownPills={knownPills}
+      />
     </section>
   );
 }
