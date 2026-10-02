@@ -1,5 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import type { ReportRecord, PillRecord, MealRecord, GuideState } from "@/types";
+import { requestPersistentStorage } from "./backup";
 
 interface HealthMateDB extends DBSchema {
   reports: {
@@ -53,10 +54,31 @@ export function initDB(): Promise<IDBPDatabase<HealthMateDB>> {
   return dbPromise;
 }
 
+/** Milliseconds for a YYYY-MM-DD report date, or NaN when it can't be read. */
+function reportDateValue(report: ReportRecord): number {
+  return new Date(report.date).getTime();
+}
+
+/**
+ * Newest first by the date printed on the report (when the test was done),
+ * not by when it was uploaded, so an old report uploaded today doesn't become
+ * the "latest". Reports without a readable date go last.
+ */
+export function sortReportsNewestFirst(reports: ReportRecord[]): ReportRecord[] {
+  return [...reports].sort((a, b) => {
+    const da = reportDateValue(a);
+    const db = reportDateValue(b);
+    if (Number.isNaN(da) !== Number.isNaN(db)) return Number.isNaN(da) ? 1 : -1;
+    if (!Number.isNaN(da) && da !== db) return db - da;
+    return b.createdAt - a.createdAt;
+  });
+}
+
 // Reports
 export async function saveReport(report: ReportRecord): Promise<void> {
   const db = await initDB();
   await db.put("reports", report);
+  void requestPersistentStorage();
 }
 
 export async function getReport(id: string): Promise<ReportRecord | undefined> {
@@ -66,8 +88,7 @@ export async function getReport(id: string): Promise<ReportRecord | undefined> {
 
 export async function getAllReports(): Promise<ReportRecord[]> {
   const db = await initDB();
-  const all = await db.getAllFromIndex("reports", "by-created");
-  return all.reverse(); // Newest first
+  return sortReportsNewestFirst(await db.getAll("reports"));
 }
 
 export async function deleteReport(id: string): Promise<void> {
@@ -79,6 +100,7 @@ export async function deleteReport(id: string): Promise<void> {
 export async function savePillRecord(pill: PillRecord): Promise<void> {
   const db = await initDB();
   await db.put("pills", pill);
+  void requestPersistentStorage();
 }
 
 export async function getPillRecord(id: string): Promise<PillRecord | undefined> {
@@ -91,11 +113,16 @@ export async function getAllPillRecords(): Promise<PillRecord[]> {
   const all = await db.getAllFromIndex("pills", "by-created");
   return all.reverse(); // Newest first
 }
+export async function deletePillRecord(id: string): Promise<void> {
+  const db = await initDB();
+  await db.delete("pills", id);
+}
 
 // Meals
 export async function saveMealRecord(meal: MealRecord): Promise<void> {
   const db = await initDB();
   await db.put("meals", meal);
+  void requestPersistentStorage();
 }
 
 export async function getMealRecord(id: string): Promise<MealRecord | undefined> {
@@ -107,6 +134,10 @@ export async function getAllMealRecords(): Promise<MealRecord[]> {
   const db = await initDB();
   const all = await db.getAllFromIndex("meals", "by-created");
   return all.reverse(); // Newest first
+}
+export async function deleteMealRecord(id: string): Promise<void> {
+  const db = await initDB();
+  await db.delete("meals", id);
 }
 
 // Doctor Guide State
@@ -136,4 +167,28 @@ export async function hasCompletedOnboarding(): Promise<boolean> {
 
 export async function setCompletedOnboarding(completed: boolean): Promise<void> {
   await saveGuideState({ hasCompletedOnboarding: completed });
+}
+
+// Backup & restore
+export async function exportAllData(): Promise<{ reports: ReportRecord[]; pills: PillRecord[]; meals: MealRecord[] }> {
+  const db = await initDB();
+  const [reports, pills, meals] = await Promise.all([db.getAll("reports"), db.getAll("pills"), db.getAll("meals")]);
+  return { reports, pills, meals };
+}
+
+/** Writes backup records into the database; records with the same id are replaced. Returns how many were written. */
+export async function importAllData(data: {
+  reports: ReportRecord[];
+  pills: PillRecord[];
+  meals: MealRecord[];
+}): Promise<number> {
+  const db = await initDB();
+  const tx = db.transaction(["reports", "pills", "meals"], "readwrite");
+  await Promise.all([
+    ...data.reports.map((r) => tx.objectStore("reports").put(r)),
+    ...data.pills.map((p) => tx.objectStore("pills").put(p)),
+    ...data.meals.map((m) => tx.objectStore("meals").put(m)),
+    tx.done,
+  ]);
+  return data.reports.length + data.pills.length + data.meals.length;
 }

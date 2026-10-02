@@ -96,3 +96,24 @@ export function toStandardUnit(id: MarkerId, value: number, unit = ""): number {
   if (id === "haemoglobin" && (u === "g/l" || value > 25)) return value / 10;
   return value;
 }
+
+/**
+ * Reads a printed reference range such as "3.9 - 6.0", "< 5.2" or "> 90".
+ * Returns null for anything ambiguous (e.g. separate male/female ranges) so
+ * callers never draw a misleading band.
+ */
+export function parseReferenceRange(range?: string): { low?: number; high?: number } | null {
+  if (!range) return null;
+  const text = range.replace(/,/g, "").trim();
+  const numbers = text.match(/\d+(\.\d+)?/g);
+  if (!numbers) return null;
+
+  const between = text.match(/^(\d+(?:\.\d+)?)\s*[-–—~]\s*(\d+(?:\.\d+)?)(?:\s|$)/);
+  if (between) return { low: parseFloat(between[1]), high: parseFloat(between[2]) };
+  if (numbers.length !== 1) return null;
+
+  const value = parseFloat(numbers[0]);
+  if (/^[<≤]/.test(text)) return { high: value };
+  if (/^[>≥]/.test(text)) return { low: value };
+  return null;
+}

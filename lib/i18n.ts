@@ -47,6 +47,34 @@ export const STRINGS = {
 
   // Shared
   "common.close": { en: "Close", bm: "Tutup", zh: "关闭", ta: "மூடு" },
+  "common.delete": { en: "Delete", bm: "Padam", zh: "删除", ta: "நீக்கு" },
+  "confirm.deleteReport": {
+    en: "Delete this report? This cannot be undone.",
+    bm: "Padam laporan ini? Tindakan ini tidak boleh dibatalkan.",
+    zh: "删除这份报告？此操作无法撤销。",
+    ta: "இந்த அறிக்கையை நீக்கவா? இதைத் திரும்பப் பெற முடியாது.",
+  },
+  "confirm.deleteScan": {
+    en: "Delete this medicine scan? This cannot be undone.",
+    bm: "Padam imbasan ubat ini? Tindakan ini tidak boleh dibatalkan.",
+    zh: "删除这次药物扫描？此操作无法撤销。",
+    ta: "இந்த மருந்து ஸ்கேனை நீக்கவா? இதைத் திரும்பப் பெற முடியாது.",
+  },
+  "confirm.deleteMeal": {
+    en: "Delete this meal log? This cannot be undone.",
+    bm: "Padam rekod makanan ini? Tindakan ini tidak boleh dibatalkan.",
+    zh: "删除这条饮食记录？此操作无法撤销。",
+    ta: "இந்த உணவுப் பதிவை நீக்கவா? இதைத் திரும்பப் பெற முடியாது.",
+  },
+  "delete.report.aria": { en: "Delete this report", bm: "Padam laporan ini", zh: "删除这份报告", ta: "இந்த அறிக்கையை நீக்கு" },
+  "delete.scan.aria": { en: "Delete this medicine scan", bm: "Padam imbasan ubat ini", zh: "删除这次药物扫描", ta: "இந்த மருந்து ஸ்கேனை நீக்கு" },
+  "delete.meal.aria": { en: "Delete this meal log", bm: "Padam rekod makanan ini", zh: "删除这条饮食记录", ta: "இந்த உணவுப் பதிவை நீக்கு" },
+  "report.testDate": {
+    en: "Test date (tap to correct)",
+    bm: "Tarikh ujian (tekan untuk betulkan)",
+    zh: "检查日期（点击可修改）",
+    ta: "பரிசோதனை தேதி (திருத்த தட்டவும்)",
+  },
   "disclaimer.aria": { en: "Medical Disclaimer", bm: "Penafian Perubatan", zh: "医疗免责声明", ta: "மருத்துவ மறுப்பு" },
   "errors.tooLarge": {
     en: "This file is too large. Please use a smaller photo or PDF (under 15 MB).",
@@ -606,6 +634,63 @@ export const STRINGS = {
   "progression.stable": { en: "STABLE", bm: "STABIL", zh: "稳定", ta: "நிலையானது" },
   "progression.declining": { en: "DECLINING", bm: "MEROSOT", zh: "变差", ta: "பின்னடைவு" },
   "progression.mixed": { en: "MIXED", bm: "BERCAMPUR", zh: "有好有坏", ta: "கலவையானது" },
+  "change.better": { en: "Better", bm: "Lebih baik", zh: "好转", ta: "மேம்பட்டது" },
+  "change.worse": { en: "Worse", bm: "Lebih teruk", zh: "变差", ta: "மோசமானது" },
+  "change.same": { en: "No change", bm: "Tiada perubahan", zh: "无变化", ta: "மாற்றமில்லை" },
+  "change.unknown": { en: "Ask your doctor", bm: "Tanya doktor", zh: "请问医生", ta: "மருத்துவரிடம் கேளுங்கள்" },
+  "trends.title": {
+    en: "Your results over time",
+    bm: "Keputusan anda dari semasa ke semasa",
+    zh: "您的指标变化趋势",
+    ta: "காலப்போக்கில் உங்கள் முடிவுகள்",
+  },
+  "trends.pick": { en: "Choose a test:", bm: "Pilih ujian:", zh: "选择检查项目：", ta: "ஒரு பரிசோதனையைத் தேர்ந்தெடுக்கவும்:" },
+  "trends.normalBand": {
+    en: "Shaded area = normal range",
+    bm: "Kawasan berlorek = julat normal",
+    zh: "阴影区域 = 正常范围",
+    ta: "நிழலிட்ட பகுதி = இயல்பு வரம்பு",
+  },
+  "trends.date": { en: "Date", bm: "Tarikh", zh: "日期", ta: "தேதி" },
+  "trends.value": { en: "Result", bm: "Keputusan", zh: "结果", ta: "முடிவு" },
+  "backup.title": {
+    en: "Keep a backup of your records",
+    bm: "Simpan salinan sandaran rekod anda",
+    zh: "备份您的健康记录",
+    ta: "உங்கள் பதிவுகளின் காப்புப் பிரதியை வைத்திருங்கள்",
+  },
+  "backup.desc": {
+    en: "Your records are saved only on this device. Download a backup file now and then, so nothing is lost if you change phones or clear your browser.",
+    bm: "Rekod anda disimpan pada peranti ini sahaja. Muat turun fail sandaran sekali-sekala supaya tiada yang hilang jika anda menukar telefon atau mengosongkan pelayar.",
+    zh: "您的记录只保存在这台设备上。请不时下载备份文件，这样即使更换手机或清除浏览器数据，也不会丢失记录。",
+    ta: "உங்கள் பதிவுகள் இந்தச் சாதனத்தில் மட்டுமே சேமிக்கப்படுகின்றன. தொலைபேசியை மாற்றினாலும் அல்லது உலாவியை அழித்தாலும் எதுவும் இழக்கப்படாமல் இருக்க, அவ்வப்போது காப்புப் பிரதிக் கோப்பைப் பதிவிறக்கவும்.",
+  },
+  "backup.privacy": {
+    en: "The file contains your health information. Keep it somewhere private.",
+    bm: "Fail ini mengandungi maklumat kesihatan anda. Simpan di tempat yang selamat.",
+    zh: "此文件包含您的健康信息，请妥善保管。",
+    ta: "இந்தக் கோப்பில் உங்கள் உடல்நலத் தகவல்கள் உள்ளன. அதைப் பாதுகாப்பான இடத்தில் வைத்திருங்கள்.",
+  },
+  "backup.export": { en: "Download backup", bm: "Muat turun sandaran", zh: "下载备份", ta: "காப்புப் பிரதியைப் பதிவிறக்கு" },
+  "backup.import": { en: "Restore from backup", bm: "Pulihkan daripada sandaran", zh: "从备份恢复", ta: "காப்புப் பிரதியிலிருந்து மீட்டெடு" },
+  "backup.imported": {
+    en: "Restored {count} records.",
+    bm: "{count} rekod dipulihkan.",
+    zh: "已恢复 {count} 条记录。",
+    ta: "{count} பதிவுகள் மீட்டெடுக்கப்பட்டன.",
+  },
+  "backup.invalid": {
+    en: "This file is not a HealthMate backup.",
+    bm: "Fail ini bukan sandaran HealthMate.",
+    zh: "此文件不是 HealthMate 备份。",
+    ta: "இந்தக் கோப்பு HealthMate காப்புப் பிரதி அல்ல.",
+  },
+  "trends.chartAria": {
+    en: "{name} over time",
+    bm: "{name} dari semasa ke semasa",
+    zh: "{name} 的变化趋势",
+    ta: "காலப்போக்கில் {name}",
+  },
 
   // Meal advisor
   "meal.title": { en: "Dietary Meal Advisor", bm: "Penasihat Pemakanan", zh: "饮食建议", ta: "உணவு ஆலோசகர்" },
