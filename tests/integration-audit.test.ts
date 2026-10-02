@@ -10,7 +10,7 @@ import {
   getAllMealRecords,
 } from "@/lib/db";
 import { formatChatPrompt } from "@/lib/chat";
-import { buildLiveSessionConfig } from "@/lib/voice-session";
+import { buildVoiceSystemPrompt } from "@/lib/voice-session";
 import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "@/lib/prompts";
 import { parseDeltaResponse } from "@/lib/delta-comparator";
 import { parseMealResponse } from "@/lib/meal-advisor";
@@ -110,14 +110,14 @@ describe("Accessibility & Cross-Feature Integration Audit", () => {
       expect(chatPrompt).toContain(MEDICAL_DISCLAIMER);
 
       // 5. Test Voice Chat Session Context Injection
-      const voiceConfig = buildLiveSessionConfig({
+      const voicePrompt = buildVoiceSystemPrompt({
         language: "en",
         latestReport,
         knownPills: allPills,
       });
-      expect(voiceConfig.systemPrompt).toContain("elevated diabetic levels");
-      expect(voiceConfig.systemPrompt).toContain("Metformin");
-      expect(voiceConfig.systemPrompt).toContain(MEDICAL_DISCLAIMER);
+      expect(voicePrompt).toContain("elevated diabetic levels");
+      expect(voicePrompt).toContain("Metformin");
+      expect(voicePrompt).toContain(MEDICAL_DISCLAIMER);
 
       // 6. Test Meal Advisor Context Injection
       const mealPrompt = buildHealthMatePrompt({

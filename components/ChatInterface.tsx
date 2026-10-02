@@ -194,11 +194,11 @@ export function ChatInterface({
           className="flex-1 px-4 py-3 border-2 border-slate-300 rounded-xl text-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-800 bg-slate-50 focus:bg-white min-h-[48px]"
         />
 
-        {/* Microphone Button for Gemini Live Voice Chat */}
+        {/* Microphone Button for hands-free voice chat */}
         <button
           type="button"
           onClick={() => setIsVoiceModalOpen(true)}
-          aria-label="Start full-duplex voice conversation with HealthMate"
+          aria-label="Start a voice conversation with HealthMate"
           className="px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm transition-colors active:bg-emerald-900"
         >
           <Mic className="w-5 h-5" aria-hidden="true" />
@@ -219,13 +219,23 @@ export function ChatInterface({
         </button>
       </form>
 
-      {/* Gemini Live Voice Chat Modal */}
+      {/* Voice Chat Modal: spoken turns are added to this chat thread */}
       <VoiceChatModal
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         language={language}
         latestReport={latestReport}
         knownPills={knownPills}
+        history={messages
+          .filter((m) => m.id !== "initial" && !m.id.startsWith("err-"))
+          .map((m) => ({ role: m.role, content: m.content }))}
+        onTurn={(turn) =>
+          setMessages((prev) => [
+            ...prev,
+            { id: `usr-voice-${Date.now()}`, role: "user", content: turn.transcript },
+            { id: `ast-voice-${Date.now()}`, role: "assistant", content: turn.reply },
+          ])
+        }
       />
     </section>
   );

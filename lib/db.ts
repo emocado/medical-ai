@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import type { ReportRecord, PillRecord, MealRecord } from "@/types";
+import type { ReportRecord, PillRecord, MealRecord, GuideState } from "@/types";
 
 interface HealthMateDB extends DBSchema {
   reports: {
@@ -17,10 +17,14 @@ interface HealthMateDB extends DBSchema {
     value: MealRecord;
     indexes: { "by-created": number };
   };
+  guide: {
+    key: string;
+    value: GuideState;
+  };
 }
 
 const DB_NAME = "healthmate_db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase<HealthMateDB>> | null = null;
 
@@ -39,6 +43,9 @@ export function initDB(): Promise<IDBPDatabase<HealthMateDB>> {
         if (!db.objectStoreNames.contains("meals")) {
           const mealStore = db.createObjectStore("meals", { keyPath: "id" });
           mealStore.createIndex("by-created", "createdAt");
+        }
+        if (!db.objectStoreNames.contains("guide")) {
+          db.createObjectStore("guide");
         }
       },
     });
@@ -100,4 +107,33 @@ export async function getAllMealRecords(): Promise<MealRecord[]> {
   const db = await initDB();
   const all = await db.getAllFromIndex("meals", "by-created");
   return all.reverse(); // Newest first
+}
+
+// Doctor Guide State
+const GUIDE_STATE_KEY = "current_state";
+
+export async function getGuideState(): Promise<GuideState | undefined> {
+  const db = await initDB();
+  return db.get("guide", GUIDE_STATE_KEY);
+}
+
+export async function saveGuideState(state: Partial<GuideState>): Promise<void> {
+  const db = await initDB();
+  const current = (await db.get("guide", GUIDE_STATE_KEY)) || {
+    hasCompletedOnboarding: false,
+  };
+  await db.put("guide", {
+    ...current,
+    ...state,
+    updatedAt: Date.now(),
+  }, GUIDE_STATE_KEY);
+}
+
+export async function hasCompletedOnboarding(): Promise<boolean> {
+  const state = await getGuideState();
+  return Boolean(state?.hasCompletedOnboarding);
+}
+
+export async function setCompletedOnboarding(completed: boolean): Promise<void> {
+  await saveGuideState({ hasCompletedOnboarding: completed });
 }
