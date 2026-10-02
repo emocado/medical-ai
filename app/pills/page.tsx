@@ -9,7 +9,7 @@ import { SampleChips } from "@/components/SampleChips";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
-import { getAllPillRecords, savePillRecord, getAllReports } from "@/lib/db";
+import { deletePillRecord, getAllPillRecords, savePillRecord, getAllReports } from "@/lib/db";
 import {
   Pill,
   Camera,
@@ -20,6 +20,7 @@ import {
   History,
   Sparkles,
   ShieldAlert,
+  Trash2,
 } from "lucide-react";
 import type { Language, PillRecord, ReportRecord } from "@/types";
 
@@ -92,6 +93,12 @@ export default function PillsPage() {
     } finally {
       setIsAnalyzing(false);
     }
+  }
+
+  async function handleDeleteScan(id: string) {
+    await deletePillRecord(id);
+    setPillRecords((prev) => prev.filter((r) => r.id !== id));
+    setSelectedRecordId(null);
   }
 
   const activeRecord = pillRecords.find((r) => r.id === selectedRecordId) || pillRecords[0];
@@ -206,6 +213,17 @@ export default function PillsPage() {
       {activeRecord && analysis ? (
         <div className="space-y-5">
           <TranslationStatus status={translation.status} onRetry={translation.retry} />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => window.confirm(t("confirm.deleteScan")) && handleDeleteScan(activeRecord.id)}
+              aria-label={t("delete.scan.aria")}
+              className="px-3 py-2 rounded-xl min-h-[48px] flex items-center gap-1.5 text-base font-bold text-red-800 border-2 border-red-200 bg-white hover:bg-red-50"
+            >
+              <Trash2 className="w-5 h-5" aria-hidden="true" />
+              {t("common.delete")}
+            </button>
+          </div>
           {/* Cross-reference alert */}
           {analysis.crossRefWithReports && (
             <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-2xl space-y-1">

@@ -10,7 +10,7 @@ import { MealScoreChip } from "@/components/MealScoreChip";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { ensureDisclaimer } from "@/lib/prompts";
-import { getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
+import { deleteMealRecord, getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
 import {
   Clock,
   FileText,
@@ -24,6 +24,7 @@ import {
   ArrowRight,
   GitCompare,
   Plus,
+  Trash2,
 } from "lucide-react";
 import type { Language, ReportRecord, MealRecord, PillRecord } from "@/types";
 import type { DeltaComparisonResult } from "@/lib/delta-comparator";
@@ -66,6 +67,11 @@ export default function TimelinePage() {
 
   function handleMealSaved(newMeal: MealRecord) {
     setMeals((prev) => [newMeal, ...prev]);
+  }
+
+  async function handleDeleteMeal(id: string) {
+    await deleteMealRecord(id);
+    setMeals((prev) => prev.filter((m) => m.id !== id));
   }
 
   function toggleReportSelection(id: string) {
@@ -380,7 +386,18 @@ export default function TimelinePage() {
                       </div>
                     </div>
 
-                    <MealScoreChip score={mealAnalysis.healthScore} />
+                    <div className="flex flex-col items-end gap-2">
+                      <MealScoreChip score={mealAnalysis.healthScore} />
+                      <button
+                        type="button"
+                        onClick={() => window.confirm(t("confirm.deleteMeal")) && handleDeleteMeal(m.id)}
+                        aria-label={t("delete.meal.aria")}
+                        className="px-3 py-2 rounded-xl min-h-[48px] min-w-[48px] flex items-center gap-1.5 text-base font-bold text-red-800 border-2 border-red-200 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-5 h-5" aria-hidden="true" />
+                        {t("common.delete")}
+                      </button>
+                    </div>
                   </div>
 
                   <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
