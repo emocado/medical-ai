@@ -36,7 +36,7 @@ Elderly patients frequently undergo medical checkups, diagnostic screenings, and
 
 ## 2. The Solution: HealthMate
 
-**HealthMate** bridges this divide by providing an intuitive, accessible AI companion designed from the ground up for older adults. Built on Next.js 14 and powered by the Google Gemini Flash API, Google Cloud Text-to-Speech, and the Gemini Live API, HealthMate translates complex clinical information into clear, compassionate, and actionable guidance.
+**HealthMate** bridges this divide by providing an intuitive, accessible AI companion designed from the ground up for older adults. Built on Next.js 14 and powered by Gemini Flash (served through the OpenCode Zen gateway) and Google Cloud Text-to-Speech, HealthMate translates complex clinical information into clear, compassionate, and actionable guidance.
 
 ```
  +-------------------------------------------------------------------------+
@@ -54,8 +54,7 @@ Elderly patients frequently undergo medical checkups, diagnostic screenings, and
  |    - Latest Report Context               - Active Pill Regimens         |
  +-------------------------------------------------------------------------+
  |                                AI Engine                                |
- |  - Google Gemini Flash API (Multimodal analysis & structured JSON)       |
- |  - Google Gemini Live API (Full-duplex real-time audio conversation)     |
+ |  - Gemini Flash via OpenCode Zen (multimodal analysis, JSON, voice)     |
  |  - Google Cloud Text-to-Speech (Neural2 / WaveNet multilingual audio)   |
  +-------------------------------------------------------------------------+
 ```
@@ -83,10 +82,10 @@ Elderly patients frequently undergo medical checkups, diagnostic screenings, and
 - Identifies active ingredients, dosages, primary indications, potential side effects, and food/drug interactions.
 - **Contextual Cross-Referencing**: Automatically matches identified medications against known conditions from the user's latest uploaded medical report.
 
-### 🎙️ 5. Real-Time Full-Duplex Voice Assistant
-- Powered by the **Gemini Live API** over bidirectional WebSockets.
-- Allows natural, spoken, hands-free conversation with interruption support.
-- Automatically falls back to a clean text chat interface if microphone permissions or WebSocket connectivity are unavailable.
+### 🎙️ 5. Hands-Free Voice Assistant
+- Speak a question; HealthMate detects when you pause, sends the recording to Gemini on the server, and reads the answer aloud (Cloud TTS, or the browser voice if TTS is not configured).
+- Hands-free: it listens again after each answer, and tapping the button interrupts. Spoken exchanges are added to the text chat so they can be re-read.
+- No API key ever reaches the browser. Falls back to text chat if the microphone is unavailable.
 
 ### 📈 6. Health Timeline & Longitudinal Delta Comparison
 - Chronological timeline combining diagnostic visits, reports, and meal entries into a unified view.
@@ -119,7 +118,7 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router, React 18, TypeScript)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) customized with high-contrast accessibility tokens
 - **AI & Multimodal Understanding**: [Google Gen AI SDK (`@google/genai`)](https://github.com/google-gemini/generative-ai-js) — Gemini Flash models served through [OpenCode Zen](https://opencode.ai/docs/zen/)
-- **Real-Time Voice**: Google Gemini Live API (Full-duplex WebSocket audio streaming)
+- **Voice**: browser microphone capture (16 kHz WAV) → server-side Gemini audio understanding → Cloud TTS / Web Speech playback
 - **Speech Synthesis**: [@google-cloud/text-to-speech](https://cloud.google.com/text-to-speech) (WaveNet / Neural2)
 - **Client-Side Storage**: [IndexedDB via `idb`](https://github.com/jakearchibald/idb)
 - **Icons**: [Lucide React](https://lucide.dev/)
@@ -138,7 +137,7 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 │   │   ├── reports/analyze/   # Document parsing and multilingual summary
 │   │   ├── timeline/compare/  # Multi-report delta progression analysis
 │   │   ├── tts/               # Google Cloud Text-to-Speech endpoint
-│   │   └── voice/config/      # Gemini Live API session configuration
+│   │   └── voice/turn/        # One spoken turn: audio in, transcript + reply out
 │   ├── pills/page.tsx         # Pill Analyzer screen
 │   ├── reports/page.tsx       # Reports ingestion and review screen
 │   ├── timeline/page.tsx      # Timeline history and delta comparator screen
@@ -152,7 +151,7 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 │   ├── Header.tsx             # App header with language selector
 │   ├── MealAdvisorModal.tsx   # Modal for meal photo/text dietary guidance
 │   ├── ReportView.tsx         # Multilingual summary and key markers card
-│   └── VoiceChatModal.tsx     # Gemini Live API full-duplex voice dialog
+│   └── VoiceChatModal.tsx     # Hands-free voice conversation dialog
 ├── lib/
 │   ├── chat.ts                # Chat business logic and context assembly
 │   ├── db.ts                  # Local IndexedDB client (reports, pills, meals)
@@ -162,7 +161,7 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 │   ├── pill-analyzer.ts       # Pill photo parsing and cross-referencing
 │   ├── prompts.ts             # HealthMate persona, prompt engineering, context injection
 │   ├── tts.ts                 # Multilingual Cloud TTS voice selection and synthesis
-│   └── voice-session.ts       # Gemini Live API WebSocket session management
+│   └── voice-session.ts       # Voice prompt, turn processing and response parsing
 ├── tests/                     # 100% passing Vitest test suite
 └── types/index.ts             # Shared TypeScript schemas and contracts
 ```

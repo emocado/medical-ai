@@ -1,15 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { buildLiveSessionConfig } from "@/lib/voice-session";
+import {
+  buildVoiceSystemPrompt,
+  parseVoiceTurnResponse,
+  stripMarkdown,
+} from "@/lib/voice-session";
 import { MEDICAL_DISCLAIMER } from "@/lib/prompts";
 import type { ReportRecord, PillRecord } from "@/types";
 
-describe("Voice Chat Live Session Configuration", () => {
-  it("builds live session prompt with persona and language instructions", () => {
-    const config = buildLiveSessionConfig({ language: "bm" });
-    expect(config.systemPrompt).toContain("HealthMate");
-    expect(config.systemPrompt).toContain("Bahasa Malaysia");
-    expect(config.systemPrompt).toContain(MEDICAL_DISCLAIMER);
-    expect(config.model).toBeDefined();
+describe("Voice Chat Session", () => {
+  it("builds voice prompt with persona and language instructions", () => {
+    const prompt = buildVoiceSystemPrompt({ language: "bm" });
+    expect(prompt).toContain("HealthMate");
+    expect(prompt).toContain("Bahasa Malaysia");
+    expect(prompt).toContain(MEDICAL_DISCLAIMER);
+    expect(prompt).toContain('"transcript"');
   });
 
   it("injects latest report and pills into voice prompt context", () => {
@@ -40,25 +44,29 @@ describe("Voice Chat Live Session Configuration", () => {
       },
     ];
 
-    const config = buildLiveSessionConfig({
+    const prompt = buildVoiceSystemPrompt({
       language: "en",
       latestReport: mockReport as ReportRecord,
       knownPills: mockPills as PillRecord[],
     });
 
-    expect(config.systemPrompt).toContain("mild osteoarthritis");
-    expect(config.systemPrompt).toContain("Glucosamine (1500mg daily)");
+    expect(prompt).toContain("mild osteoarthritis");
+    expect(prompt).toContain("Glucosamine (1500mg daily)");
   });
 
-  it("selects appropriate voice name for selected language", () => {
-    const enConfig = buildLiveSessionConfig({ language: "en" });
-    const bmConfig = buildLiveSessionConfig({ language: "bm" });
-    const zhConfig = buildLiveSessionConfig({ language: "zh" });
-    const taConfig = buildLiveSessionConfig({ language: "ta" });
+  it("parses a transcript and spoken reply, stripping markdown for speech", () => {
+    const result = parseVoiceTurnResponse(
+      '```json\n{"transcript":"Is my sugar high?","reply":"**Yes**, a little.\\n- Eat less rice."}\n```'
+    );
+    expect(result.transcript).toBe("Is my sugar high?");
+    expect(result.reply).toBe("Yes, a little.\nEat less rice.");
+  });
 
-    expect(enConfig.voiceName).toBeDefined();
-    expect(bmConfig.voiceName).toBeDefined();
-    expect(zhConfig.voiceName).toBeDefined();
-    expect(taConfig.voiceName).toBeDefined();
+  it("rejects a response with no reply", () => {
+    expect(() => parseVoiceTurnResponse('{"transcript":"hello"}')).toThrow(/reply/);
+  });
+
+  it("strips headings and inline code", () => {
+    expect(stripMarkdown("## Advice\n`rest` well")).toBe("Advice\nrest well");
   });
 });
