@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import type { ReportRecord, PillRecord, MealRecord, GuideState } from "@/types";
+import type { ReportRecord, PillRecord, MealRecord, GuideState, MedicationEntry, DoseLog } from "@/types";
 import { requestPersistentStorage } from "./backup";
 
 interface HealthMateDB extends DBSchema {
@@ -18,6 +18,15 @@ interface HealthMateDB extends DBSchema {
     value: MealRecord;
     indexes: { "by-created": number };
   };
+  medications: {
+    key: string;
+    value: MedicationEntry;
+  };
+  doses: {
+    key: string;
+    value: DoseLog;
+    indexes: { "by-date": string };
+  };
   guide: {
     key: string;
     value: GuideState;
@@ -25,7 +34,7 @@ interface HealthMateDB extends DBSchema {
 }
 
 const DB_NAME = "healthmate_db";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<HealthMateDB>> | null = null;
 
@@ -44,6 +53,13 @@ export function initDB(): Promise<IDBPDatabase<HealthMateDB>> {
         if (!db.objectStoreNames.contains("meals")) {
           const mealStore = db.createObjectStore("meals", { keyPath: "id" });
           mealStore.createIndex("by-created", "createdAt");
+        }
+        if (!db.objectStoreNames.contains("medications")) {
+          db.createObjectStore("medications", { keyPath: "id" });
+        }
+        if (!db.objectStoreNames.contains("doses")) {
+          const doseStore = db.createObjectStore("doses", { keyPath: "key" });
+          doseStore.createIndex("by-date", "date");
         }
         if (!db.objectStoreNames.contains("guide")) {
           db.createObjectStore("guide");
@@ -170,25 +186,70 @@ export async function setCompletedOnboarding(completed: boolean): Promise<void> 
 }
 
 // Backup & restore
-export async function exportAllData(): Promise<{ reports: ReportRecord[]; pills: PillRecord[]; meals: MealRecord[] }> {
-  const db = await initDB();
-  const [reports, pills, meals] = await Promise.all([db.getAll("reports"), db.getAll("pills"), db.getAll("meals")]);
-  return { reports, pills, meals };
-}
-
-/** Writes backup records into the database; records with the same id are replaced. Returns how many were written. */
-export async function importAllData(data: {
+export interface AllData {
   reports: ReportRecord[];
   pills: PillRecord[];
   meals: MealRecord[];
-}): Promise<number> {
+  medications: MedicationEntry[];
+  doses: DoseLog[];
+}
+
+export async function exportAllData(): Promise<AllData> {
   const db = await initDB();
-  const tx = db.transaction(["reports", "pills", "meals"], "readwrite");
+  const [reports, pills, meals, medications, doses] = await Promise.all([
+    db.getAll("reports"),
+    db.getAll("pills"),
+    db.getAll("meals"),
+    db.getAll("medications"),
+    db.getAll("doses"),
+  ]);
+  return { reports, pills, meals, medications, doses };
+}
+
+/** Writes backup records into the database; records with the same id are replaced. Returns how many were written. */
+export async function importAllData(data: AllData): Promise<number> {
+  const db = await initDB();
+  const tx = db.transaction(["reports", "pills", "meals", "medications", "doses"], "readwrite");
   await Promise.all([
     ...data.reports.map((r) => tx.objectStore("reports").put(r)),
     ...data.pills.map((p) => tx.objectStore("pills").put(p)),
     ...data.meals.map((m) => tx.objectStore("meals").put(m)),
+    ...data.medications.map((m) => tx.objectStore("medications").put(m)),
+    ...data.doses.map((d) => tx.objectStore("doses").put(d)),
     tx.done,
   ]);
-  return data.reports.length + data.pills.length + data.meals.length;
+  return data.reports.length + data.pills.length + data.meals.length + data.medications.length;
+}
+
+// Medications the patient has confirmed they take
+export async function saveMedication(med: MedicationEntry): Promise<void> {
+  const db = await initDB();
+  await db.put("medications", med);
+  void requestPersistentStorage();
+}
+
+/** Active medicines first, each group newest first. */
+export async function getAllMedications(): Promise<MedicationEntry[]> {
+  const db = await initDB();
+  const all = await db.getAll("medications");
+  return all.sort((a, b) => Number(b.active) - Number(a.active) || b.createdAt - a.createdAt);
+}
+
+export async function deleteMedication(id: string): Promise<void> {
+  const db = await initDB();
+  await db.delete("medications", id);
+}
+
+export async function getDoseLogsForDate(date: string): Promise<DoseLog[]> {
+  const db = await initDB();
+  return db.getAllFromIndex("doses", "by-date", date);
+}
+
+export async function setDoseTaken(log: Omit<DoseLog, "takenAt">, taken: boolean): Promise<void> {
+  const db = await initDB();
+  if (taken) {
+    await db.put("doses", { ...log, takenAt: Date.now() });
+  } else {
+    await db.delete("doses", log.key);
+  }
 }

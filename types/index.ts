@@ -107,3 +107,40 @@ export interface GuideHint {
   speech: string;
   index: number;
 }
+
+export type DoseSlot = "morning" | "afternoon" | "evening" | "night";
+
+/**
+ * A medicine the patient has confirmed they take. Created from a pill scan
+ * (adding it is the patient's confirmation that the identification is right).
+ * Text details live in `analysis` so they translate like other AI records.
+ */
+export interface MedicationEntry {
+  id: string;
+  name: string;
+  genericName: string;
+  analysis: {
+    purpose: string;
+    /** Label instructions, or "" when the label did not show a dose. */
+    dosage: string;
+    sideEffects: string[];
+    foodInteractions: string[];
+    drugInteractions: string[];
+  };
+  schedule: DoseSlot[];
+  active: boolean;
+  sourceScanId?: string;
+  language?: Language;
+  translations?: Partial<Record<Language, MedicationEntry["analysis"]>>;
+  createdAt: number;
+  stoppedAt?: number;
+}
+
+/** One dose marked as taken: keyed `${date}|${medicationId}|${slot}`. */
+export interface DoseLog {
+  key: string;
+  medicationId: string;
+  date: string;
+  slot: DoseSlot;
+  takenAt: number;
+}
