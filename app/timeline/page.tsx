@@ -110,7 +110,8 @@ export default function TimelinePage() {
     ...reports.map((r): TimelineItem => ({
       type: "report",
       item: r,
-      timestamp: r.createdAt || new Date(r.date).getTime(),
+      // Place reports by when the test was done, falling back to upload time.
+      timestamp: Number.isNaN(new Date(r.date).getTime()) ? r.createdAt : new Date(r.date).getTime(),
     })),
     ...meals.map((m): TimelineItem => ({
       type: "meal",

@@ -106,3 +106,18 @@ describe("IndexedDB Storage Layer", () => {
     expect(all.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("Report ordering", () => {
+  const base = { fileName: "f", fileType: "image/png", summary: { en: "", bm: "", zh: "", ta: "" }, keyMarkers: {} };
+
+  it("orders by the date on the report, not upload time", async () => {
+    const { sortReportsNewestFirst } = await import("@/lib/db");
+    const sorted = sortReportsNewestFirst([
+      { ...base, id: "sept", date: "2026-09-10", createdAt: 1 },
+      { ...base, id: "old-uploaded-today", date: "2025-01-05", createdAt: 999 },
+      { ...base, id: "march", date: "2026-03-15", createdAt: 2 },
+      { ...base, id: "no-date", date: "unknown", createdAt: 1000 },
+    ]);
+    expect(sorted.map((r) => r.id)).toEqual(["sept", "march", "old-uploaded-today", "no-date"]);
+  });
+});
