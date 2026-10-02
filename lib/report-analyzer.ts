@@ -1,5 +1,5 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt, ensureDisclaimer } from "./prompts";
 import type { KeyMarker, ReportRecord } from "@/types";
 
 interface RawKeyMarker {
@@ -19,12 +19,6 @@ export function cleanJsonText(rawText: string): string {
   return cleaned.trim();
 }
 
-function ensureDisclaimer(text: string): string {
-  if (!text.includes(MEDICAL_DISCLAIMER)) {
-    return `${text.trim()}\n\n${MEDICAL_DISCLAIMER}`;
-  }
-  return text;
-}
 
 export function parseReportResponse(
   rawText: string,
@@ -42,10 +36,10 @@ export function parseReportResponse(
 
   const rawSummary = parsed.summary || {};
   const summary = {
-    en: ensureDisclaimer(rawSummary.en || "Medical report summary not available."),
-    bm: ensureDisclaimer(rawSummary.bm || "Ringkasan laporan perubatan tidak tersedia."),
-    zh: ensureDisclaimer(rawSummary.zh || "医疗报告摘要不可用。"),
-    ta: ensureDisclaimer(rawSummary.ta || "மருத்துவ அறிக்கை சுருக்கம் கிடைக்கவில்லை."),
+    en: ensureDisclaimer(rawSummary.en || "Medical report summary not available.", "en"),
+    bm: ensureDisclaimer(rawSummary.bm || "Ringkasan laporan perubatan tidak tersedia.", "bm"),
+    zh: ensureDisclaimer(rawSummary.zh || "医疗报告摘要不可用。", "zh"),
+    ta: ensureDisclaimer(rawSummary.ta || "மருத்துவ அறிக்கை சுருக்கம் கிடைக்கவில்லை.", "ta"),
   };
 
   const keyMarkers: Record<string, KeyMarker> = {};
