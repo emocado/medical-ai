@@ -1,13 +1,6 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
 import { buildHealthMatePrompt, ensureDisclaimer } from "./prompts";
-import type { KeyMarker, ReportRecord } from "@/types";
-
-interface RawKeyMarker {
-  name: string;
-  value: string | number;
-  unit?: string;
-  status?: string;
-}
+import type { KeyMarker, MarkerStatus, ReportRecord } from "@/types";
 
 export function cleanJsonText(rawText: string): string {
   let cleaned = rawText.trim();
@@ -19,6 +12,17 @@ export function cleanJsonText(rawText: string): string {
   return cleaned.trim();
 }
 
+
+const MARKER_STATUSES: MarkerStatus[] = ["normal", "high", "low", "abnormal", "critical", "unknown"];
+
+/**
+ * Maps the model's status to a known value. Anything missing or unrecognised
+ * becomes "unknown" so an unreadable result is never shown as normal.
+ */
+export function normalizeMarkerStatus(raw: unknown): MarkerStatus {
+  const status = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+  return (MARKER_STATUSES as string[]).includes(status) ? (status as MarkerStatus) : "unknown";
+}
 
 export function parseReportResponse(
   rawText: string,
@@ -43,27 +47,21 @@ export function parseReportResponse(
   };
 
   const keyMarkers: Record<string, KeyMarker> = {};
-  if (Array.isArray(parsed.keyMarkers)) {
-    for (const item of parsed.keyMarkers) {
-      if (item && item.name) {
-        keyMarkers[item.name] = {
-          value: item.value ?? "",
-          unit: item.unit ?? "",
-          status: item.status ?? "normal",
-        };
-      }
-    }
-  } else if (parsed.keyMarkers && typeof parsed.keyMarkers === "object") {
-    for (const [key, val] of Object.entries<any>(parsed.keyMarkers)) {
-      if (val && typeof val === "object") {
-        keyMarkers[key] = {
-          value: val.value ?? "",
-          unit: val.unit ?? "",
-          status: val.status ?? "normal",
-        };
-      } else {
-        keyMarkers[key] = { value: String(val) };
-      }
+  const entries: [string, any][] = Array.isArray(parsed.keyMarkers)
+    ? parsed.keyMarkers.filter((item: any) => item && item.name).map((item: any) => [item.name, item])
+    : parsed.keyMarkers && typeof parsed.keyMarkers === "object"
+    ? Object.entries<any>(parsed.keyMarkers)
+    : [];
+  for (const [name, val] of entries) {
+    if (val && typeof val === "object") {
+      keyMarkers[name] = {
+        value: val.value ?? "",
+        unit: val.unit ?? "",
+        status: normalizeMarkerStatus(val.status),
+        ...(val.referenceRange ? { referenceRange: String(val.referenceRange) } : {}),
+      };
+    } else {
+      keyMarkers[name] = { value: String(val), status: "unknown" };
     }
   }
 
@@ -102,7 +100,13 @@ Extract:
    - "name": e.g. "Fasting Blood Glucose", "Total Cholesterol", "Hemoglobin", "Blood Pressure"
    - "value": string or number
    - "unit": e.g. "mmol/L", "mg/dL", "g/dL", "mmHg"
-   - "status": "normal" | "high" | "low" | "abnormal"
+   - "referenceRange": the reference/normal range exactly as printed on the report (e.g. "3.9 - 6.0", "<5.2"), or "" if none is printed
+   - "status": one of:
+       "critical" if the report marks it critical/panic (e.g. "HH", "LL", "CRITICAL", "*CRIT*"),
+       "high" or "low" if it is flagged (H/L) or falls outside the printed reference range,
+       "normal" if it is inside the printed reference range,
+       "abnormal" for a non-numeric result reported as abnormal,
+       "unknown" if there is no flag and no reference range to judge by. Never guess "normal".
 
 Return ONLY valid JSON with fields { "date", "summary": { "en", "bm", "zh", "ta" }, "keyMarkers": [...] }.`,
   });

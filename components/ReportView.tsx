@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import type { Language, ReportRecord } from "@/types";
+import type { Language, MarkerStatus, ReportRecord } from "@/types";
 import { MedicalDisclaimer } from "./Disclaimer";
 import { useT } from "./LanguageProvider";
 import { speakText } from "@/lib/speech";
@@ -15,6 +15,8 @@ import {
   Square,
   Loader2,
   AlertCircle,
+  HelpCircle,
+  Siren,
 } from "lucide-react";
 
 interface ReportViewProps {
@@ -22,10 +24,27 @@ interface ReportViewProps {
   language: Language;
 }
 
-const STATUS_KEYS: Record<string, StringKey> = {
-  high: "status.high",
-  low: "status.low",
-  abnormal: "status.abnormal",
+const STATUS_STYLES: Record<
+  MarkerStatus,
+  { label: StringKey; card: string; chip: string; icon: typeof AlertTriangle }
+> = {
+  normal: {
+    label: "status.normal",
+    card: "border-slate-200 bg-slate-50",
+    chip: "text-emerald-900 bg-emerald-100",
+    icon: CheckCircle2,
+  },
+  high: { label: "status.high", card: "border-amber-400 bg-amber-50/60", chip: "text-amber-900 bg-amber-200", icon: AlertTriangle },
+  low: { label: "status.low", card: "border-amber-400 bg-amber-50/60", chip: "text-amber-900 bg-amber-200", icon: AlertTriangle },
+  abnormal: {
+    label: "status.abnormal",
+    card: "border-amber-400 bg-amber-50/60",
+    chip: "text-amber-900 bg-amber-200",
+    icon: AlertTriangle,
+  },
+  critical: { label: "status.critical", card: "border-red-500 bg-red-50", chip: "text-white bg-red-700", icon: Siren },
+  // No flag or range on the report: say so plainly instead of implying "normal".
+  unknown: { label: "status.unknown", card: "border-slate-300 bg-white", chip: "text-slate-800 bg-slate-200", icon: HelpCircle },
 };
 
 export function ReportView({ report, language }: ReportViewProps) {
@@ -148,35 +167,31 @@ export function ReportView({ report, language }: ReportViewProps) {
           <h4 className="text-lg font-bold text-slate-900">{t("report.keyMarkers")}</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {keyMarkerEntries.map(([name, marker]) => {
-              const statusKey = marker.status ? STATUS_KEYS[marker.status] : undefined;
-              const isAbnormal = Boolean(statusKey);
+              const style = STATUS_STYLES[marker.status ?? "unknown"] ?? STATUS_STYLES.unknown;
+              const Icon = style.icon;
 
               return (
                 <div
                   key={name}
-                  className={`p-3 rounded-xl border-2 flex items-start justify-between ${
-                    isAbnormal
-                      ? "border-amber-400 bg-amber-50/60"
-                      : "border-slate-200 bg-slate-50"
-                  }`}
+                  className={`p-3 rounded-xl border-2 flex items-start justify-between gap-2 ${style.card}`}
                 >
                   <div>
                     <span className="text-base font-bold text-slate-900 block">{name}</span>
                     <span className="text-lg font-extrabold text-blue-950">
                       {marker.value} {marker.unit || ""}
                     </span>
+                    {marker.referenceRange && (
+                      <span className="text-sm font-medium text-slate-600 block">
+                        {t("report.normalRange", { range: marker.referenceRange })}
+                      </span>
+                    )}
                   </div>
-                  {statusKey ? (
-                    <span className="inline-flex items-center text-sm font-bold text-amber-900 bg-amber-200 px-2.5 py-1 rounded-full">
-                      <AlertTriangle className="w-4 h-4 mr-1 text-amber-800" />
-                      {t(statusKey)}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center text-sm font-bold text-emerald-900 bg-emerald-100 px-2.5 py-1 rounded-full">
-                      <CheckCircle2 className="w-4 h-4 mr-1 text-emerald-700" />
-                      {t("status.normal")}
-                    </span>
-                  )}
+                  <span
+                    className={`inline-flex items-center text-sm font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${style.chip}`}
+                  >
+                    <Icon className="w-4 h-4 mr-1" aria-hidden="true" />
+                    {t(style.label)}
+                  </span>
                 </div>
               );
             })}
