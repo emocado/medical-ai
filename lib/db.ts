@@ -53,6 +53,26 @@ export function initDB(): Promise<IDBPDatabase<HealthMateDB>> {
   return dbPromise;
 }
 
+/** Milliseconds for a YYYY-MM-DD report date, or NaN when it can't be read. */
+function reportDateValue(report: ReportRecord): number {
+  return new Date(report.date).getTime();
+}
+
+/**
+ * Newest first by the date printed on the report (when the test was done),
+ * not by when it was uploaded, so an old report uploaded today doesn't become
+ * the "latest". Reports without a readable date go last.
+ */
+export function sortReportsNewestFirst(reports: ReportRecord[]): ReportRecord[] {
+  return [...reports].sort((a, b) => {
+    const da = reportDateValue(a);
+    const db = reportDateValue(b);
+    if (Number.isNaN(da) !== Number.isNaN(db)) return Number.isNaN(da) ? 1 : -1;
+    if (!Number.isNaN(da) && da !== db) return db - da;
+    return b.createdAt - a.createdAt;
+  });
+}
+
 // Reports
 export async function saveReport(report: ReportRecord): Promise<void> {
   const db = await initDB();
@@ -66,8 +86,7 @@ export async function getReport(id: string): Promise<ReportRecord | undefined> {
 
 export async function getAllReports(): Promise<ReportRecord[]> {
   const db = await initDB();
-  const all = await db.getAllFromIndex("reports", "by-created");
-  return all.reverse(); // Newest first
+  return sortReportsNewestFirst(await db.getAll("reports"));
 }
 
 export async function deleteReport(id: string): Promise<void> {

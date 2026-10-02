@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { ReportView } from "@/components/ReportView";
 import { ChatInterface } from "@/components/ChatInterface";
-import { getAllReports, saveReport, getAllPillRecords } from "@/lib/db";
+import { getAllReports, saveReport, getAllPillRecords, sortReportsNewestFirst } from "@/lib/db";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { loadSampleFile, type SampleFile } from "@/lib/samples";
 import { SampleChips } from "@/components/SampleChips";
@@ -70,7 +70,7 @@ export default function ReportsPage() {
       });
       await saveReport(analyzedReport);
 
-      setReports((prev) => [analyzedReport, ...prev]);
+      setReports((prev) => sortReportsNewestFirst([analyzedReport, ...prev]));
       setSelectedReportId(analyzedReport.id);
     } catch (err) {
       console.error("Upload/analysis failed:", err);
