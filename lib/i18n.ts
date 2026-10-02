@@ -17,6 +17,7 @@ export const LANGUAGE_NATIVE_NAMES: Record<Language, string> = {
  */
 export const STRINGS = {
   // Navigation & page titles
+  "guide.aiBadge": { en: "AI Companion", bm: "Pembantu AI", zh: "AI 助手", ta: "AI உதவியாளர்" },
   "nav.reports": { en: "Reports & Chat", bm: "Laporan & Sembang", zh: "报告与问答", ta: "அறிக்கை & உரையாடல்" },
   "nav.reports.aria": {
     en: "Reports and conversational chat",
@@ -314,10 +315,10 @@ export const STRINGS = {
   "chat.aria": { en: "Health Assistant Chat", bm: "Sembang Pembantu Kesihatan", zh: "健康助手问答", ta: "உடல்நல உதவியாளர் உரையாடல்" },
   "chat.title": { en: "Health Assistant Chat", bm: "Sembang Pembantu Kesihatan", zh: "健康助手问答", ta: "உடல்நல உதவியாளர் உரையாடல்" },
   "chat.greeting": {
-    en: "Hello, I am HealthMate. Do you have any questions about your report or medications that I can help explain?",
-    bm: "Hai, saya HealthMate. Ada apa-apa soalan tentang laporan kesihatan atau ubat anda yang boleh saya bantu?",
-    zh: "您好，我是 HealthMate。关于您的健康报告或药物，您有什么想问的吗？",
-    ta: "வணக்கம், நான் ஹெல்த்மேட். உங்கள் உடல்நல அறிக்கை அல்லது மருந்துகள் குறித்து ஏதேனும் கேள்விகள் உள்ளதா?",
+    en: "Hello, I am HealthMate, an AI helper (not a doctor). Do you have any questions about your report or medications that I can help explain?",
+    bm: "Hai, saya HealthMate, pembantu AI (bukan doktor). Ada apa-apa soalan tentang laporan kesihatan atau ubat anda yang boleh saya bantu?",
+    zh: "您好，我是 HealthMate，一个 AI 助手（不是医生）。关于您的健康报告或药物，您有什么想问的吗？",
+    ta: "வணக்கம், நான் ஹெல்த்மேட், ஒரு AI உதவியாளர் (மருத்துவர் அல்ல). உங்கள் உடல்நல அறிக்கை அல்லது மருந்துகள் குறித்து ஏதேனும் கேள்விகள் உள்ளதா?",
   },
   "chat.error": {
     en: "Sorry, I had trouble answering that. Please try asking again.",
