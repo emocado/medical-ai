@@ -121,3 +121,21 @@ describe("Report ordering", () => {
     expect(sorted.map((r) => r.id)).toEqual(["sept", "march", "old-uploaded-today", "no-date"]);
   });
 });
+
+describe("Deleting records", () => {
+  it("removes pill and meal records", async () => {
+    const { deletePillRecord, deleteMealRecord } = await import("@/lib/db");
+    await savePillRecord({ id: "del-pill", date: "2026-09-01", analysis: { pills: [] }, createdAt: 1 });
+    await saveMealRecord({
+      id: "del-meal",
+      date: "2026-09-01",
+      inputType: "text",
+      analysis: { dishes: [], advice: "", healthScore: null },
+      createdAt: 1,
+    });
+    await deletePillRecord("del-pill");
+    await deleteMealRecord("del-meal");
+    expect(await getPillRecord("del-pill")).toBeUndefined();
+    expect(await getMealRecord("del-meal")).toBeUndefined();
+  });
+});

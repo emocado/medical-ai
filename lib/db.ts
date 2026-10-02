@@ -110,6 +110,10 @@ export async function getAllPillRecords(): Promise<PillRecord[]> {
   const all = await db.getAllFromIndex("pills", "by-created");
   return all.reverse(); // Newest first
 }
+export async function deletePillRecord(id: string): Promise<void> {
+  const db = await initDB();
+  await db.delete("pills", id);
+}
 
 // Meals
 export async function saveMealRecord(meal: MealRecord): Promise<void> {
@@ -126,6 +130,10 @@ export async function getAllMealRecords(): Promise<MealRecord[]> {
   const db = await initDB();
   const all = await db.getAllFromIndex("meals", "by-created");
   return all.reverse(); // Newest first
+}
+export async function deleteMealRecord(id: string): Promise<void> {
+  const db = await initDB();
+  await db.delete("meals", id);
 }
 
 // Doctor Guide State

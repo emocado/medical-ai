@@ -47,6 +47,34 @@ export const STRINGS = {
 
   // Shared
   "common.close": { en: "Close", bm: "Tutup", zh: "关闭", ta: "மூடு" },
+  "common.delete": { en: "Delete", bm: "Padam", zh: "删除", ta: "நீக்கு" },
+  "confirm.deleteReport": {
+    en: "Delete this report? This cannot be undone.",
+    bm: "Padam laporan ini? Tindakan ini tidak boleh dibatalkan.",
+    zh: "删除这份报告？此操作无法撤销。",
+    ta: "இந்த அறிக்கையை நீக்கவா? இதைத் திரும்பப் பெற முடியாது.",
+  },
+  "confirm.deleteScan": {
+    en: "Delete this medicine scan? This cannot be undone.",
+    bm: "Padam imbasan ubat ini? Tindakan ini tidak boleh dibatalkan.",
+    zh: "删除这次药物扫描？此操作无法撤销。",
+    ta: "இந்த மருந்து ஸ்கேனை நீக்கவா? இதைத் திரும்பப் பெற முடியாது.",
+  },
+  "confirm.deleteMeal": {
+    en: "Delete this meal log? This cannot be undone.",
+    bm: "Padam rekod makanan ini? Tindakan ini tidak boleh dibatalkan.",
+    zh: "删除这条饮食记录？此操作无法撤销。",
+    ta: "இந்த உணவுப் பதிவை நீக்கவா? இதைத் திரும்பப் பெற முடியாது.",
+  },
+  "delete.report.aria": { en: "Delete this report", bm: "Padam laporan ini", zh: "删除这份报告", ta: "இந்த அறிக்கையை நீக்கு" },
+  "delete.scan.aria": { en: "Delete this medicine scan", bm: "Padam imbasan ubat ini", zh: "删除这次药物扫描", ta: "இந்த மருந்து ஸ்கேனை நீக்கு" },
+  "delete.meal.aria": { en: "Delete this meal log", bm: "Padam rekod makanan ini", zh: "删除这条饮食记录", ta: "இந்த உணவுப் பதிவை நீக்கு" },
+  "report.testDate": {
+    en: "Test date (tap to correct)",
+    bm: "Tarikh ujian (tekan untuk betulkan)",
+    zh: "检查日期（点击可修改）",
+    ta: "பரிசோதனை தேதி (திருத்த தட்டவும்)",
+  },
   "disclaimer.aria": { en: "Medical Disclaimer", bm: "Penafian Perubatan", zh: "医疗免责声明", ta: "மருத்துவ மறுப்பு" },
   "errors.tooLarge": {
     en: "This file is too large. Please use a smaller photo or PDF (under 15 MB).",
