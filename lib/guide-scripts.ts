@@ -16,10 +16,10 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       ta: "டாக்டர் ஆயிஷாவைச் சந்தியுங்கள்",
     },
     speech: {
-      en: "Hello! I am Dr. Aisha. I am your personal health companion, here to help you understand your reports, medicines, and daily wellness.",
-      bm: "Salam sejahtera! Saya Dr. Aisha, rakan kesihatan anda. Saya di sini untuk membantu anda memahami laporan perubatan, ubat-ubatan, dan kesihatan harian anda.",
-      zh: "您好！我是爱莎医生。我是您的贴心健康伙伴，协助您轻松了解检验报告、用药指南与日常健康。",
-      ta: "வணக்கம்! நான் டாக்டர் ஆயிஷா. உங்கள் மருத்துவ அறிக்கைகள் மற்றும் மருந்துகளை எளிதில் புரிந்துகொள்ள உதவும் உங்கள் நலத் தோழி.",
+      en: "Hello! I am Dr. Aisha. I am your personal health companion, here to help you understand your reports, medicines, and daily wellness. I am an AI helper, not a real doctor, so please check important decisions with your own doctor.",
+      bm: "Salam sejahtera! Saya Dr. Aisha, rakan kesihatan anda. Saya di sini untuk membantu anda memahami laporan perubatan, ubat-ubatan, dan kesihatan harian anda. Saya pembantu AI, bukan doktor sebenar, jadi sila rujuk doktor anda untuk keputusan penting.",
+      zh: "您好！我是爱莎医生。我是您的贴心健康伙伴，协助您轻松了解检验报告、用药指南与日常健康。我是 AI 助手，不是真正的医生，重要的决定请咨询您的医生。",
+      ta: "வணக்கம்! நான் டாக்டர் ஆயிஷா. உங்கள் மருத்துவ அறிக்கைகள் மற்றும் மருந்துகளை எளிதில் புரிந்துகொள்ள உதவும் உங்கள் நலத் தோழி. நான் ஒரு AI உதவியாளர், உண்மையான மருத்துவர் அல்ல; முக்கிய முடிவுகளுக்கு உங்கள் மருத்துவரை அணுகவும்.",
     },
   },
   {
