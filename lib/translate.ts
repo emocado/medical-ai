@@ -8,6 +8,9 @@ import type { Language } from "@/types";
  * position in the model's translation. Keys, numbers and array lengths always
  * come from the original, so a sloppy translation can never corrupt a record.
  */
+/** Machine-readable fields whose values must never be translated. */
+const PRESERVED_KEYS = new Set(["dosageSource", "confidence", "progression", "status", "id", "language"]);
+
 export function mergeTranslatedStrings<T>(original: T, translated: unknown): T {
   if (typeof original === "string") {
     return (typeof translated === "string" && translated.trim() ? translated : original) as T;
@@ -20,7 +23,7 @@ export function mergeTranslatedStrings<T>(original: T, translated: unknown): T {
     const source = translated && typeof translated === "object" ? (translated as Record<string, unknown>) : {};
     const out: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(original as Record<string, unknown>)) {
-      out[key] = mergeTranslatedStrings(value, source[key]);
+      out[key] = PRESERVED_KEYS.has(key) ? value : mergeTranslatedStrings(value, source[key]);
     }
     return out as T;
   }

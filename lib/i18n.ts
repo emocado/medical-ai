@@ -504,6 +504,24 @@ export const STRINGS = {
   },
   "pills.purpose": { en: "What It Is For", bm: "Kegunaan Ubat", zh: "用途", ta: "இது எதற்காக" },
   "pills.howToTake": { en: "How to Take It", bm: "Cara Mengambil", zh: "服用方法", ta: "எப்படி உட்கொள்வது" },
+  "pills.fromLabel": {
+    en: "From your pharmacy label",
+    bm: "Daripada label farmasi anda",
+    zh: "来自您的药房标签",
+    ta: "உங்கள் மருந்தக லேபிளிலிருந்து",
+  },
+  "pills.dosageNotVisible": {
+    en: "The dose is not visible in this photo. Follow the instructions on your pharmacy label, or ask your pharmacist.",
+    bm: "Dos tidak kelihatan dalam foto ini. Ikut arahan pada label farmasi anda, atau tanya ahli farmasi.",
+    zh: "照片中看不到剂量。请按照药房标签上的说明服用，或询问药剂师。",
+    ta: "இந்தப் புகைப்படத்தில் மருந்தளவு தெரியவில்லை. உங்கள் மருந்தக லேபிளில் உள்ள வழிமுறைகளைப் பின்பற்றவும் அல்லது மருந்தாளரிடம் கேளுங்கள்.",
+  },
+  "pills.lowConfidence": {
+    en: "We are not sure this is the right medicine. Please check the name with your pharmacist before relying on this information.",
+    bm: "Kami tidak pasti ini ubat yang betul. Sila semak nama ubat dengan ahli farmasi sebelum bergantung pada maklumat ini.",
+    zh: "我们不确定这是否是正确的药物。在依据这些信息之前，请先向药剂师核对药名。",
+    ta: "இது சரியான மருந்துதானா என்று எங்களுக்கு உறுதியாகத் தெரியவில்லை. இந்தத் தகவலை நம்புவதற்கு முன் மருந்தின் பெயரை மருந்தாளரிடம் சரிபார்க்கவும்.",
+  },
   "pills.sideEffects": {
     en: "Side Effects to Watch Out For",
     bm: "Kesan Sampingan yang Perlu Diperhatikan",

@@ -226,6 +226,15 @@ export default function PillsPage() {
                 key={idx}
                 className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
               >
+                {pill.confidence === "low" && (
+                  <div
+                    role="note"
+                    className="p-3 rounded-xl bg-amber-50 border-2 border-amber-400 text-amber-950 text-base font-semibold flex items-start gap-2"
+                  >
+                    <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    {t("pills.lowConfidence")}
+                  </div>
+                )}
                 <div className="border-b border-slate-200 pb-3">
                   <div className="flex items-baseline justify-between gap-2">
                     <h3 className="text-2xl font-black text-blue-950">{pill.name}</h3>
@@ -254,9 +263,20 @@ export default function PillsPage() {
                     <Pill className="w-5 h-5 text-blue-700" />
                     {t("pills.howToTake")}
                   </span>
-                  <p className="text-lg font-semibold text-blue-950 bg-blue-50 p-3 rounded-xl border border-blue-200 leading-relaxed">
-                    {pill.dosage}
-                  </p>
+                  {pill.dosageSource === "not-visible" ? (
+                    <p className="text-lg font-semibold text-amber-950 bg-amber-50 p-3 rounded-xl border-2 border-amber-300 leading-relaxed">
+                      {t("pills.dosageNotVisible")}
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-lg font-semibold text-blue-950 bg-blue-50 p-3 rounded-xl border border-blue-200 leading-relaxed">
+                        {pill.dosage}
+                      </p>
+                      {pill.dosageSource === "label" && (
+                        <p className="text-sm font-medium text-slate-600">{t("pills.fromLabel")}</p>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* Side Effects */}

@@ -34,3 +34,15 @@ describe("Translating saved AI content", () => {
     expect(localizedAnalysis({ id: "2", analysis: { advice: "x" } }, "en")).toEqual({ advice: "x" });
   });
 });
+
+describe("Translation keeps machine-readable fields", () => {
+  it("never translates enum values such as dosageSource and confidence", () => {
+    const original = { dosage: "Take 1 tablet", dosageSource: "label", confidence: "high" };
+    const translated = { dosage: "服用 1 片", dosageSource: "标签", confidence: "高" };
+    expect(mergeTranslatedStrings(original, translated)).toEqual({
+      dosage: "服用 1 片",
+      dosageSource: "label",
+      confidence: "high",
+    });
+  });
+});

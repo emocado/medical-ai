@@ -97,3 +97,31 @@ describe("Pill Analyzer Logic", () => {
     expect(result.analysis.crossRefWithReports).toContain("fasting glucose");
   });
 });
+
+describe("Pill dosage comes only from the label", () => {
+  it("drops any dose when the model says none was visible", () => {
+    const record = parsePillResponse(
+      JSON.stringify({
+        pills: [{ name: "Amlodipine", dosage: "5mg once daily", dosageSource: "not-visible", confidence: "low" }],
+      })
+    );
+    expect(record.analysis.pills[0].dosage).toBe("");
+    expect(record.analysis.pills[0].dosageSource).toBe("not-visible");
+    expect(record.analysis.pills[0].confidence).toBe("low");
+  });
+
+  it("keeps label text and defaults unknown confidence to low", () => {
+    const record = parsePillResponse(
+      JSON.stringify({ pills: [{ name: "Metformin", dosage: "Take 1 tablet twice daily", dosageSource: "label" }] }),
+      undefined,
+      "bm"
+    );
+    expect(record.analysis.pills[0]).toMatchObject({ dosage: "Take 1 tablet twice daily", dosageSource: "label", confidence: "low" });
+    expect(record.language).toBe("bm");
+  });
+
+  it("treats an empty dose as not visible", () => {
+    const record = parsePillResponse(JSON.stringify({ pills: [{ name: "X", dosage: "" }] }));
+    expect(record.analysis.pills[0].dosageSource).toBe("not-visible");
+  });
+});
