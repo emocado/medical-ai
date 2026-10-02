@@ -8,6 +8,7 @@ import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
 import { MealScoreChip } from "@/components/MealScoreChip";
 import { MarkerTrends } from "@/components/MarkerTrends";
+import { BackupSection } from "@/components/BackupSection";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { ensureDisclaimer } from "@/lib/prompts";
@@ -430,6 +431,8 @@ export default function TimelinePage() {
           })
         )}
       </section>
+
+      <BackupSection onRestored={loadTimelineData} />
 
       {/* Meal Advisor Modal */}
       <MealAdvisorModal

@@ -653,6 +653,38 @@ export const STRINGS = {
   },
   "trends.date": { en: "Date", bm: "Tarikh", zh: "日期", ta: "தேதி" },
   "trends.value": { en: "Result", bm: "Keputusan", zh: "结果", ta: "முடிவு" },
+  "backup.title": {
+    en: "Keep a backup of your records",
+    bm: "Simpan salinan sandaran rekod anda",
+    zh: "备份您的健康记录",
+    ta: "உங்கள் பதிவுகளின் காப்புப் பிரதியை வைத்திருங்கள்",
+  },
+  "backup.desc": {
+    en: "Your records are saved only on this device. Download a backup file now and then, so nothing is lost if you change phones or clear your browser.",
+    bm: "Rekod anda disimpan pada peranti ini sahaja. Muat turun fail sandaran sekali-sekala supaya tiada yang hilang jika anda menukar telefon atau mengosongkan pelayar.",
+    zh: "您的记录只保存在这台设备上。请不时下载备份文件，这样即使更换手机或清除浏览器数据，也不会丢失记录。",
+    ta: "உங்கள் பதிவுகள் இந்தச் சாதனத்தில் மட்டுமே சேமிக்கப்படுகின்றன. தொலைபேசியை மாற்றினாலும் அல்லது உலாவியை அழித்தாலும் எதுவும் இழக்கப்படாமல் இருக்க, அவ்வப்போது காப்புப் பிரதிக் கோப்பைப் பதிவிறக்கவும்.",
+  },
+  "backup.privacy": {
+    en: "The file contains your health information. Keep it somewhere private.",
+    bm: "Fail ini mengandungi maklumat kesihatan anda. Simpan di tempat yang selamat.",
+    zh: "此文件包含您的健康信息，请妥善保管。",
+    ta: "இந்தக் கோப்பில் உங்கள் உடல்நலத் தகவல்கள் உள்ளன. அதைப் பாதுகாப்பான இடத்தில் வைத்திருங்கள்.",
+  },
+  "backup.export": { en: "Download backup", bm: "Muat turun sandaran", zh: "下载备份", ta: "காப்புப் பிரதியைப் பதிவிறக்கு" },
+  "backup.import": { en: "Restore from backup", bm: "Pulihkan daripada sandaran", zh: "从备份恢复", ta: "காப்புப் பிரதியிலிருந்து மீட்டெடு" },
+  "backup.imported": {
+    en: "Restored {count} records.",
+    bm: "{count} rekod dipulihkan.",
+    zh: "已恢复 {count} 条记录。",
+    ta: "{count} பதிவுகள் மீட்டெடுக்கப்பட்டன.",
+  },
+  "backup.invalid": {
+    en: "This file is not a HealthMate backup.",
+    bm: "Fail ini bukan sandaran HealthMate.",
+    zh: "此文件不是 HealthMate 备份。",
+    ta: "இந்தக் கோப்பு HealthMate காப்புப் பிரதி அல்ல.",
+  },
   "trends.chartAria": {
     en: "{name} over time",
     bm: "{name} dari semasa ke semasa",
