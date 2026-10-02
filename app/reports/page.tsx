@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Header } from "@/components/Header";
+import { useLanguage } from "@/components/LanguageProvider";
 import { ReportView } from "@/components/ReportView";
 import { ChatInterface } from "@/components/ChatInterface";
 import { getAllReports, saveReport, getAllPillRecords } from "@/lib/db";
@@ -9,7 +10,7 @@ import { FileUp, Loader2, Plus, AlertCircle, History } from "lucide-react";
 import type { Language, ReportRecord, PillRecord } from "@/types";
 
 export default function ReportsPage() {
-  const [lang, setLang] = useState<Language>("en");
+  const { language: lang } = useLanguage();
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -92,7 +93,7 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <Header currentLang={lang} onLanguageChange={setLang} title="HealthMate Reports" />
+      <Header title="HealthMate Reports" />
 
       {/* Upload Action */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">

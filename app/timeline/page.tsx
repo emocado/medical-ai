@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
+import { useLanguage } from "@/components/LanguageProvider";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
 import { getAllReports, getAllMealRecords, getAllPillRecords } from "@/lib/db";
@@ -27,7 +28,7 @@ type TimelineItem =
   | { type: "meal"; item: MealRecord; timestamp: number };
 
 export default function TimelinePage() {
-  const [lang, setLang] = useState<Language>("en");
+  const { language: lang } = useLanguage();
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [meals, setMeals] = useState<MealRecord[]>([]);
   const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
@@ -125,7 +126,7 @@ export default function TimelinePage() {
 
   return (
     <div className="space-y-6">
-      <Header currentLang={lang} onLanguageChange={setLang} title="Health Timeline" />
+      <Header title="Health Timeline" />
 
       {/* Overview & Actions */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
