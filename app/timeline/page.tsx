@@ -6,7 +6,10 @@ import { useLanguage, useT } from "@/components/LanguageProvider";
 import { errorMessageKey, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
-import { getAllReports, getAllMealRecords, getAllPillRecords } from "@/lib/db";
+import { TranslationStatus } from "@/components/TranslationStatus";
+import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
+import { ensureDisclaimer } from "@/lib/prompts";
+import { getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
 import {
   Clock,
   FileText,
@@ -37,6 +40,7 @@ export default function TimelinePage() {
   const [selectedReportIds, setSelectedReportIds] = useState<string[]>([]);
   const [isComparing, setIsComparing] = useState(false);
   const [deltaResult, setDeltaResult] = useState<DeltaComparisonResult | null>(null);
+  const [deltaLanguage, setDeltaLanguage] = useState<Language>("en");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isMealModalOpen, setIsMealModalOpen] = useState(false);
 
@@ -92,6 +96,7 @@ export default function TimelinePage() {
         language: lang,
       });
       setDeltaResult(result);
+      setDeltaLanguage(lang);
     } catch (err) {
       console.error("Comparison failed:", err);
       setErrorMessage(t(errorMessageKey(err, "timeline.compareError")));
@@ -114,6 +119,39 @@ export default function TimelinePage() {
   ].sort((a, b) => b.timestamp - a.timestamp);
 
   const latestReport = reports.length > 0 ? reports[0] : null;
+
+  const mealTranslation = useAutoTranslate(
+    meals,
+    lang,
+    saveMealRecord,
+    (updated) => setMeals((prev) => prev.map((m) => updated.find((u) => u.id === m.id) ?? m)),
+    (analysis) => ({ ...analysis, advice: ensureDisclaimer(analysis.advice, lang) })
+  );
+
+  // A comparison is not stored, so when the language changes we translate the one on screen.
+  const [deltaTranslation, setDeltaTranslation] = useState<"idle" | "translating" | "error">("idle");
+  const [deltaRetry, setDeltaRetry] = useState(0);
+  useEffect(() => {
+    if (!deltaResult || deltaLanguage === lang) {
+      setDeltaTranslation("idle");
+      return;
+    }
+    let cancelled = false;
+    setDeltaTranslation("translating");
+    const { progression, ...text } = deltaResult;
+    postJson<{ content: typeof text }>("/api/translate", { content: text, targetLanguage: lang })
+      .then(({ content }) => {
+        if (cancelled) return;
+        setDeltaResult({ progression, ...content, summary: ensureDisclaimer(content.summary, lang) });
+        setDeltaLanguage(lang);
+        setDeltaTranslation("idle");
+      })
+      .catch(() => !cancelled && setDeltaTranslation("error"));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, deltaLanguage, deltaRetry]);
 
   return (
     <div className="space-y-6">
@@ -179,6 +217,8 @@ export default function TimelinePage() {
           </div>
         )}
       </section>
+
+      <TranslationStatus status={deltaTranslation} onRetry={() => setDeltaRetry((n) => n + 1)} />
 
       {/* Delta Comparison Result Display */}
       {deltaResult && (
@@ -251,6 +291,7 @@ export default function TimelinePage() {
 
       {/* Timeline Entries List */}
       <section aria-label={t("timeline.history.aria")} className="space-y-4">
+        <TranslationStatus status={mealTranslation.status} onRetry={mealTranslation.retry} />
         {timelineItems.length === 0 ? (
           <div className="text-center py-12 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
             <p className="text-lg font-medium text-slate-600">
@@ -318,6 +359,7 @@ export default function TimelinePage() {
               );
             } else {
               const m = entry.item;
+              const mealAnalysis = localizedAnalysis(m, lang) ?? m.analysis;
               return (
                 <article
                   key={m.id}
@@ -328,7 +370,7 @@ export default function TimelinePage() {
                       <Utensils className="w-6 h-6 text-amber-700 flex-shrink-0" aria-hidden="true" />
                       <div>
                         <h3 className="text-xl font-bold text-slate-900">
-                          {t("timeline.meal", { dishes: m.analysis.dishes.join(", ") })}
+                          {t("timeline.meal", { dishes: mealAnalysis.dishes.join(", ") })}
                         </h3>
                         <time className="text-sm font-semibold text-slate-500" dateTime={m.date}>
                           {m.date}
@@ -338,19 +380,19 @@ export default function TimelinePage() {
 
                     <span
                       className={`px-3 py-1 rounded-full text-base font-black ${
-                        m.analysis.healthScore >= 70
+                        mealAnalysis.healthScore >= 70
                           ? "bg-emerald-100 text-emerald-950"
-                          : m.analysis.healthScore >= 50
+                          : mealAnalysis.healthScore >= 50
                           ? "bg-amber-100 text-amber-950"
                           : "bg-red-100 text-red-950"
                       }`}
                     >
-                      {t("meal.score", { score: m.analysis.healthScore })}
+                      {t("meal.score", { score: mealAnalysis.healthScore })}
                     </span>
                   </div>
 
                   <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
-                    {m.analysis.advice}
+                    {mealAnalysis.advice}
                   </p>
                 </article>
               );

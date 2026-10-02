@@ -60,6 +60,21 @@ export const STRINGS = {
     ta: "அதிகமான கோரிக்கைகள். ஒரு நிமிடம் காத்திருந்து மீண்டும் முயற்சிக்கவும்.",
   },
 
+  // Translating saved AI content
+  "translate.working": {
+    en: "Translating into your language...",
+    bm: "Sedang menterjemah ke dalam bahasa anda...",
+    zh: "正在翻译成您的语言...",
+    ta: "உங்கள் மொழிக்கு மொழிபெயர்க்கிறோம்...",
+  },
+  "translate.error": {
+    en: "Could not translate this yet. Showing the original.",
+    bm: "Belum dapat diterjemah. Memaparkan versi asal.",
+    zh: "暂时无法翻译，显示原文。",
+    ta: "இன்னும் மொழிபெயர்க்க முடியவில்லை. மூலத்தைக் காட்டுகிறோம்.",
+  },
+  "translate.retry": { en: "Try again", bm: "Cuba lagi", zh: "重试", ta: "மீண்டும் முயற்சி" },
+
   // Status chips
   "status.normal": { en: "NORMAL", bm: "NORMAL", zh: "正常", ta: "இயல்பு" },
   "status.high": { en: "HIGH", bm: "TINGGI", zh: "偏高", ta: "அதிகம்" },
