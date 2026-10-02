@@ -36,93 +36,92 @@ Elderly patients frequently undergo medical checkups, diagnostic screenings, and
 
 ## 2. The Solution: HealthMate
 
-**HealthMate** bridges this divide by providing an intuitive, accessible AI companion designed from the ground up for older adults. Built on Next.js 14 and powered by Gemini Flash (served through the OpenCode Zen gateway) and Google Cloud Text-to-Speech, HealthMate translates complex clinical information into clear, compassionate, and actionable guidance.
+**HealthMate** is an accessible AI companion for older adults, built with Next.js 14. It uses Gemini Flash (through the OpenCode Zen gateway) for reading documents, photos and speech, and Google Cloud Text-to-Speech for reading answers aloud. It turns clinical information into clear guidance in the patient's own language, and it never hides a result that needs attention.
 
 ```
- +-------------------------------------------------------------------------+
- |                               HealthMate                                |
- |               (Accessible UI: >=18px typography, >=48px touch)           |
- +-------------------+---------------------+-------------------------------+
- |  Reports & Chat   |    Pill Analyzer    |      Timeline & Delta         |
- |  - Ingest PDF/IMG |    - Camera / Photo |      - Longitudinal history   |
- |  - 4-Lang Summary |    - Active ingred. |      - Multi-report Delta AI  |
- |  - Key lab markers|    - Food/Drug risk |      - Combined meal logs     |
- |  - High-res TTS   |    - Report crossref|      - Progress trends        |
- |  - Follow-up chat |                     |                               |
- +-------------------+---------------------+-------------------------------+
- |          Cross-Feature Context Layer (Local IndexedDB Storage)          |
- |    - Latest Report Context               - Active Pill Regimens         |
- +-------------------------------------------------------------------------+
- |                                AI Engine                                |
- |  - Gemini Flash via OpenCode Zen (multimodal analysis, JSON, voice)     |
- |  - Google Cloud Text-to-Speech (Neural2 / WaveNet multilingual audio)   |
- +-------------------------------------------------------------------------+
+ +---------------------------------------------------------------------------+
+ |          HealthMate  (EN / BM / 中文 / தமிழ் · ≥18px text · ≥48px taps)    |
+ +-----------+------------------+---------------------+----------------------+
+ |  Today    |  Reports & Chat  |  Medicines          |  Timeline            |
+ |  - doses  |  - PDF/photo     |  - confirmed list   |  - computed compare  |
+ |  - latest |  - 4-lang summary|  - daily doses      |  - trends per test   |
+ |  - urgent |  - urgent banner |  - check together   |  - meals             |
+ |  - doctor |  - chat + voice  |  - label scanner    |  - backup / restore  |
+ |    visit  |                  |                     |                      |
+ +-----------+------------------+---------------------+----------------------+
+ |  Safety layer: critical-value rules · known-interaction table · label-only |
+ |  doses · "unknown" never shown as normal · AI disclosure · 999 escalation  |
+ +---------------------------------------------------------------------------+
+ |  Local-first storage (IndexedDB): reports, scans, meals, medicines, doses  |
+ +---------------------------------------------------------------------------+
+ |  Server API (rate-limited): Gemini Flash via OpenCode Zen · Cloud TTS      |
+ +---------------------------------------------------------------------------+
 ```
 
 ---
 
 ## 3. Key Features
 
-### 📄 1. Report Analyzer with 4-Language Translation
-- **Multimodal Ingestion**: Upload photos (JPEG, PNG) or PDFs of blood tests, scans, or discharge summaries.
-- **Plain-Language Synthesis**: Translates dense lab metrics into simple, comforting explanations with clear high/low/normal indicators.
-- **Multilingual Support**: Switch seamlessly between **English**, **Bahasa Malaysia**, **Mandarin (简体中文)**, and **Tamil (தமிழ்)** with instant language toggling.
-- **Persistent Local Records**: Every report is parsed and safely archived in browser-local storage for longitudinal reference.
+### 🏠 Today
+- One screen for the day: an urgent banner if the latest report needs attention, today's doses to tick off, the latest report's out-of-range results, and shortcuts to ask a question or prepare for a doctor visit.
+- New users get three clear starting points: upload a report, scan a medicine, or try the sample files.
 
-### 🔊 2. High-Fidelity Text-to-Speech (TTS)
-- Integrated with Google Cloud Text-to-Speech (Neural2 and WaveNet engines).
-- Reads report summaries aloud in the user's selected language, removing the burden of squinting at screens for vision-impaired patients.
+### 📄 Reports, in four languages
+- Upload photos (JPEG, PNG) or PDFs of blood tests or discharge summaries. Each report gets a plain-language summary in **English, Bahasa Malaysia, Mandarin and Tamil**, plus every marker with its **printed normal range**.
+- **Honest statuses**: a result with no flag or range shows "Ask doctor", never "Normal". Lab-flagged panic values show as **Urgent**.
+- **Same-day escalation**: a red banner ("contact your doctor or clinic today", the flagged values, emergency signs and a **Call 999** button) appears when the AI marks a report urgent, or when a fixed rule trips (potassium, sodium, glucose, haemoglobin, eGFR, platelets, hypertensive crisis).
+- Read-aloud, follow-up chat and suggested questions. The date can be corrected and reports can be deleted.
 
-### 💬 3. Contextual Text Chat
-- Follow-up Q&A directly grounded in the active medical report.
-- The assistant operates under the "HealthMate" persona: warm, empathetic, patient, and medically cautious.
+### 🎙️ Hands-free voice
+- Speak a question. HealthMate notices when you pause, answers aloud, then listens again; tapping interrupts. Spoken exchanges are added to the chat so they can be re-read.
+- Audio goes to the server, so no API key ever reaches the browser. Cloud TTS is used when configured, otherwise the browser's own voice.
 
-### 💊 4. Pill Analyzer with Cross-Referencing
-- Snap or upload a photo of prescription medications, blister strips, or loose pills.
-- Identifies active ingredients, dosages, primary indications, potential side effects, and food/drug interactions.
-- **Contextual Cross-Referencing**: Automatically matches identified medications against known conditions from the user's latest uploaded medical report.
+### 💊 My Medicines
+- Scan a pharmacy label or box. **Doses are copied from the label only** and never invented. Identifications have a confidence level, and uncertain ones say "check with your pharmacist".
+- **Add to my medicines** confirms the identification. The confirmed list gives you a daily **dose checklist** (morning / afternoon / evening / night), editable times, and stop/restart.
+- **Check my medicines together**: a fixed table flags well-known dangerous combinations immediately (e.g. clarithromycin + statin). An AI review then ranks anything else against the whole list and the latest report. New scans are checked against what you already take.
 
-### 🎙️ 5. Hands-Free Voice Assistant
-- Speak a question; HealthMate detects when you pause, sends the recording to Gemini on the server, and reads the answer aloud (Cloud TTS, or the browser voice if TTS is not configured).
-- Hands-free: it listens again after each answer, and tapping the button interrupts. Spoken exchanges are added to the text chat so they can be re-read.
-- No API key ever reaches the browser. Falls back to text chat if the microphone is unavailable.
+### 📈 Timeline, trends and comparisons
+- Reports and meals in date order (by the date on the report, not upload time).
+- **Comparisons are computed, not guessed**: markers are matched across lab naming differences, and "better / worse / no change" comes from the lab flags and values. The AI only writes the explanation.
+- **Results over time**: a chart per test across all reports, with the normal range shaded and an exact-value table.
+- **Backup & restore**: records live only on the device, so you can download a backup file and restore it on a new phone.
 
-### 📈 6. Health Timeline & Longitudinal Delta Comparison
-- Chronological timeline combining diagnostic visits, reports, and meal entries into a unified view.
-- **Delta Analysis**: Select any two historical reports to generate an automated comparative summary highlighting what improved, what deteriorated, and what remained stable.
+### 🍲 Local meal advice
+- Photograph or describe everyday meals (nasi lemak, roti canai, chicken rice…) for advice based on your results and medicines. If no score can be worked out, it says "Not scored" rather than showing a made-up number.
 
-### 🍲 7. Localized Meal Advisor
-- Snap a photo or type the name of everyday meals (including local hawker dishes such as char kway teow, roti canai, or chicken rice).
-- Gemini identifies dish components and evaluates nutritional impact against the patient's active lab markers and medication regimen.
-- Delivers a practical health score with actionable suggestions.
+### 🩺 For My Doctor
+- A one-page sheet built only from stored records: urgent results, medicines with label doses and times, out-of-range results, changes since the previous report, known interactions, suggested questions and your own notes.
+- It can be in a different language from the app (English by default), prints cleanly, and shares as text to family or the clinic through the phone's share sheet.
 
-### ♿ 8. Elderly-Safe Accessibility (a11y)
-- Minimum base font size of **18px** with generous leading and high-contrast color palettes (WCAG AAA compliant).
-- All interactive buttons and tap targets adhere to a minimum size of **48px × 48px**.
-- Mobile-friendly fixed bottom navigation for effortless one-handed switching.
-- Every response includes an unmissable medical disclaimer reinforcing that the app is an assistive tool, not a doctor.
+### 🌏 Fully multilingual
+- Every screen, button, status and error is translated, and the language choice is remembered across pages. Saved AI results (pill scans, meals, comparisons, medicines) translate themselves when you switch language; drug names, numbers and units are kept as written.
+- The medical disclaimer appears in the reader's language.
+
+### ♿ Elderly-safe accessibility
+- Base text ≥18px, tap targets ≥48px, high contrast, no sideways scrolling on a 390px phone in any language.
+- Dr. Aisha, the illustrated guide, introduces herself as an **AI helper, not a real doctor**.
 
 ---
 
 ## 4. Privacy & Local-First Architecture
 
-HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
-- **No Central Database**: Patient reports, images, and medication history are stored exclusively within the browser via **IndexedDB** (`idb`).
-- **No Account Required**: Immediate access with zero friction—no passwords to remember, no OAuth flows, and no email harvesting.
-- **Ephemeral AI Processing**: Document payloads and images sent to the Gemini API are processed in-flight without persisting user health data on third-party backend servers.
+- **No central database or account**: reports, images, medicines and dose history are stored only in the browser (IndexedDB). The app asks the browser to keep this storage persistent, and backups are files the patient controls.
+- **What leaves the device**: when you analyse a document, photo, meal, question or voice clip, that content is sent through this app's server to the OpenCode Zen gateway and on to the Gemini model, along with the relevant report and medicine context. How long those services keep requests depends on their terms; review the OpenCode Zen and Google terms that apply to your account before using real patient data.
+- **Keys stay on the server**: the OpenCode key is only read server-side, and API routes are rate-limited (40 requests/minute per client) and size-capped (20 MB).
 
 ---
 
 ## 5. Technology Stack
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router, React 18, TypeScript)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) customized with high-contrast accessibility tokens
-- **AI & Multimodal Understanding**: [Google Gen AI SDK (`@google/genai`)](https://github.com/google-gemini/generative-ai-js) — Gemini Flash models served through [OpenCode Zen](https://opencode.ai/docs/zen/)
-- **Voice**: browser microphone capture (16 kHz WAV) → server-side Gemini audio understanding → Cloud TTS / Web Speech playback
-- **Speech Synthesis**: [@google-cloud/text-to-speech](https://cloud.google.com/text-to-speech) (WaveNet / Neural2)
-- **Client-Side Storage**: [IndexedDB via `idb`](https://github.com/jakearchibald/idb)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with high-contrast accessibility tokens
+- **AI**: [Google Gen AI SDK (`@google/genai`)](https://github.com/googleapis/js-genai), Gemini Flash models served through [OpenCode Zen](https://opencode.ai/docs/zen/)
+- **Voice**: browser microphone capture (16 kHz WAV) → server-side Gemini audio understanding → Cloud TTS or Web Speech playback
+- **Speech synthesis**: [@google-cloud/text-to-speech](https://cloud.google.com/text-to-speech)
+- **Client storage**: [IndexedDB via `idb`](https://github.com/jakearchibald/idb)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Testing**: [Vitest](https://vitest.dev/) with `fake-indexeddb` for fast, deterministic unit and integration tests
+- **Testing**: [Vitest](https://vitest.dev/) with `fake-indexeddb`
 
 ---
 
@@ -131,39 +130,32 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 ```
 ├── app/
 │   ├── api/
-│   │   ├── chat/              # Contextual report follow-up chat
-│   │   ├── meals/analyze/     # Dietary advice and dish recognition
-│   │   ├── pills/analyze/     # Pill identification and interaction check
-│   │   ├── reports/analyze/   # Document parsing and multilingual summary
-│   │   ├── timeline/compare/  # Multi-report delta progression analysis
-│   │   ├── tts/               # Google Cloud Text-to-Speech endpoint
-│   │   └── voice/turn/        # One spoken turn: audio in, transcript + reply out
-│   ├── pills/page.tsx         # Pill Analyzer screen
-│   ├── reports/page.tsx       # Reports ingestion and review screen
-│   ├── timeline/page.tsx      # Timeline history and delta comparator screen
-│   ├── globals.css            # Accessible styles, contrast rules, touch sizing
-│   ├── layout.tsx             # Root layout with Header and BottomNav
-│   └── page.tsx               # Primary landing / Reports view
-├── components/
-│   ├── BottomNav.tsx          # Accessible 3-tab bottom navigation
-│   ├── ChatInterface.tsx      # Report follow-up messaging component
-│   ├── Disclaimer.tsx         # Mandatory medical disclaimer component
-│   ├── Header.tsx             # App header with language selector
-│   ├── MealAdvisorModal.tsx   # Modal for meal photo/text dietary guidance
-│   ├── ReportView.tsx         # Multilingual summary and key markers card
-│   └── VoiceChatModal.tsx     # Hands-free voice conversation dialog
+│   │   ├── chat/                   # Follow-up chat with report + medicine context
+│   │   ├── meals/analyze/          # Meal recognition and advice
+│   │   ├── medicines/interactions/ # Whole-regimen interaction review
+│   │   ├── pills/analyze/          # Label reading, checked against current medicines
+│   │   ├── reports/analyze/        # Report parsing, 4-language summary, urgency
+│   │   ├── timeline/compare/       # Explanation of computed report changes
+│   │   ├── translate/              # Translates saved AI results on language switch
+│   │   ├── tts/                    # Cloud Text-to-Speech
+│   │   └── voice/turn/             # One spoken turn: audio in, transcript + reply out
+│   ├── today/  reports/  medicines/  pills/  timeline/  visit/  samples/
+│   └── layout.tsx                  # Language + guide providers, bottom navigation
+├── components/                     # Screens' building blocks (ReportView, UrgentAlert,
+│   ├── medicines/                  #   MarkerTrends, BackupSection, TodayDoses, …)
+│   └── DoctorGuide/                # Dr. Aisha visual-novel companion
 ├── lib/
-│   ├── chat.ts                # Chat business logic and context assembly
-│   ├── db.ts                  # Local IndexedDB client (reports, pills, meals)
-│   ├── delta-comparator.ts    # Longitudinal delta comparison logic
-│   ├── gemini.ts              # Gemini API client wrapper
-│   ├── meal-advisor.ts        # Meal evaluation engine
-│   ├── pill-analyzer.ts       # Pill photo parsing and cross-referencing
-│   ├── prompts.ts             # HealthMate persona, prompt engineering, context injection
-│   ├── tts.ts                 # Multilingual Cloud TTS voice selection and synthesis
-│   └── voice-session.ts       # Voice prompt, turn processing and response parsing
-├── tests/                     # 100% passing Vitest test suite
-└── types/index.ts             # Shared TypeScript schemas and contracts
+│   ├── i18n.ts                     # Every interface string in EN/BM/ZH/TA
+│   ├── markers.ts  red-flags.ts    # Marker catalog, units, ranges, critical-value rules
+│   ├── trends.ts                   # Computed comparisons and per-test trends
+│   ├── medications.ts              # Schedules, duplicates, known dangerous combinations
+│   ├── visit-summary.ts            # Doctor-visit sheet and share text
+│   ├── gemini.ts                   # Gemini client pointed at OpenCode Zen
+│   └── db.ts  backup.ts            # IndexedDB stores, backup/restore, persistence
+├── middleware.ts                   # API rate limiting and size cap
+├── public/samples/                 # Fictional demo reports, labels and meal photos
+├── scripts/samples/                # Sources + renderer for the demo documents
+└── tests/                          # Vitest suite
 ```
 
 ---
@@ -218,8 +210,9 @@ You don't need real medical documents. The app ships with **fictional, watermark
 | Report analysis + read aloud + chat | March check-up (PDF), September follow-up (PDF) | Reports → "Just trying it out? Use a sample" |
 | Report comparison | Upload both reports above | Timeline → select both → Compare |
 | Critical-value handling | Urgent result (PNG: potassium 6.4, glucose 18.5) | Reports → sample buttons |
-| Pill identification | 3 daily medicines (metformin, amlodipine, atorvastatin) | Pill Analyzer → sample buttons |
-| Interaction check | New antibiotic (clarithromycin, which interacts with atorvastatin) | Pill Analyzer → sample buttons |
+| Label reading + My Medicines | 3 daily medicines (metformin, amlodipine, atorvastatin) | Medicines → Scan a medicine → sample buttons → "Add to my medicines" |
+| Interaction check | New antibiotic (clarithromycin, which interacts with atorvastatin) | Scan it after the 3 medicines, add it, then Medicines → "Check my medicines together" |
+| Trends + doctor summary | Upload both reports, add the medicines | Timeline → "Your results over time"; Today → "Prepare for my doctor visit" |
 | Meal advice | Nasi lemak, chicken rice, roti canai photos; typed meals including "grapefruit juice" | Timeline → Log Meal |
 | Voice | Speak any question, e.g. "Is my blood sugar too high?" | Reports → microphone button |
 

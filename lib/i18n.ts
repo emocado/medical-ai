@@ -182,6 +182,12 @@ export const STRINGS = {
     zh: "时间线 → 记录饮食：试试饮食照片，或输入“西柚汁”查看食物与药物的警告。",
     ta: "காலவரிசை → உணவைப் பதிவு செய்: உணவுப் புகைப்படத்தை முயற்சிக்கவும், அல்லது உணவு–மருந்து எச்சரிக்கையைக் காண “கிரேப்ஃப்ரூட் சாறு” என்று தட்டச்சு செய்யவும்.",
   },
+  "samples.step.visit": {
+    en: "Today → Prepare for my doctor visit: see the one-page summary, choose the doctor's language, then print or share it.",
+    bm: "Hari Ini → Sedia untuk lawatan doktor: lihat ringkasan satu muka surat, pilih bahasa doktor, kemudian cetak atau kongsi.",
+    zh: "今天 → 准备看医生：查看一页纸摘要，选择医生阅读的语言，然后打印或分享。",
+    ta: "இன்று → மருத்துவரைச் சந்திக்கத் தயாராகுங்கள்: ஒரு பக்கச் சுருக்கத்தைப் பார்த்து, மருத்துவருக்கான மொழியைத் தேர்ந்தெடுத்து, அச்சிடுங்கள் அல்லது பகிருங்கள்.",
+  },
   "samples.step.language": {
     en: "Change the language at the top: every screen and saved result switches over.",
     bm: "Tukar bahasa di bahagian atas: setiap skrin dan keputusan tersimpan akan bertukar.",
