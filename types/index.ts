@@ -41,6 +41,10 @@ export interface PillRecord {
     crossRefWithReports?: string;
   };
   createdAt: number;
+  /** Language the analysis was written in. Missing on records made before this was tracked. */
+  language?: Language;
+  /** Cached translations of `analysis`, filled in when viewed in another language. */
+  translations?: Partial<Record<Language, PillRecord["analysis"]>>;
 }
 
 export interface MealRecord {
@@ -55,6 +59,10 @@ export interface MealRecord {
     healthScore: number;
   };
   createdAt: number;
+  /** Language the analysis was written in. Missing on records made before this was tracked. */
+  language?: Language;
+  /** Cached translations of `analysis`, filled in when viewed in another language. */
+  translations?: Partial<Record<Language, MealRecord["analysis"]>>;
 }
 
 export type DrAishaExpression = "neutral" | "speaking" | "smiling";

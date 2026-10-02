@@ -40,6 +40,7 @@ export function parseMealResponse(
       healthScore,
     },
     createdAt: Date.now(),
+    language,
   };
 }
 

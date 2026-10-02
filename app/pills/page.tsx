@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
+import { TranslationStatus } from "@/components/TranslationStatus";
+import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { getAllPillRecords, savePillRecord, getAllReports } from "@/lib/db";
 import {
   Pill,
@@ -80,6 +82,11 @@ export default function PillsPage() {
   }
 
   const activeRecord = pillRecords.find((r) => r.id === selectedRecordId) || pillRecords[0];
+  const visibleRecords = useMemo(() => (activeRecord ? [activeRecord] : []), [activeRecord]);
+  const translation = useAutoTranslate(visibleRecords, lang, savePillRecord, (updated) =>
+    setPillRecords((prev) => prev.map((r) => updated.find((u) => u.id === r.id) ?? r))
+  );
+  const analysis = activeRecord ? localizedAnalysis(activeRecord, lang) ?? activeRecord.analysis : null;
 
   return (
     <div className="space-y-6">
@@ -181,24 +188,25 @@ export default function PillsPage() {
       )}
 
       {/* Active Pill Analysis Display */}
-      {activeRecord ? (
+      {activeRecord && analysis ? (
         <div className="space-y-5">
+          <TranslationStatus status={translation.status} onRetry={translation.retry} />
           {/* Cross-reference alert */}
-          {activeRecord.analysis.crossRefWithReports && (
+          {analysis.crossRefWithReports && (
             <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-2xl space-y-1">
               <div className="flex items-center space-x-2 text-blue-950 font-bold text-lg">
                 <Sparkles className="w-5 h-5 text-blue-700" />
                 <span>{t("pills.connection")}</span>
               </div>
               <p className="text-base text-slate-800 leading-relaxed font-medium">
-                {activeRecord.analysis.crossRefWithReports}
+                {analysis.crossRefWithReports}
               </p>
             </div>
           )}
 
           {/* Cards for each identified pill */}
           <div className="space-y-4">
-            {activeRecord.analysis.pills.map((pill, idx) => (
+            {analysis.pills.map((pill, idx) => (
               <article
                 key={idx}
                 className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
