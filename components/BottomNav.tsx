@@ -10,7 +10,7 @@ export function BottomNav() {
   const t = useT();
 
   const isReportsActive = pathname === "/" || pathname.startsWith("/reports");
-  const isPillsActive = pathname.startsWith("/pills");
+  const isMedicinesActive = pathname.startsWith("/medicines") || pathname.startsWith("/pills");
   const isTimelineActive = pathname.startsWith("/timeline");
 
   const tabs = [
@@ -22,11 +22,11 @@ export function BottomNav() {
       ariaLabel: t("nav.reports.aria"),
     },
     {
-      href: "/pills",
-      label: t("nav.pills"),
+      href: "/medicines",
+      label: t("nav.medicines"),
       icon: Pill,
-      active: isPillsActive,
-      ariaLabel: t("nav.pills.aria"),
+      active: isMedicinesActive,
+      ariaLabel: t("nav.medicines.aria"),
     },
     {
       href: "/timeline",

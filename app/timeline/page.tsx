@@ -12,7 +12,14 @@ import { BackupSection } from "@/components/BackupSection";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { ensureDisclaimer } from "@/lib/prompts";
-import { deleteMealRecord, getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
+import {
+  deleteMealRecord,
+  getAllMealRecords,
+  getAllMedications,
+  getAllPillRecords,
+  getAllReports,
+  saveMealRecord,
+} from "@/lib/db";
 import {
   Clock,
   FileText,
@@ -28,7 +35,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import type { Language, ReportRecord, MealRecord, PillRecord } from "@/types";
+import type { Language, MedicationEntry, ReportRecord, MealRecord, PillRecord } from "@/types";
 import type { DeltaComparisonResult } from "@/lib/delta-comparator";
 import { buildTrends, type ChangeVerdict } from "@/lib/trends";
 import type { StringKey } from "@/lib/i18n";
@@ -50,6 +57,7 @@ export default function TimelinePage() {
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [meals, setMeals] = useState<MealRecord[]>([]);
   const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
+  const [medications, setMedications] = useState<MedicationEntry[]>([]);
   const [selectedReportIds, setSelectedReportIds] = useState<string[]>([]);
   const [isComparing, setIsComparing] = useState(false);
   const [deltaResult, setDeltaResult] = useState<DeltaComparisonResult | null>(null);
@@ -63,14 +71,16 @@ export default function TimelinePage() {
 
   async function loadTimelineData() {
     try {
-      const [allReports, allMeals, allPills] = await Promise.all([
+      const [allReports, allMeals, allPills, meds] = await Promise.all([
         getAllReports(),
         getAllMealRecords(),
         getAllPillRecords(),
+        getAllMedications(),
       ]);
       setReports(allReports);
       setMeals(allMeals);
       setKnownPills(allPills);
+      setMedications(meds.filter((m) => m.active));
     } catch (err) {
       console.error("Failed to load timeline items:", err);
     }
@@ -441,6 +451,7 @@ export default function TimelinePage() {
         language={lang}
         latestReport={latestReport}
         knownPills={knownPills}
+        medications={medications}
         onMealSaved={handleMealSaved}
       />
     </div>
