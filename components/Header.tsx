@@ -21,7 +21,7 @@ export function Header({ title = "HealthMate" }: HeaderProps) {
   const t = useT();
 
   return (
-    <header className="sticky top-0 z-40 bg-blue-900 text-white shadow-md">
+    <header className="sticky top-0 z-40 bg-blue-900 text-white shadow-md print:hidden">
       <div className="max-w-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
           <HeartPulse className="w-8 h-8 text-red-300" aria-hidden="true" />
