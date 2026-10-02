@@ -70,7 +70,8 @@ export interface MealRecord {
   analysis: {
     dishes: string[];
     advice: string;
-    healthScore: number;
+    /** 0–100 suitability for this patient, or null when the AI gave no usable score. */
+    healthScore: number | null;
   };
   createdAt: number;
   /** Language the analysis was written in. Missing on records made before this was tracked. */

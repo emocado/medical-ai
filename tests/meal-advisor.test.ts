@@ -87,3 +87,16 @@ describe("Meal Advisor Logic", () => {
     expect(result.analysis.advice).toContain("omega-3");
   });
 });
+
+describe("Meal score is never invented", () => {
+  it("leaves the score empty when the AI gives none or a non-number", () => {
+    expect(parseMealResponse(JSON.stringify({ advice: "ok" }), "text").analysis.healthScore).toBeNull();
+    expect(parseMealResponse(JSON.stringify({ advice: "ok", healthScore: "" }), "text").analysis.healthScore).toBeNull();
+    expect(parseMealResponse(JSON.stringify({ advice: "ok", healthScore: "good" }), "text").analysis.healthScore).toBeNull();
+  });
+
+  it("clamps and rounds real scores", () => {
+    expect(parseMealResponse(JSON.stringify({ healthScore: "72.6" }), "text").analysis.healthScore).toBe(73);
+    expect(parseMealResponse(JSON.stringify({ healthScore: 140 }), "text").analysis.healthScore).toBe(100);
+  });
+});
