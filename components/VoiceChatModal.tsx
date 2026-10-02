@@ -14,6 +14,8 @@ import {
 } from "@/lib/audio-capture";
 import { speakText } from "@/lib/speech";
 import { stopGuideAudio } from "@/lib/guide-audio";
+import type { StringKey } from "@/lib/i18n";
+import { useT } from "./LanguageProvider";
 
 export interface VoiceTurn {
   transcript: string;
@@ -43,8 +45,9 @@ export function VoiceChatModal({
   history = [],
   onTurn,
 }: VoiceChatModalProps) {
+  const t = useT();
   const [status, setStatus] = useState<VoiceStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<StringKey | null>(null);
   const [lastTranscript, setLastTranscript] = useState("");
   const [lastReply, setLastReply] = useState("");
 
@@ -98,7 +101,7 @@ export function VoiceChatModal({
       !(window.AudioContext || (window as any).webkitAudioContext)
     ) {
       setStatus("error");
-      setErrorMessage("Voice chat is not supported on this browser. Please use text chat instead.");
+      setErrorMessage("voice.error.unsupported");
       return;
     }
 
@@ -152,8 +155,8 @@ export function VoiceChatModal({
       setStatus("error");
       setErrorMessage(
         err?.name === "NotAllowedError"
-          ? "Microphone permission was denied. Please allow the microphone or use text chat."
-          : "Voice chat is temporarily unavailable. Please use text chat instead."
+          ? "voice.error.permission"
+          : "voice.error.unavailable"
       );
     }
   }
@@ -200,7 +203,7 @@ export function VoiceChatModal({
       console.error("Voice turn failed:", err);
       if (!sessionActiveRef.current) return;
       setStatus("error");
-      setErrorMessage("Sorry, I could not hear that clearly. Tap the microphone to try again.");
+      setErrorMessage("voice.error.turn");
     }
   }
 
@@ -220,41 +223,41 @@ export function VoiceChatModal({
 
   const headline =
     status === "listening"
-      ? "Listening... Speak naturally"
+      ? t("voice.listening")
       : status === "thinking"
-      ? "Thinking about your question..."
+      ? t("voice.thinking")
       : status === "speaking"
-      ? "HealthMate is speaking..."
+      ? t("voice.speaking")
       : status === "error"
-      ? "Voice Unavailable"
-      : "Tap the microphone to talk";
+      ? t("voice.unavailable")
+      : t("voice.tapToTalk");
 
   const hint =
     status === "listening"
-      ? "Ask about your medical report, pills, or dietary advice. I will answer when you pause."
+      ? t("voice.hint.listening")
       : status === "speaking"
-      ? "Tap the button to interrupt and ask something else."
+      ? t("voice.hint.speaking")
       : status === "idle"
-      ? "Tap the microphone whenever you are ready to speak."
+      ? t("voice.hint.idle")
       : "";
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Voice Conversation Assistant"
+      aria-label={t("voice.aria")}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
     >
       <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-300 flex flex-col items-center space-y-6 text-center">
         <div className="w-full flex items-center justify-between border-b border-slate-200 pb-3">
           <div className="flex items-center space-x-2 text-blue-900 font-bold text-lg">
             <Mic className="w-6 h-6 text-blue-700" />
-            <span>HealthMate Voice</span>
+            <span>{t("voice.title")}</span>
           </div>
           {latestReport && (
             <span className="text-xs font-bold bg-blue-100 text-blue-900 px-2.5 py-1 rounded-full flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-blue-700" />
-              Report Context Active
+              {t("voice.reportActive")}
             </span>
           )}
         </div>
@@ -264,7 +267,7 @@ export function VoiceChatModal({
             type="button"
             onClick={handleMainButton}
             disabled={status === "listening" || status === "thinking"}
-            aria-label={status === "speaking" ? "Interrupt and speak" : "Start speaking"}
+            aria-label={status === "speaking" ? t("voice.interrupt.aria") : t("voice.start.aria")}
             className={`w-28 h-28 rounded-full flex items-center justify-center transition-all ${
               status === "listening"
                 ? "bg-blue-100 ring-8 ring-blue-300 animate-pulse text-blue-900"
@@ -298,7 +301,7 @@ export function VoiceChatModal({
           <div className="w-full bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-base text-slate-700 text-left max-h-40 overflow-y-auto leading-relaxed space-y-2">
             {lastTranscript && (
               <p>
-                <span className="font-bold text-slate-900">You: </span>
+                <span className="font-bold text-slate-900">{t("voice.you")}: </span>
                 {lastTranscript}
               </p>
             )}
@@ -318,8 +321,8 @@ export function VoiceChatModal({
           >
             <AlertCircle className="w-6 h-6 text-red-700 flex-shrink-0 mt-0.5" />
             <div className="text-base">
-              <p className="font-bold">Voice Session Error</p>
-              <p className="mt-0.5">{errorMessage}</p>
+              <p className="font-bold">{t("voice.errorTitle")}</p>
+              <p className="mt-0.5">{t(errorMessage)}</p>
             </div>
           </div>
         )}
@@ -330,7 +333,7 @@ export function VoiceChatModal({
             className="w-full py-4 px-6 rounded-2xl min-h-[56px] text-lg font-bold flex items-center justify-center space-x-2 bg-red-700 hover:bg-red-800 text-white shadow-md active:bg-red-900 transition-colors"
           >
             <PhoneOff className="w-6 h-6" />
-            <span>End Voice Chat (Return to Text)</span>
+            <span>{t("voice.end")}</span>
           </button>
         </div>
       </div>
