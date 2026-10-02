@@ -135,7 +135,7 @@ export default function PillsPage() {
 
       {/* Upload / Capture Section */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Pill className="w-6 h-6 text-blue-800" aria-hidden="true" />
             {t("pills.check.title")}
