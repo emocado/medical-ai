@@ -58,7 +58,8 @@ Always end your response with this disclaimer verbatim on a new line:
     if (context.latestReport.keyMarkers && Object.keys(context.latestReport.keyMarkers).length > 0) {
       prompt += "Key Markers:\n";
       for (const [key, marker] of Object.entries(context.latestReport.keyMarkers)) {
-        prompt += `- ${key}: ${marker.value} ${marker.unit || ""} (${marker.status || "normal"})\n`;
+        const range = marker.referenceRange ? `, normal range ${marker.referenceRange}` : "";
+        prompt += `- ${key}: ${marker.value} ${marker.unit || ""} (${marker.status || "unknown"}${range})\n`;
       }
     }
     prompt += "\n";

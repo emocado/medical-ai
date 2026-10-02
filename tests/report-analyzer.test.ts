@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { parseReportResponse, analyzeReportWithGemini } from "@/lib/report-analyzer";
+import { parseReportResponse, normalizeMarkerStatus, analyzeReportWithGemini } from "@/lib/report-analyzer";
 import { MEDICAL_DISCLAIMER } from "@/lib/prompts";
 import * as geminiModule from "@/lib/gemini";
 
@@ -88,5 +88,31 @@ describe("Report Analyzer Logic", () => {
     expect(result.fileName).toBe("ultrasound.jpg");
     expect(result.summary.en).toContain("All organs normal.");
     expect(result.keyMarkers["BP"].value).toBe("120/80");
+  });
+});
+
+describe("Marker status safety", () => {
+  it("never defaults a missing or unrecognised status to normal", () => {
+    const report = parseReportResponse(
+      JSON.stringify({
+        summary: { en: "x" },
+        keyMarkers: [
+          { name: "Vitamin D", value: "18", unit: "ng/mL" },
+          { name: "Ferritin", value: "40", status: "Borderline" },
+          { name: "Potassium", value: "6.4", status: "CRITICAL", referenceRange: "3.5 - 5.1" },
+        ],
+      }),
+      "r.png",
+      "image/png"
+    );
+    expect(report.keyMarkers["Vitamin D"].status).toBe("unknown");
+    expect(report.keyMarkers["Ferritin"].status).toBe("unknown");
+    expect(report.keyMarkers["Potassium"].status).toBe("critical");
+    expect(report.keyMarkers["Potassium"].referenceRange).toBe("3.5 - 5.1");
+  });
+
+  it("normalizes status casing and whitespace", () => {
+    expect(normalizeMarkerStatus(" High ")).toBe("high");
+    expect(normalizeMarkerStatus(undefined)).toBe("unknown");
   });
 });

@@ -193,6 +193,14 @@ export const STRINGS = {
   "status.high": { en: "HIGH", bm: "TINGGI", zh: "偏高", ta: "அதிகம்" },
   "status.low": { en: "LOW", bm: "RENDAH", zh: "偏低", ta: "குறைவு" },
   "status.abnormal": { en: "CHECK", bm: "SEMAK", zh: "异常", ta: "சரிபார்க்கவும்" },
+  "status.critical": { en: "URGENT", bm: "SEGERA", zh: "危急", ta: "அவசரம்" },
+  "status.unknown": { en: "ASK DOCTOR", bm: "TANYA DOKTOR", zh: "请问医生", ta: "மருத்துவரிடம் கேளுங்கள்" },
+  "report.normalRange": {
+    en: "Normal range: {range}",
+    bm: "Julat normal: {range}",
+    zh: "正常范围：{range}",
+    ta: "இயல்பு வரம்பு: {range}",
+  },
 
   // Reports page
   "reports.upload.title": {

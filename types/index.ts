@@ -1,9 +1,17 @@
 export type Language = "en" | "bm" | "zh" | "ta";
 
+/**
+ * "unknown" means the report gave no flag or range to judge by. It must never
+ * be shown as normal.
+ */
+export type MarkerStatus = "normal" | "high" | "low" | "abnormal" | "critical" | "unknown";
+
 export interface KeyMarker {
   value: string | number;
   unit?: string;
-  status?: "normal" | "high" | "low" | "abnormal" | string;
+  status?: MarkerStatus;
+  /** Reference range exactly as printed on the report, e.g. "3.9 - 6.0". */
+  referenceRange?: string;
 }
 
 export interface ReportRecord {
