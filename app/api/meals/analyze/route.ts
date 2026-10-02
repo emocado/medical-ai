@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
       mimeType,
       textInput,
       latestReport,
+      medications,
       knownPills,
       language,
     } = body;
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
       mimeType,
       textInput,
       latestReport,
+      medications,
       knownPills,
       language: language || "en",
     });

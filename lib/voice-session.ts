@@ -1,7 +1,7 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
 import { buildHealthMatePrompt, getDisclaimer } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
-import type { Language, PillRecord, ReportRecord } from "@/types";
+import type { Language, PillRecord, ReportRecord, MedicationEntry } from "@/types";
 
 export interface VoiceHistoryItem {
   role: "user" | "assistant";
@@ -20,11 +20,13 @@ export function buildVoiceSystemPrompt(params: {
   language?: Language;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  medications?: MedicationEntry[] | null;
 }): string {
   return buildHealthMatePrompt({
     language: params.language,
     latestReport: params.latestReport,
     knownPills: params.knownPills,
+    medications: params.medications,
     extraInstructions: `You are in a spoken voice conversation with an elderly patient. Each turn you receive a short audio recording of the patient speaking.
 1. Transcribe exactly what the patient said, in the language they spoke.
 2. Reply as you would out loud: gentle, warm, patient, conversational, at most 4 short sentences.
@@ -71,6 +73,7 @@ export async function processVoiceTurn(params: {
   language?: Language;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  medications?: MedicationEntry[] | null;
 }): Promise<VoiceTurnResult> {
   const client = getGeminiClient();
   const systemPrompt = buildVoiceSystemPrompt(params);

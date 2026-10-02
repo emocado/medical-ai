@@ -80,3 +80,23 @@ describe("Known dangerous combinations", () => {
     ).toEqual([]);
   });
 });
+
+describe("AI interaction check parsing", () => {
+  it("sorts serious findings first, defaults unknown severity, drops malformed items", async () => {
+    const { parseInteractionResponse } = await import("@/lib/interaction-checker");
+    const result = parseInteractionResponse(
+      JSON.stringify({
+        summary: "Two things to ask about.",
+        findings: [
+          { medicines: ["Metformin"], severity: "minor", explanation: "a", advice: "b" },
+          { medicines: ["Clarithromycin", "Atorvastatin"], severity: "serious", explanation: "c", advice: "d" },
+          { medicines: ["Amlodipine"], severity: "weird", explanation: "e", advice: "f" },
+          { severity: "serious" },
+        ],
+      })
+    );
+    expect(result.findings.map((f) => f.severity)).toEqual(["serious", "moderate", "minor"]);
+    expect(result.findings[0].medicines).toEqual(["Clarithromycin", "Atorvastatin"]);
+    expect(result.summary).toBe("Two things to ask about.");
+  });
+});
