@@ -15,6 +15,8 @@ import { MedicalDisclaimer } from "./Disclaimer";
 import { useT } from "./LanguageProvider";
 import { saveMealRecord } from "@/lib/db";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
+import { loadSampleFile, SAMPLE_MEAL_TEXTS, type SampleFile } from "@/lib/samples";
+import { SampleChips } from "./SampleChips";
 import type { Language, MealRecord, PillRecord, ReportRecord } from "@/types";
 
 interface MealAdvisorModalProps {
@@ -79,6 +81,15 @@ export function MealAdvisorModal({
       imageBase64: await fileToBase64(file),
       mimeType: file.type || "image/jpeg",
     });
+  }
+
+  async function handleSamplePhoto(sample: SampleFile) {
+    try {
+      const file = await loadSampleFile(sample);
+      await analyze({ inputType: "photo", imageBase64: await fileToBase64(file), mimeType: file.type });
+    } catch {
+      setErrorMessage(t("samples.loadError"));
+    }
   }
 
   async function handleTextSubmit(e: React.FormEvent) {
@@ -183,6 +194,7 @@ export function MealAdvisorModal({
                 </>
               )}
             </button>
+            <SampleChips kind="meal" onPick={handleSamplePhoto} disabled={isAnalyzing} />
           </div>
         )}
 
@@ -198,6 +210,19 @@ export function MealAdvisorModal({
               rows={3}
               className="w-full p-4 border-2 border-slate-300 rounded-xl text-lg text-slate-900 focus:outline-none focus:border-blue-800 bg-slate-50 focus:bg-white"
             />
+            <div className="flex flex-wrap gap-2">
+              {SAMPLE_MEAL_TEXTS.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setTextInput(t(key))}
+                  disabled={isAnalyzing}
+                  className="px-3 py-2 rounded-xl min-h-[48px] text-base font-semibold border-2 border-violet-300 bg-violet-50 text-violet-950 hover:bg-violet-100 text-left"
+                >
+                  {t(key)}
+                </button>
+              ))}
+            </div>
             <button
               type="submit"
               disabled={isAnalyzing || !textInput.trim()}
