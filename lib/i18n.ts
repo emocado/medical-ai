@@ -634,6 +634,10 @@ export const STRINGS = {
   "progression.stable": { en: "STABLE", bm: "STABIL", zh: "稳定", ta: "நிலையானது" },
   "progression.declining": { en: "DECLINING", bm: "MEROSOT", zh: "变差", ta: "பின்னடைவு" },
   "progression.mixed": { en: "MIXED", bm: "BERCAMPUR", zh: "有好有坏", ta: "கலவையானது" },
+  "change.better": { en: "Better", bm: "Lebih baik", zh: "好转", ta: "மேம்பட்டது" },
+  "change.worse": { en: "Worse", bm: "Lebih teruk", zh: "变差", ta: "மோசமானது" },
+  "change.same": { en: "No change", bm: "Tiada perubahan", zh: "无变化", ta: "மாற்றமில்லை" },
+  "change.unknown": { en: "Ask your doctor", bm: "Tanya doktor", zh: "请问医生", ta: "மருத்துவரிடம் கேளுங்கள்" },
 
   // Meal advisor
   "meal.title": { en: "Dietary Meal Advisor", bm: "Penasihat Pemakanan", zh: "饮食建议", ta: "உணவு ஆலோசகர்" },
