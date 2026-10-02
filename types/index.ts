@@ -1,9 +1,17 @@
 export type Language = "en" | "bm" | "zh" | "ta";
 
+/**
+ * "unknown" means the report gave no flag or range to judge by. It must never
+ * be shown as normal.
+ */
+export type MarkerStatus = "normal" | "high" | "low" | "abnormal" | "critical" | "unknown";
+
 export interface KeyMarker {
   value: string | number;
   unit?: string;
-  status?: "normal" | "high" | "low" | "abnormal" | string;
+  status?: MarkerStatus;
+  /** Reference range exactly as printed on the report, e.g. "3.9 - 6.0". */
+  referenceRange?: string;
 }
 
 export interface ReportRecord {
@@ -20,6 +28,8 @@ export interface ReportRecord {
   };
   keyMarkers: Record<string, KeyMarker>;
   createdAt: number;
+  /** The AI judged that something on the report needs same-day medical attention. */
+  urgent?: boolean;
 }
 
 export interface PillInfo {
@@ -30,6 +40,10 @@ export interface PillInfo {
   sideEffects: string[];
   foodInteractions: string[];
   drugInteractions: string[];
+  /** Whether `dosage` was read from the label. Missing on records from before this was tracked. */
+  dosageSource?: "label" | "not-visible";
+  /** How sure the identification is: "low" means identified from appearance only. */
+  confidence?: "high" | "medium" | "low";
 }
 
 export interface PillRecord {
@@ -56,7 +70,8 @@ export interface MealRecord {
   analysis: {
     dishes: string[];
     advice: string;
-    healthScore: number;
+    /** 0–100 suitability for this patient, or null when the AI gave no usable score. */
+    healthScore: number | null;
   };
   createdAt: number;
   /** Language the analysis was written in. Missing on records made before this was tracked. */

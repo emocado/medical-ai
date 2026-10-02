@@ -17,6 +17,7 @@ export const LANGUAGE_NATIVE_NAMES: Record<Language, string> = {
  */
 export const STRINGS = {
   // Navigation & page titles
+  "guide.aiBadge": { en: "AI Companion", bm: "Pembantu AI", zh: "AI 助手", ta: "AI உதவியாளர்" },
   "nav.reports": { en: "Reports & Chat", bm: "Laporan & Sembang", zh: "报告与问答", ta: "அறிக்கை & உரையாடல்" },
   "nav.reports.aria": {
     en: "Reports and conversational chat",
@@ -135,6 +136,12 @@ export const STRINGS = {
     zh: "时间线：选择这两份报告并点击比较，看看哪些好转、哪些变差。",
     ta: "காலவரிசை: இரண்டு அறிக்கைகளையும் தேர்ந்தெடுத்து ஒப்பிடு என்பதை அழுத்தி, எது மேம்பட்டது, எது மோசமானது என்று பாருங்கள்.",
   },
+  "samples.step.urgent": {
+    en: "Reports: upload the urgent result to see how dangerous values are flagged with a same-day warning.",
+    bm: "Laporan: muat naik keputusan segera untuk melihat bagaimana nilai berbahaya ditanda dengan amaran untuk hari yang sama.",
+    zh: "报告：上传紧急结果，看看危险数值如何被标出并提示当天就医。",
+    ta: "அறிக்கைகள்: ஆபத்தான மதிப்புகள் அன்றே மருத்துவரை அணுகுமாறு எச்சரிக்கையுடன் எவ்வாறு குறிக்கப்படுகின்றன என்பதைக் காண அவசர முடிவைப் பதிவேற்றவும்.",
+  },
   "samples.step.pills": {
     en: "Pill Analyzer: scan the 3 daily medicines, then the new antibiotic, to check for interactions.",
     bm: "Semak Ubat: imbas 3 ubat harian, kemudian antibiotik baharu, untuk menyemak interaksi.",
@@ -193,6 +200,39 @@ export const STRINGS = {
   "status.high": { en: "HIGH", bm: "TINGGI", zh: "偏高", ta: "அதிகம்" },
   "status.low": { en: "LOW", bm: "RENDAH", zh: "偏低", ta: "குறைவு" },
   "status.abnormal": { en: "CHECK", bm: "SEMAK", zh: "异常", ta: "சரிபார்க்கவும்" },
+  "status.critical": { en: "URGENT", bm: "SEGERA", zh: "危急", ta: "அவசரம்" },
+  "status.unknown": { en: "ASK DOCTOR", bm: "TANYA DOKTOR", zh: "请问医生", ta: "மருத்துவரிடம் கேளுங்கள்" },
+  "urgent.title": {
+    en: "Some results need medical attention soon",
+    bm: "Sesetengah keputusan perlu perhatian perubatan segera",
+    zh: "部分结果需要尽快就医",
+    ta: "சில முடிவுகளுக்கு விரைவில் மருத்துவ கவனம் தேவை",
+  },
+  "urgent.body": {
+    en: "Please contact your doctor or clinic today and show them this report.",
+    bm: "Sila hubungi doktor atau klinik anda hari ini dan tunjukkan laporan ini.",
+    zh: "请今天就联系您的医生或诊所，并出示这份报告。",
+    ta: "இன்றே உங்கள் மருத்துவர் அல்லது கிளினிக்கைத் தொடர்புகொண்டு இந்த அறிக்கையைக் காட்டுங்கள்.",
+  },
+  "urgent.flagged": {
+    en: "Results that need attention:",
+    bm: "Keputusan yang perlu perhatian:",
+    zh: "需要注意的结果：",
+    ta: "கவனிக்க வேண்டிய முடிவுகள்:",
+  },
+  "urgent.emergency": {
+    en: "If you feel very unwell (chest pain, trouble breathing, confusion, weakness or fainting), call 999 or go to the nearest emergency department now.",
+    bm: "Jika anda berasa sangat tidak sihat (sakit dada, sukar bernafas, keliru, lemah atau pengsan), hubungi 999 atau pergi ke jabatan kecemasan terdekat sekarang.",
+    zh: "如果您感到非常不适（胸痛、呼吸困难、意识混乱、乏力或晕倒），请立即拨打 999 或前往最近的急诊部。",
+    ta: "கடுமையான உடல்நலக் குறைவை (நெஞ்சு வலி, மூச்சுத் திணறல், குழப்பம், பலவீனம் அல்லது மயக்கம்) உணர்ந்தால், உடனே 999 ஐ அழைக்கவும் அல்லது அருகிலுள்ள அவசர சிகிச்சைப் பிரிவுக்குச் செல்லவும்.",
+  },
+  "urgent.call": { en: "Call 999 (Emergency)", bm: "Hubungi 999 (Kecemasan)", zh: "拨打 999（急救）", ta: "999 ஐ அழைக்கவும் (அவசரம்)" },
+  "report.normalRange": {
+    en: "Normal range: {range}",
+    bm: "Julat normal: {range}",
+    zh: "正常范围：{range}",
+    ta: "இயல்பு வரம்பு: {range}",
+  },
 
   // Reports page
   "reports.upload.title": {
@@ -275,10 +315,10 @@ export const STRINGS = {
   "chat.aria": { en: "Health Assistant Chat", bm: "Sembang Pembantu Kesihatan", zh: "健康助手问答", ta: "உடல்நல உதவியாளர் உரையாடல்" },
   "chat.title": { en: "Health Assistant Chat", bm: "Sembang Pembantu Kesihatan", zh: "健康助手问答", ta: "உடல்நல உதவியாளர் உரையாடல்" },
   "chat.greeting": {
-    en: "Hello, I am HealthMate. Do you have any questions about your report or medications that I can help explain?",
-    bm: "Hai, saya HealthMate. Ada apa-apa soalan tentang laporan kesihatan atau ubat anda yang boleh saya bantu?",
-    zh: "您好，我是 HealthMate。关于您的健康报告或药物，您有什么想问的吗？",
-    ta: "வணக்கம், நான் ஹெல்த்மேட். உங்கள் உடல்நல அறிக்கை அல்லது மருந்துகள் குறித்து ஏதேனும் கேள்விகள் உள்ளதா?",
+    en: "Hello, I am HealthMate, an AI helper (not a doctor). Do you have any questions about your report or medications that I can help explain?",
+    bm: "Hai, saya HealthMate, pembantu AI (bukan doktor). Ada apa-apa soalan tentang laporan kesihatan atau ubat anda yang boleh saya bantu?",
+    zh: "您好，我是 HealthMate，一个 AI 助手（不是医生）。关于您的健康报告或药物，您有什么想问的吗？",
+    ta: "வணக்கம், நான் ஹெல்த்மேட், ஒரு AI உதவியாளர் (மருத்துவர் அல்ல). உங்கள் உடல்நல அறிக்கை அல்லது மருந்துகள் குறித்து ஏதேனும் கேள்விகள் உள்ளதா?",
   },
   "chat.error": {
     en: "Sorry, I had trouble answering that. Please try asking again.",
@@ -465,6 +505,24 @@ export const STRINGS = {
   },
   "pills.purpose": { en: "What It Is For", bm: "Kegunaan Ubat", zh: "用途", ta: "இது எதற்காக" },
   "pills.howToTake": { en: "How to Take It", bm: "Cara Mengambil", zh: "服用方法", ta: "எப்படி உட்கொள்வது" },
+  "pills.fromLabel": {
+    en: "From your pharmacy label",
+    bm: "Daripada label farmasi anda",
+    zh: "来自您的药房标签",
+    ta: "உங்கள் மருந்தக லேபிளிலிருந்து",
+  },
+  "pills.dosageNotVisible": {
+    en: "The dose is not visible in this photo. Follow the instructions on your pharmacy label, or ask your pharmacist.",
+    bm: "Dos tidak kelihatan dalam foto ini. Ikut arahan pada label farmasi anda, atau tanya ahli farmasi.",
+    zh: "照片中看不到剂量。请按照药房标签上的说明服用，或询问药剂师。",
+    ta: "இந்தப் புகைப்படத்தில் மருந்தளவு தெரியவில்லை. உங்கள் மருந்தக லேபிளில் உள்ள வழிமுறைகளைப் பின்பற்றவும் அல்லது மருந்தாளரிடம் கேளுங்கள்.",
+  },
+  "pills.lowConfidence": {
+    en: "We are not sure this is the right medicine. Please check the name with your pharmacist before relying on this information.",
+    bm: "Kami tidak pasti ini ubat yang betul. Sila semak nama ubat dengan ahli farmasi sebelum bergantung pada maklumat ini.",
+    zh: "我们不确定这是否是正确的药物。在依据这些信息之前，请先向药剂师核对药名。",
+    ta: "இது சரியான மருந்துதானா என்று எங்களுக்கு உறுதியாகத் தெரியவில்லை. இந்தத் தகவலை நம்புவதற்கு முன் மருந்தின் பெயரை மருந்தாளரிடம் சரிபார்க்கவும்.",
+  },
   "pills.sideEffects": {
     en: "Side Effects to Watch Out For",
     bm: "Kesan Sampingan yang Perlu Diperhatikan",
@@ -604,6 +662,7 @@ export const STRINGS = {
   },
   "meal.dishes": { en: "Dishes: {dishes}", bm: "Hidangan: {dishes}", zh: "菜肴：{dishes}", ta: "உணவுகள்: {dishes}" },
   "meal.score": { en: "Score: {score}/100", bm: "Skor: {score}/100", zh: "评分：{score}/100", ta: "மதிப்பெண்: {score}/100" },
+  "meal.notScored": { en: "Not scored", bm: "Tiada skor", zh: "未评分", ta: "மதிப்பெண் இல்லை" },
   "meal.saved": {
     en: "Saved to your Health Timeline!",
     bm: "Disimpan ke Garis Masa Kesihatan anda!",

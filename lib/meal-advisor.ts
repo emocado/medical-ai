@@ -22,8 +22,10 @@ export function parseMealResponse(
 
   const advice = ensureDisclaimer(parsed.advice || "Meal analysis completed.", language);
 
-  const scoreNum = Number(parsed.healthScore);
-  const healthScore = !isNaN(scoreNum) ? Math.max(0, Math.min(100, Math.round(scoreNum))) : 60;
+  // A missing or non-numeric score stays null: showing a made-up number would mislead.
+  const rawScore = parsed.healthScore;
+  const scoreNum = typeof rawScore === "number" || (typeof rawScore === "string" && rawScore.trim() !== "") ? Number(rawScore) : NaN;
+  const healthScore = Number.isFinite(scoreNum) ? Math.max(0, Math.min(100, Math.round(scoreNum))) : null;
 
   const now = new Date();
   const dateStr = now.toISOString().split("T")[0];
