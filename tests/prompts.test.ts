@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "@/lib/prompts";
+import { buildHealthMatePrompt, ensureDisclaimer, MEDICAL_DISCLAIMER, MEDICAL_DISCLAIMERS } from "@/lib/prompts";
 import type { ReportRecord, PillRecord } from "@/types";
 
 describe("HealthMate System Prompt Builder", () => {
@@ -56,5 +56,22 @@ describe("HealthMate System Prompt Builder", () => {
 
     const taPrompt = buildHealthMatePrompt({ language: "ta" });
     expect(taPrompt).toContain("Tamil");
+  });
+});
+
+describe("Localized medical disclaimer", () => {
+  it("appends the disclaimer in the reader's language", () => {
+    expect(ensureDisclaimer("Gula anda tinggi.", "bm")).toBe(`Gula anda tinggi.\n\n${MEDICAL_DISCLAIMERS.bm}`);
+  });
+
+  it("swaps an English disclaimer the model added to non-English text", () => {
+    const out = ensureDisclaimer(`血糖偏高。\n\n${MEDICAL_DISCLAIMERS.en}`, "zh");
+    expect(out).not.toContain(MEDICAL_DISCLAIMERS.en);
+    expect(out.endsWith(MEDICAL_DISCLAIMERS.zh)).toBe(true);
+  });
+
+  it("does not duplicate an existing disclaimer", () => {
+    const text = `Fine.\n\n${MEDICAL_DISCLAIMERS.en}`;
+    expect(ensureDisclaimer(text, "en")).toBe(text);
   });
 });

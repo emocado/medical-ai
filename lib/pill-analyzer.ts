@@ -1,5 +1,5 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
 import type { Language, PillInfo, PillRecord, ReportRecord } from "@/types";
 

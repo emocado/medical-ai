@@ -1,5 +1,5 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt, ensureDisclaimer, getDisclaimer } from "./prompts";
 import type { Language, ReportRecord, PillRecord } from "@/types";
 
 export interface ChatMessageItem {
@@ -21,7 +21,7 @@ Be warm, compassionate, patient, and straightforward.
 If the user asks questions about their report or pills, refer to their injected health context.
 If no report or pills are provided, provide safe, accurate, general health information.
 Never prescribe medication or give definitive diagnoses.
-Always conclude your answer with the disclaimer: "${MEDICAL_DISCLAIMER}".`,
+Always conclude your answer with the disclaimer: "${getDisclaimer(params.language)}".`,
   });
 }
 
@@ -51,10 +51,5 @@ export async function processChatMessage(params: {
     },
   });
 
-  let text = (response.text || "").trim();
-  if (!text.includes(MEDICAL_DISCLAIMER)) {
-    text = `${text}\n\n${MEDICAL_DISCLAIMER}`;
-  }
-
-  return text;
+  return ensureDisclaimer(response.text || "", params.language);
 }
