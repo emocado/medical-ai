@@ -6,7 +6,7 @@ import { VoiceChatModal } from "./VoiceChatModal";
 import { useT } from "./LanguageProvider";
 import { errorMessageKey, postJson } from "@/lib/api-client";
 import { SAMPLE_QUESTIONS } from "@/lib/samples";
-import type { Language, ReportRecord, PillRecord } from "@/types";
+import type { Language, ReportRecord, PillRecord, MedicationEntry } from "@/types";
 
 interface Message {
   id: string;
@@ -18,12 +18,14 @@ interface ChatInterfaceProps {
   language: Language;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  medications?: MedicationEntry[] | null;
 }
 
 export function ChatInterface({
   language,
   latestReport,
   knownPills,
+  medications,
 }: ChatInterfaceProps) {
   const t = useT();
   const [messages, setMessages] = useState<Message[]>([
@@ -72,6 +74,7 @@ export function ChatInterface({
         language,
         latestReport,
         knownPills,
+        medications,
       });
       setMessages((prev) => [
         ...prev,
@@ -228,6 +231,7 @@ export function ChatInterface({
         language={language}
         latestReport={latestReport}
         knownPills={knownPills}
+        medications={medications}
         history={messages
           .filter((m) => m.id !== "initial" && !m.id.startsWith("err-"))
           .map((m) => ({ role: m.role, content: m.content }))}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, MicOff, PhoneOff, Volume2, Loader2, AlertCircle, Sparkles } from "lucide-react";
-import type { Language, ReportRecord, PillRecord } from "@/types";
+import type { Language, ReportRecord, PillRecord, MedicationEntry } from "@/types";
 import {
   VOICE_SAMPLE_RATE,
   bytesToBase64,
@@ -28,6 +28,7 @@ interface VoiceChatModalProps {
   language: Language;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  medications?: MedicationEntry[] | null;
   /** Prior chat messages, sent so spoken questions keep the conversation's context. */
   history?: { role: "user" | "assistant"; content: string }[];
   /** Called after each completed spoken exchange so it can join the text chat thread. */
@@ -42,6 +43,7 @@ export function VoiceChatModal({
   language,
   latestReport,
   knownPills,
+  medications,
   history = [],
   onTurn,
 }: VoiceChatModalProps) {
@@ -174,6 +176,7 @@ export function VoiceChatModal({
           language,
           latestReport,
           knownPills,
+          medications,
         }),
       });
       if (!res.ok) {

@@ -37,7 +37,10 @@ export function getNextCooldown(
 }
 
 export function selectDialogueChoices(path: string, lang: Language): GuideChoice[] {
-  const routeChoices = CONTEXTUAL_GUIDE_CHOICES[path]?.choices[lang] || CONTEXTUAL_GUIDE_CHOICES["/reports"].choices[lang];
+  // The medicines hub shares the scanner's help content.
+  const scriptPath = path.startsWith("/medicines") ? "/pills" : path;
+  const routeChoices =
+    CONTEXTUAL_GUIDE_CHOICES[scriptPath]?.choices[lang] || CONTEXTUAL_GUIDE_CHOICES["/reports"].choices[lang];
   const globalOverview = GLOBAL_OVERVIEW_CHOICE[lang] || GLOBAL_OVERVIEW_CHOICE.en;
 
   const choices: GuideChoice[] = routeChoices.map((c) => ({
@@ -71,7 +74,7 @@ export function selectIdleHint(params: {
   let hintPool: string[] = [];
   let category = "reports";
 
-  if (path.startsWith("/pills")) {
+  if (path.startsWith("/pills") || path.startsWith("/medicines")) {
     category = "pills";
     hintPool = IDLE_HINTS.pills.all[lang] || IDLE_HINTS.pills.all.en;
   } else if (path.startsWith("/timeline")) {
