@@ -1,7 +1,7 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
 import { buildHealthMatePrompt, ensureDisclaimer } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
-import type { Language, MealRecord, PillRecord, ReportRecord } from "@/types";
+import type { Language, MealRecord, PillRecord, ReportRecord, MedicationEntry } from "@/types";
 
 export function parseMealResponse(
   rawText: string,
@@ -53,6 +53,7 @@ export async function analyzeMealWithGemini(params: {
   textInput?: string;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  medications?: MedicationEntry[] | null;
   language?: Language;
 }): Promise<MealRecord> {
   const client = getGeminiClient();
@@ -61,6 +62,7 @@ export async function analyzeMealWithGemini(params: {
     language: params.language,
     latestReport: params.latestReport,
     knownPills: params.knownPills,
+    medications: params.medications,
     extraInstructions: `You are providing dietary guidance on a meal for an elderly patient.
 You are familiar with local Malaysian meals and hawker foods (such as Nasi Lemak, Roti Canai, Char Kway Teow, Hainan Chicken Rice, Bak Kut Teh, Economy Rice / Mixed Rice, Yong Tau Foo, Thosai, Congee, Teh Tarik, etc.), as well as everyday home-cooked dishes.
 
