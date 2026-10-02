@@ -28,10 +28,19 @@ import {
 } from "lucide-react";
 import type { Language, ReportRecord, MealRecord, PillRecord } from "@/types";
 import type { DeltaComparisonResult } from "@/lib/delta-comparator";
+import type { ChangeVerdict } from "@/lib/trends";
+import type { StringKey } from "@/lib/i18n";
 
 type TimelineItem =
   | { type: "report"; item: ReportRecord; timestamp: number }
   | { type: "meal"; item: MealRecord; timestamp: number };
+
+const CHANGE_STYLES: Record<ChangeVerdict, { label: StringKey; card: string; chip: string }> = {
+  better: { label: "change.better", card: "border-emerald-300 bg-emerald-50/50", chip: "bg-emerald-100 text-emerald-950" },
+  worse: { label: "change.worse", card: "border-red-300 bg-red-50/50", chip: "bg-red-100 text-red-950" },
+  same: { label: "change.same", card: "border-slate-200 bg-slate-50", chip: "bg-slate-100 text-slate-900" },
+  unknown: { label: "change.unknown", card: "border-slate-200 bg-slate-50", chip: "bg-blue-100 text-blue-950" },
+};
 
 export default function TimelinePage() {
   const { language: lang } = useLanguage();
@@ -266,17 +275,24 @@ export default function TimelinePage() {
             <div className="space-y-3">
               <h4 className="text-lg font-bold text-slate-900">{t("timeline.markerChanges")}</h4>
               <div className="space-y-2.5">
-                {deltaResult.markerDeltas.map((delta, i) => (
+                {deltaResult.markerDeltas.map((delta, i) => {
+                  const style = CHANGE_STYLES[delta.change ?? "unknown"];
+                  return (
                   <div
                     key={i}
-                    className="p-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 space-y-2"
+                    className={`p-3.5 rounded-xl border-2 space-y-2 ${style.card}`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between gap-2">
                       <span className="text-lg font-bold text-slate-900">{delta.markerName}</span>
-                      <span className="text-base font-semibold px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-950">
-                        {delta.statusChange}
+                      <span className={`text-base font-bold px-2.5 py-0.5 rounded-md flex-shrink-0 ${style.chip}`}>
+                        {delta.change ? t(style.label) : delta.statusChange}
                       </span>
                     </div>
+                    {delta.previousStatus && delta.currentStatus && (
+                      <p className="text-sm font-semibold text-slate-600">
+                        {t(`status.${delta.previousStatus}`)} → {t(`status.${delta.currentStatus}`)}
+                      </p>
+                    )}
                     <div className="flex items-center space-x-3 text-base font-semibold text-slate-700">
                       <span>{t("timeline.previous", { value: delta.previousValue })}</span>
                       <ArrowRight className="w-4 h-4 text-slate-400" aria-hidden="true" />
@@ -288,7 +304,8 @@ export default function TimelinePage() {
                       </p>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

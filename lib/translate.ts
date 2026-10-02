@@ -9,7 +9,17 @@ import type { Language } from "@/types";
  * come from the original, so a sloppy translation can never corrupt a record.
  */
 /** Machine-readable fields whose values must never be translated. */
-const PRESERVED_KEYS = new Set(["dosageSource", "confidence", "progression", "status", "id", "language"]);
+const PRESERVED_KEYS = new Set([
+  "dosageSource",
+  "confidence",
+  "progression",
+  "status",
+  "change",
+  "previousStatus",
+  "currentStatus",
+  "id",
+  "language",
+]);
 
 export function mergeTranslatedStrings<T>(original: T, translated: unknown): T {
   if (typeof original === "string") {
