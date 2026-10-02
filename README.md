@@ -210,6 +210,21 @@ Execute the comprehensive Vitest test suite:
 npm test
 ```
 
+### Trying It Out (Sample Files)
+You don't need real medical documents. The app ships with **fictional, watermarked** test material in [`public/samples/`](public/samples/):
+
+| Feature | Sample | Where |
+|---|---|---|
+| Report analysis + read aloud + chat | March check-up (PDF), September follow-up (PDF) | Reports → "Just trying it out? Use a sample" |
+| Report comparison | Upload both reports above | Timeline → select both → Compare |
+| Critical-value handling | Urgent result (PNG: potassium 6.4, glucose 18.5) | Reports → sample buttons |
+| Pill identification | 3 daily medicines (metformin, amlodipine, atorvastatin) | Pill Analyzer → sample buttons |
+| Interaction check | New antibiotic (clarithromycin, which interacts with atorvastatin) | Pill Analyzer → sample buttons |
+| Meal advice | Nasi lemak, chicken rice, roti canai photos; typed meals including "grapefruit juice" | Timeline → Log Meal |
+| Voice | Speak any question, e.g. "Is my blood sugar too high?" | Reports → microphone button |
+
+Open **`/samples`** in the app for a suggested walkthrough, thumbnails and downloads. The chat also offers tap-to-ask example questions. The documents are regenerated from HTML with `node scripts/samples/build.mjs`; the food-photo licences are in [`public/samples/ATTRIBUTION.md`](public/samples/ATTRIBUTION.md).
+
 ---
 
 ## 8. Medical Disclaimer

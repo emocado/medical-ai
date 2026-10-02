@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
+import { loadSampleFile, type SampleFile } from "@/lib/samples";
+import { SampleChips } from "@/components/SampleChips";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
@@ -56,8 +58,19 @@ export default function PillsPage() {
   async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
     e.target.value = "";
+    await analyzeImage(file);
+  }
+
+  async function handleSample(sample: SampleFile) {
+    try {
+      await analyzeImage(await loadSampleFile(sample));
+    } catch {
+      setErrorMessage(t("samples.loadError"));
+    }
+  }
+
+  async function analyzeImage(file: File) {
     setErrorMessage(null);
     setIsAnalyzing(true);
 
@@ -143,6 +156,8 @@ export default function PillsPage() {
             </>
           )}
         </button>
+
+        <SampleChips kind="pill" onPick={handleSample} disabled={isAnalyzing} />
 
         {errorMessage && (
           <div
