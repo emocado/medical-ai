@@ -68,3 +68,15 @@ describe("Urgent result detection", () => {
     expect(needsUrgentAttention({ keyMarkers: {} })).toBe(false);
   });
 });
+
+describe("Reference range parsing", () => {
+  it("reads ranges, ceilings and floors, and refuses ambiguous text", async () => {
+    const { parseReferenceRange } = await import("@/lib/markers");
+    expect(parseReferenceRange("3.9 – 6.0")).toEqual({ low: 3.9, high: 6.0 });
+    expect(parseReferenceRange("45 - 90 (F)")).toEqual({ low: 45, high: 90 });
+    expect(parseReferenceRange("< 5.2")).toEqual({ high: 5.2 });
+    expect(parseReferenceRange("> 90")).toEqual({ low: 90 });
+    expect(parseReferenceRange("M > 1.0 / F > 1.2")).toBeNull();
+    expect(parseReferenceRange("")).toBeNull();
+  });
+});
