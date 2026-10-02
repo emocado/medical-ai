@@ -118,7 +118,7 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router, React 18, TypeScript)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) customized with high-contrast accessibility tokens
-- **AI & Multimodal Understanding**: [Google Gen AI SDK (`@google/genai`)](https://github.com/google-gemini/generative-ai-js) — Gemini Flash models
+- **AI & Multimodal Understanding**: [Google Gen AI SDK (`@google/genai`)](https://github.com/google-gemini/generative-ai-js) — Gemini Flash models served through [OpenCode Zen](https://opencode.ai/docs/zen/)
 - **Real-Time Voice**: Google Gemini Live API (Full-duplex WebSocket audio streaming)
 - **Speech Synthesis**: [@google-cloud/text-to-speech](https://cloud.google.com/text-to-speech) (WaveNet / Neural2)
 - **Client-Side Storage**: [IndexedDB via `idb`](https://github.com/jakearchibald/idb)
@@ -174,15 +174,16 @@ HealthMate adheres to a **Local-First, Zero-Login Privacy Model**:
 ### Prerequisites
 - **Node.js** (v18.17.0 or higher recommended)
 - **npm** or **pnpm**
-- **Google Gemini API Key** (from [Google AI Studio](https://aistudio.google.com/))
+- **OpenCode API Key** (from [OpenCode Zen](https://opencode.ai/zen)). All Gemini calls go through the OpenCode Zen gateway (`https://opencode.ai/zen/v1`), so no Google AI Studio key is needed.
 - *(Optional for TTS)* **Google Cloud Service Account** with Text-to-Speech API enabled
 
 ### Environment Configuration
-Create a `.env.local` file in the root directory:
+Create a `.env.local` (or `.env`) file in the root directory:
 
 ```env
-# Gemini API Key for multimodal document, pill, meal, and chat analysis
-GEMINI_API_KEY=your_gemini_api_key_here
+# OpenCode Zen API key, used server-side only for every Gemini call
+# (reports, pills, meals, chat, comparisons and voice)
+OPENCODE_API_KEY=your_opencode_api_key_here
 
 # (Optional) Google Cloud credentials for high-fidelity Text-to-Speech
 # Can be provided as a JSON string or file path
