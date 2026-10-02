@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
+import { useLanguage } from "@/components/LanguageProvider";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { getAllPillRecords, savePillRecord, getAllReports } from "@/lib/db";
 import {
@@ -18,7 +19,7 @@ import {
 import type { Language, PillRecord, ReportRecord } from "@/types";
 
 export default function PillsPage() {
-  const [lang, setLang] = useState<Language>("en");
+  const { language: lang } = useLanguage();
   const [pillRecords, setPillRecords] = useState<PillRecord[]>([]);
   const [latestReport, setLatestReport] = useState<ReportRecord | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -104,7 +105,7 @@ export default function PillsPage() {
 
   return (
     <div className="space-y-6">
-      <Header currentLang={lang} onLanguageChange={setLang} title="Pill Analyzer" />
+      <Header title="Pill Analyzer" />
 
       {/* Upload / Capture Section */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
