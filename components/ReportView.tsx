@@ -5,6 +5,8 @@ import type { Language, MarkerStatus, ReportRecord } from "@/types";
 import { MedicalDisclaimer } from "./Disclaimer";
 import { useT } from "./LanguageProvider";
 import { speakText } from "@/lib/speech";
+import { findUrgentFindings, needsUrgentAttention } from "@/lib/red-flags";
+import { UrgentAlert } from "./UrgentAlert";
 import type { StringKey } from "@/lib/i18n";
 import {
   FileText,
@@ -51,6 +53,8 @@ export function ReportView({ report, language }: ReportViewProps) {
   const t = useT();
   const summaryText = report.summary[language] || report.summary.en;
   const keyMarkerEntries = Object.entries(report.keyMarkers || {});
+  const urgentFindings = findUrgentFindings(report);
+  const isUrgent = needsUrgentAttention(report);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
@@ -111,6 +115,8 @@ export function ReportView({ report, language }: ReportViewProps) {
           <time dateTime={report.date}>{report.date}</time>
         </div>
       </div>
+
+      {isUrgent && <UrgentAlert findings={urgentFindings} />}
 
       {/* Summary Section with Read Aloud Button */}
       <div className="space-y-3">
