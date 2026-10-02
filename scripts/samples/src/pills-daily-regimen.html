@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daily Regimen Labels (SAMPLE)</title>
+<style>
+  html, body { margin: 0; width: 1600px; height: 1000px; overflow: hidden; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #111;
+    /* table-top photo feel: warm laminate with soft light falloff */
+    background:
+      radial-gradient(ellipse 75% 70% at 45% 40%, rgba(255,255,255,0.22), rgba(0,0,0,0.28) 100%),
+      repeating-linear-gradient(92deg, rgba(0,0,0,0.035) 0 3px, rgba(255,255,255,0.03) 3px 9px, rgba(0,0,0,0.02) 9px 17px),
+      linear-gradient(180deg, #b89a76, #a5855f); }
+  .row { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; gap: 46px; padding-top: 10px; }
+  .box { position: relative; width: 450px; height: 700px; border-radius: 6px;
+         box-shadow: 18px 22px 30px rgba(0,0,0,0.35), 2px 3px 4px rgba(0,0,0,0.25); }
+  .box::before { /* lid / top face */ content: ""; position: absolute; left: 6px; right: -6px; top: -14px; height: 14px;
+         background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(0,0,0,0.05)); border-radius: 4px 4px 0 0; transform: skewX(-24deg); }
+  .b1 { background: linear-gradient(135deg, #f4f7fb, #dfe7f0); transform: rotate(-2.2deg); }
+  .b2 { background: linear-gradient(135deg, #fbf6ee, #ece1cf); transform: rotate(1.2deg) translateY(12px); }
+  .b3 { background: linear-gradient(135deg, #f7f2f8, #e6dbe9); transform: rotate(-0.8deg) translateY(-6px); }
+  .pack { height: 190px; padding: 22px 26px 0; box-sizing: border-box; position: relative; }
+  .stripe { position: absolute; left: 0; right: 0; top: 0; height: 14px; border-radius: 6px 6px 0 0; }
+  .b1 .stripe { background: #2a6fb3; } .b2 .stripe { background: #c4741f; } .b3 .stripe { background: #7a3f8f; }
+  .pack .gen { font-size: 30px; font-weight: 700; margin-top: 10px; letter-spacing: .5px; }
+  .pack .str { font-size: 19px; margin-top: 2px; color: #333; }
+  .pack .mfr { font-size: 12.5px; color: #555; margin-top: 4px; }
+  .pills { position: absolute; right: 26px; bottom: 26px; display: flex; gap: 10px; align-items: center; }
+  .pill { background: radial-gradient(ellipse at 35% 30%, #fff, #e9e9e9 60%, #cfcfcf); box-shadow: 2px 3px 4px rgba(0,0,0,0.3); position: relative; }
+  .pill::after { content: ""; position: absolute; left: 50%; top: 18%; bottom: 18%; border-left: 1.5px solid rgba(0,0,0,0.25); }
+  .oblong { width: 72px; height: 32px; border-radius: 16px; }
+  .round { width: 40px; height: 40px; border-radius: 50%; }
+  .oval { width: 58px; height: 34px; border-radius: 50%; }
+  .oval::after, .round::after { display: none; }
+  .label { position: absolute; left: 14px; right: 14px; bottom: 16px; background: #fff; padding: 14px 16px 12px;
+           box-shadow: 0 1px 2px rgba(0,0,0,0.25); border-radius: 2px; font-size: 15px; line-height: 1.35;
+           background-image: linear-gradient(180deg, #fff, #fafafa); }
+  .ph { text-align: center; border-bottom: 1.5px solid #111; padding-bottom: 6px; }
+  .ph .n { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+  .ph .a { font-size: 12.5px; }
+  .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 14.5px; }
+  .drug { font-size: 25px; font-weight: 700; margin: 10px 0 2px; letter-spacing: .3px; }
+  .qty { font-size: 15px; }
+  .ins { margin-top: 10px; font-size: 16.5px; font-weight: 700; border-top: 1px dashed #666; padding-top: 8px; }
+  .ins .bm { font-weight: 400; font-style: italic; margin-top: 4px; }
+  .warn { margin-top: 10px; border-top: 1.5px solid #111; padding-top: 6px; font-size: 13.5px; }
+  .warn .uk { color: #c00; font-weight: 700; font-size: 16px; letter-spacing: 1px; }
+  .wm { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-24deg); font-size: 96px; font-weight: 700;
+        color: rgba(70,70,70,0.10); white-space: nowrap; letter-spacing: 6px; pointer-events: none; }
+  .wm-corner { position: absolute; right: 18px; bottom: 14px; font-size: 14px; letter-spacing: 1px; color: rgba(255,255,255,0.85);
+               background: rgba(0,0,0,0.35); padding: 3px 8px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="row">
+
+  <div class="box b1">
+    <div class="pack"><div class="stripe"></div>
+      <div class="gen">Metformin HCl</div>
+      <div class="str">500 mg &middot; 60 film-coated tablets</div>
+      <div class="mfr">Demo Generics Sdn Bhd &middot; For oral use</div>
+      <div class="pills"><div class="pill oblong"></div><div class="pill oblong"></div></div>
+    </div>
+    <div class="label">
+      <div class="ph"><div class="n">FARMASI SEJAHTERA DEMO</div>
+        <div class="a">No. 5, Jalan Demo 2/3, 46200 Petaling Jaya &middot; Tel: 03-0000 0002</div></div>
+      <div class="meta"><span>Nama: <b>LIM SIEW LAN</b></span><span>Tarikh: 10/09/2026</span></div>
+      <div class="meta" style="margin-top:2px"><span>Rx No: FSD-0910-118</span><span>Dr. S. Kumar (demo)</span></div>
+      <div class="drug">METFORMIN 500MG TABLET</div>
+      <div class="qty">Kuantiti / Qty: <b>60</b> TABLET</div>
+      <div class="ins">Take 1 tablet twice daily after breakfast and dinner
+        <div class="bm">Makan 1 biji 2 kali sehari selepas sarapan dan makan malam</div></div>
+      <div class="warn"><div class="uk">UBAT TERKAWAL</div>
+        Jauhkan daripada kanak-kanak / Keep out of reach of children</div>
+    </div>
+  </div>
+
+  <div class="box b2">
+    <div class="pack"><div class="stripe"></div>
+      <div class="gen">Amlodipine</div>
+      <div class="str">5 mg &middot; 30 tablets</div>
+      <div class="mfr">Demo Generics Sdn Bhd &middot; For oral use</div>
+      <div class="pills"><div class="pill round"></div><div class="pill round"></div><div class="pill round"></div></div>
+    </div>
+    <div class="label">
+      <div class="ph"><div class="n">FARMASI SEJAHTERA DEMO</div>
+        <div class="a">No. 5, Jalan Demo 2/3, 46200 Petaling Jaya &middot; Tel: 03-0000 0002</div></div>
+      <div class="meta"><span>Nama: <b>LIM SIEW LAN</b></span><span>Tarikh: 10/09/2026</span></div>
+      <div class="meta" style="margin-top:2px"><span>Rx No: FSD-0910-119</span><span>Dr. S. Kumar (demo)</span></div>
+      <div class="drug">AMLODIPINE 5MG TABLET</div>
+      <div class="qty">Kuantiti / Qty: <b>30</b> TABLET</div>
+      <div class="ins">Take 1 tablet once daily in the morning
+        <div class="bm">Makan 1 biji sekali sehari pada waktu pagi</div></div>
+      <div class="warn"><div class="uk">UBAT TERKAWAL</div>
+        Jauhkan daripada kanak-kanak / Keep out of reach of children</div>
+    </div>
+  </div>
+
+  <div class="box b3">
+    <div class="pack"><div class="stripe"></div>
+      <div class="gen">Atorvastatin</div>
+      <div class="str">20 mg &middot; 30 film-coated tablets</div>
+      <div class="mfr">Demo Generics Sdn Bhd &middot; For oral use</div>
+      <div class="pills"><div class="pill oval"></div><div class="pill oval"></div></div>
+    </div>
+    <div class="label">
+      <div class="ph"><div class="n">FARMASI SEJAHTERA DEMO</div>
+        <div class="a">No. 5, Jalan Demo 2/3, 46200 Petaling Jaya &middot; Tel: 03-0000 0002</div></div>
+      <div class="meta"><span>Nama: <b>LIM SIEW LAN</b></span><span>Tarikh: 10/09/2026</span></div>
+      <div class="meta" style="margin-top:2px"><span>Rx No: FSD-0910-120</span><span>Dr. S. Kumar (demo)</span></div>
+      <div class="drug">ATORVASTATIN 20MG TABLET</div>
+      <div class="qty">Kuantiti / Qty: <b>30</b> TABLET</div>
+      <div class="ins">Take 1 tablet once daily at night
+        <div class="bm">Makan 1 biji sekali sehari pada waktu malam</div></div>
+      <div class="warn"><div class="uk">UBAT TERKAWAL</div>
+        Jauhkan daripada kanak-kanak / Keep out of reach of children</div>
+    </div>
+  </div>
+
+</div>
+<div class="wm">SAMPLE — FOR DEMO ONLY</div>
+<div class="wm-corner">SAMPLE — FOR DEMO ONLY</div>
+</body>
+</html>
