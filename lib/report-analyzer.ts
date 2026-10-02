@@ -76,6 +76,7 @@ export function parseReportResponse(
     rawBase64,
     summary,
     keyMarkers,
+    urgent: parsed.urgent === true,
     createdAt: Date.now(),
   };
 }
@@ -108,7 +109,10 @@ Extract:
        "abnormal" for a non-numeric result reported as abnormal,
        "unknown" if there is no flag and no reference range to judge by. Never guess "normal".
 
-Return ONLY valid JSON with fields { "date", "summary": { "en", "bm", "zh", "ta" }, "keyMarkers": [...] }.`,
+4. "urgent": true if anything on the report needs same-day medical attention (critical or panic values, dangerously abnormal results, or lab notes such as "critical values phoned to clinic"), otherwise false.
+   If urgent, each summary must say clearly and early, in plain words, that the patient should contact their doctor or clinic today. Do not soften this.
+
+Return ONLY valid JSON with fields { "date", "summary": { "en", "bm", "zh", "ta" }, "keyMarkers": [...], "urgent" }.`,
   });
 
   const response = await client.models.generateContent({

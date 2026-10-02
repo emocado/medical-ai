@@ -135,6 +135,12 @@ export const STRINGS = {
     zh: "时间线：选择这两份报告并点击比较，看看哪些好转、哪些变差。",
     ta: "காலவரிசை: இரண்டு அறிக்கைகளையும் தேர்ந்தெடுத்து ஒப்பிடு என்பதை அழுத்தி, எது மேம்பட்டது, எது மோசமானது என்று பாருங்கள்.",
   },
+  "samples.step.urgent": {
+    en: "Reports: upload the urgent result to see how dangerous values are flagged with a same-day warning.",
+    bm: "Laporan: muat naik keputusan segera untuk melihat bagaimana nilai berbahaya ditanda dengan amaran untuk hari yang sama.",
+    zh: "报告：上传紧急结果，看看危险数值如何被标出并提示当天就医。",
+    ta: "அறிக்கைகள்: ஆபத்தான மதிப்புகள் அன்றே மருத்துவரை அணுகுமாறு எச்சரிக்கையுடன் எவ்வாறு குறிக்கப்படுகின்றன என்பதைக் காண அவசர முடிவைப் பதிவேற்றவும்.",
+  },
   "samples.step.pills": {
     en: "Pill Analyzer: scan the 3 daily medicines, then the new antibiotic, to check for interactions.",
     bm: "Semak Ubat: imbas 3 ubat harian, kemudian antibiotik baharu, untuk menyemak interaksi.",
@@ -195,6 +201,31 @@ export const STRINGS = {
   "status.abnormal": { en: "CHECK", bm: "SEMAK", zh: "异常", ta: "சரிபார்க்கவும்" },
   "status.critical": { en: "URGENT", bm: "SEGERA", zh: "危急", ta: "அவசரம்" },
   "status.unknown": { en: "ASK DOCTOR", bm: "TANYA DOKTOR", zh: "请问医生", ta: "மருத்துவரிடம் கேளுங்கள்" },
+  "urgent.title": {
+    en: "Some results need medical attention soon",
+    bm: "Sesetengah keputusan perlu perhatian perubatan segera",
+    zh: "部分结果需要尽快就医",
+    ta: "சில முடிவுகளுக்கு விரைவில் மருத்துவ கவனம் தேவை",
+  },
+  "urgent.body": {
+    en: "Please contact your doctor or clinic today and show them this report.",
+    bm: "Sila hubungi doktor atau klinik anda hari ini dan tunjukkan laporan ini.",
+    zh: "请今天就联系您的医生或诊所，并出示这份报告。",
+    ta: "இன்றே உங்கள் மருத்துவர் அல்லது கிளினிக்கைத் தொடர்புகொண்டு இந்த அறிக்கையைக் காட்டுங்கள்.",
+  },
+  "urgent.flagged": {
+    en: "Results that need attention:",
+    bm: "Keputusan yang perlu perhatian:",
+    zh: "需要注意的结果：",
+    ta: "கவனிக்க வேண்டிய முடிவுகள்:",
+  },
+  "urgent.emergency": {
+    en: "If you feel very unwell (chest pain, trouble breathing, confusion, weakness or fainting), call 999 or go to the nearest emergency department now.",
+    bm: "Jika anda berasa sangat tidak sihat (sakit dada, sukar bernafas, keliru, lemah atau pengsan), hubungi 999 atau pergi ke jabatan kecemasan terdekat sekarang.",
+    zh: "如果您感到非常不适（胸痛、呼吸困难、意识混乱、乏力或晕倒），请立即拨打 999 或前往最近的急诊部。",
+    ta: "கடுமையான உடல்நலக் குறைவை (நெஞ்சு வலி, மூச்சுத் திணறல், குழப்பம், பலவீனம் அல்லது மயக்கம்) உணர்ந்தால், உடனே 999 ஐ அழைக்கவும் அல்லது அருகிலுள்ள அவசர சிகிச்சைப் பிரிவுக்குச் செல்லவும்.",
+  },
+  "urgent.call": { en: "Call 999 (Emergency)", bm: "Hubungi 999 (Kecemasan)", zh: "拨打 999（急救）", ta: "999 ஐ அழைக்கவும் (அவசரம்)" },
   "report.normalRange": {
     en: "Normal range: {range}",
     bm: "Julat normal: {range}",

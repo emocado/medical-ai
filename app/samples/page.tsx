@@ -80,6 +80,7 @@ const SECTIONS: { title: StringKey; items: DownloadableSample[] }[] = [
 const STEPS: StringKey[] = [
   "samples.step.reports",
   "samples.step.compare",
+  "samples.step.urgent",
   "samples.step.pills",
   "samples.step.meals",
   "samples.step.language",

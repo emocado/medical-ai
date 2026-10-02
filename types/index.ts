@@ -28,6 +28,8 @@ export interface ReportRecord {
   };
   keyMarkers: Record<string, KeyMarker>;
   createdAt: number;
+  /** The AI judged that something on the report needs same-day medical attention. */
+  urgent?: boolean;
 }
 
 export interface PillInfo {
