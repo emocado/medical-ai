@@ -3,7 +3,7 @@
 import React from "react";
 import { HeartPulse } from "lucide-react";
 import type { Language } from "@/types";
-import { useLanguage } from "@/components/LanguageProvider";
+import { useLanguage, useT } from "@/components/LanguageProvider";
 
 interface HeaderProps {
   title?: string;
@@ -18,6 +18,7 @@ const LANGUAGES: { code: Language; label: string }[] = [
 
 export function Header({ title = "HealthMate" }: HeaderProps) {
   const { language, setLanguage } = useLanguage();
+  const t = useT();
 
   return (
     <header className="sticky top-0 z-40 bg-blue-900 text-white shadow-md">
@@ -27,7 +28,7 @@ export function Header({ title = "HealthMate" }: HeaderProps) {
           <h1 className="text-xl font-bold tracking-tight text-white">{title}</h1>
         </div>
 
-        <div className="flex items-center space-x-1" role="group" aria-label="Language selection">
+        <div className="flex items-center space-x-1" role="group" aria-label={t("header.languageSelection")}>
           {LANGUAGES.map((l) => (
             <button
               key={l.code}

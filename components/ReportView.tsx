@@ -3,6 +3,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import type { Language, ReportRecord } from "@/types";
 import { MedicalDisclaimer } from "./Disclaimer";
+import { useT } from "./LanguageProvider";
+import { speakText } from "@/lib/speech";
+import type { StringKey } from "@/lib/i18n";
 import {
   FileText,
   Calendar,
@@ -19,38 +22,35 @@ interface ReportViewProps {
   language: Language;
 }
 
+const STATUS_KEYS: Record<string, StringKey> = {
+  high: "status.high",
+  low: "status.low",
+  abnormal: "status.abnormal",
+};
+
 export function ReportView({ report, language }: ReportViewProps) {
+  const t = useT();
   const summaryText = report.summary[language] || report.summary.en;
   const keyMarkerEntries = Object.entries(report.keyMarkers || {});
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [ttsError, setTtsError] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const stopRef = useRef<(() => void) | null>(null);
 
-  // Stop audio if report or language changes
+  // Stop audio if report or language changes, and on unmount
   useEffect(() => {
-    stopAudio();
+    return () => stopAudio();
   }, [report.id, language]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopAudio();
-    };
-  }, []);
-
   function stopAudio() {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current = null;
-    }
+    stopRef.current?.();
+    stopRef.current = null;
     setIsPlaying(false);
     setIsLoadingAudio(false);
   }
 
-  async function handleToggleReadAloud() {
+  function handleToggleReadAloud() {
     if (isPlaying) {
       stopAudio();
       return;
@@ -58,54 +58,28 @@ export function ReportView({ report, language }: ReportViewProps) {
 
     setTtsError(null);
     setIsLoadingAudio(true);
-
-    try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: summaryText,
-          language,
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `TTS failed with status ${res.status}`);
-      }
-
-      const blob = await res.blob();
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-
-      audio.onended = () => {
+    stopRef.current = speakText(summaryText, language, {
+      onStart: () => {
+        setIsLoadingAudio(false);
+        setIsPlaying(true);
+      },
+      onEnd: () => {
+        stopRef.current = null;
         setIsPlaying(false);
-        audioRef.current = null;
-      };
-
-      audio.onerror = () => {
+      },
+      onError: (err) => {
+        console.error("TTS playback error:", err);
+        stopRef.current = null;
         setIsPlaying(false);
         setIsLoadingAudio(false);
-        setTtsError("Audio playback error.");
-      };
-
-      await audio.play();
-      setIsPlaying(true);
-    } catch (err: any) {
-      console.error("TTS playback error:", err);
-      setTtsError(
-        err.message ||
-          "Could not read aloud at this moment. Please check network or TTS credentials."
-      );
-    } finally {
-      setIsLoadingAudio(false);
-    }
+        setTtsError(t("report.ttsError"));
+      },
+    });
   }
 
   return (
     <article
-      aria-label={`Report Summary for ${report.fileName}`}
+      aria-label={t("report.aria", { name: report.fileName })}
       className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
@@ -122,13 +96,12 @@ export function ReportView({ report, language }: ReportViewProps) {
       {/* Summary Section with Read Aloud Button */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-bold text-slate-900">Summary</h4>
+          <h4 className="text-lg font-bold text-slate-900">{t("report.summary")}</h4>
 
-          {/* Accessible Read Aloud Button */}
           <button
             onClick={handleToggleReadAloud}
             disabled={isLoadingAudio}
-            aria-label={isPlaying ? "Stop reading report summary aloud" : "Read report summary aloud"}
+            aria-label={isPlaying ? t("report.stopReading.aria") : t("report.readAloud.aria")}
             className={`px-4 py-2 rounded-xl text-base font-bold min-h-[48px] flex items-center gap-2 transition-colors shadow-sm ${
               isPlaying
                 ? "bg-red-700 hover:bg-red-800 text-white"
@@ -138,17 +111,17 @@ export function ReportView({ report, language }: ReportViewProps) {
             {isLoadingAudio ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin text-blue-900" aria-hidden="true" />
-                <span>Preparing voice...</span>
+                <span>{t("report.preparingVoice")}</span>
               </>
             ) : isPlaying ? (
               <>
                 <Square className="w-5 h-5 fill-current" aria-hidden="true" />
-                <span>Stop Reading</span>
+                <span>{t("report.stopReading")}</span>
               </>
             ) : (
               <>
                 <Volume2 className="w-5 h-5 text-blue-800" aria-hidden="true" />
-                <span>Read Aloud</span>
+                <span>{t("report.readAloud")}</span>
               </>
             )}
           </button>
@@ -172,13 +145,11 @@ export function ReportView({ report, language }: ReportViewProps) {
       {/* Key Markers */}
       {keyMarkerEntries.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-lg font-bold text-slate-900">Key Health Markers</h4>
+          <h4 className="text-lg font-bold text-slate-900">{t("report.keyMarkers")}</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {keyMarkerEntries.map(([name, marker]) => {
-              const isAbnormal =
-                marker.status === "high" ||
-                marker.status === "low" ||
-                marker.status === "abnormal";
+              const statusKey = marker.status ? STATUS_KEYS[marker.status] : undefined;
+              const isAbnormal = Boolean(statusKey);
 
               return (
                 <div
@@ -195,15 +166,15 @@ export function ReportView({ report, language }: ReportViewProps) {
                       {marker.value} {marker.unit || ""}
                     </span>
                   </div>
-                  {isAbnormal ? (
+                  {statusKey ? (
                     <span className="inline-flex items-center text-sm font-bold text-amber-900 bg-amber-200 px-2.5 py-1 rounded-full">
                       <AlertTriangle className="w-4 h-4 mr-1 text-amber-800" />
-                      {marker.status ? marker.status.toUpperCase() : "CHECK"}
+                      {t(statusKey)}
                     </span>
                   ) : (
                     <span className="inline-flex items-center text-sm font-bold text-emerald-900 bg-emerald-100 px-2.5 py-1 rounded-full">
                       <CheckCircle2 className="w-4 h-4 mr-1 text-emerald-700" />
-                      NORMAL
+                      {t("status.normal")}
                     </span>
                   )}
                 </div>

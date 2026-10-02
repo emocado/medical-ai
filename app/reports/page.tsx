@@ -2,15 +2,17 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Header } from "@/components/Header";
-import { useLanguage } from "@/components/LanguageProvider";
+import { useLanguage, useT } from "@/components/LanguageProvider";
 import { ReportView } from "@/components/ReportView";
 import { ChatInterface } from "@/components/ChatInterface";
 import { getAllReports, saveReport, getAllPillRecords } from "@/lib/db";
+import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { FileUp, Loader2, Plus, AlertCircle, History } from "lucide-react";
-import type { Language, ReportRecord, PillRecord } from "@/types";
+import type { ReportRecord, PillRecord } from "@/types";
 
 export default function ReportsPage() {
   const { language: lang } = useLanguage();
+  const t = useT();
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -48,66 +50,40 @@ export default function ReportsPage() {
 
     try {
       const base64 = await fileToBase64(file);
-      const res = await fetch("/api/reports/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileBase64: base64,
-          mimeType: file.type || "application/octet-stream",
-          fileName: file.name,
-        }),
+      const analyzedReport = await postJson<ReportRecord>("/api/reports/analyze", {
+        fileBase64: base64,
+        mimeType: file.type || "application/octet-stream",
+        fileName: file.name,
       });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server responded with ${res.status}`);
-      }
-
-      const analyzedReport: ReportRecord = await res.json();
       await saveReport(analyzedReport);
 
       setReports((prev) => [analyzedReport, ...prev]);
       setSelectedReportId(analyzedReport.id);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Upload/analysis failed:", err);
-      setErrorMessage(err.message || "Failed to analyze report. Please try again.");
+      setErrorMessage(t(errorMessageKey(err, "reports.upload.error")));
     } finally {
       setIsUploading(false);
     }
-  }
-
-  function fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        const base64 = result.split(",")[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   }
 
   const activeReport = reports.find((r) => r.id === selectedReportId) || reports[0];
 
   return (
     <div className="space-y-6">
-      <Header title="HealthMate Reports" />
+      <Header title={t("title.reports")} />
 
       {/* Upload Action */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <FileUp className="w-6 h-6 text-blue-800" aria-hidden="true" />
-            Upload Medical Report
+            {t("reports.upload.title")}
           </h2>
-          <span className="text-base text-slate-600 font-medium">Photo or PDF</span>
+          <span className="text-base text-slate-600 font-medium">{t("reports.upload.formats")}</span>
         </div>
 
-        <p className="text-base text-slate-700 leading-relaxed">
-          Take a photo or upload your blood test, scan, or hospital discharge summary. We explain it simply in your language.
-        </p>
+        <p className="text-base text-slate-700 leading-relaxed">{t("reports.upload.desc")}</p>
 
         <input
           ref={fileInputRef}
@@ -131,12 +107,12 @@ export default function ReportsPage() {
           {isUploading ? (
             <>
               <Loader2 className="w-6 h-6 animate-spin text-blue-900" aria-hidden="true" />
-              <span>Analyzing your report with care...</span>
+              <span>{t("reports.upload.analyzing")}</span>
             </>
           ) : (
             <>
               <Plus className="w-6 h-6" aria-hidden="true" />
-              <span>Select or Photograph Report</span>
+              <span>{t("reports.upload.button")}</span>
             </>
           )}
         </button>
@@ -155,12 +131,12 @@ export default function ReportsPage() {
       {/* Report History / Selector if multiple reports exist */}
       {reports.length > 1 && (
         <section
-          aria-label="Previous Reports"
+          aria-label={t("reports.history.aria")}
           className="bg-white p-4 rounded-2xl border-2 border-slate-200 space-y-2"
         >
           <div className="flex items-center space-x-2 text-slate-800 font-bold text-base mb-1">
             <History className="w-5 h-5 text-blue-800" aria-hidden="true" />
-            <span>Select Report to View:</span>
+            <span>{t("reports.history.label")}</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
             {reports.map((r) => (
@@ -188,9 +164,7 @@ export default function ReportsPage() {
       ) : (
         !isUploading && (
           <div className="text-center py-8 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
-            <p className="text-lg font-medium text-slate-600">
-              No reports uploaded yet. Upload a report above, or ask any health question below.
-            </p>
+            <p className="text-lg font-medium text-slate-600">{t("reports.empty")}</p>
           </div>
         )
       )}

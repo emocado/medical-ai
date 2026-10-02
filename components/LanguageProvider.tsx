@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { Language } from "@/types";
+import { translate, type StringKey } from "@/lib/i18n";
 
 const STORAGE_KEY = "healthmate_lang";
 const SUPPORTED: Language[] = ["en", "bm", "zh", "ta"];
@@ -50,5 +51,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>{children}</LanguageContext.Provider>
+  );
+}
+
+/** Returns a translator bound to the current language: `t("reports.summary")`. */
+export function useT() {
+  const { language } = useLanguage();
+  return useCallback(
+    (key: StringKey, vars?: Record<string, string | number>) => translate(language, key, vars),
+    [language]
   );
 }
