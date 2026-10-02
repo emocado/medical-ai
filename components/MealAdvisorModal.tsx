@@ -114,7 +114,7 @@ export function MealAdvisorModal({
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-2 sm:p-4 overflow-y-auto"
     >
       <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 border-2 border-slate-300 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
           <div className="flex items-center space-x-2">
             <Utensils className="w-7 h-7 text-amber-600" aria-hidden="true" />
             <h3 id="meal-modal-title" className="text-xl font-bold text-slate-900">
