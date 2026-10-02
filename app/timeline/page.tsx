@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { errorMessageKey, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
 import { MealScoreChip } from "@/components/MealScoreChip";
+import { MarkerTrends } from "@/components/MarkerTrends";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { ensureDisclaimer } from "@/lib/prompts";
@@ -28,7 +29,7 @@ import {
 } from "lucide-react";
 import type { Language, ReportRecord, MealRecord, PillRecord } from "@/types";
 import type { DeltaComparisonResult } from "@/lib/delta-comparator";
-import type { ChangeVerdict } from "@/lib/trends";
+import { buildTrends, type ChangeVerdict } from "@/lib/trends";
 import type { StringKey } from "@/lib/i18n";
 
 type TimelineItem =
@@ -136,6 +137,7 @@ export default function TimelinePage() {
   ].sort((a, b) => b.timestamp - a.timestamp);
 
   const latestReport = reports.length > 0 ? reports[0] : null;
+  const trends = useMemo(() => buildTrends(reports), [reports]);
 
   const mealTranslation = useAutoTranslate(
     meals,
@@ -234,6 +236,8 @@ export default function TimelinePage() {
           </div>
         )}
       </section>
+
+      {trends.length > 0 && <MarkerTrends trends={trends} />}
 
       <TranslationStatus status={deltaTranslation} onRetry={() => setDeltaRetry((n) => n + 1)} />
 

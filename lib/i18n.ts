@@ -638,6 +638,27 @@ export const STRINGS = {
   "change.worse": { en: "Worse", bm: "Lebih teruk", zh: "变差", ta: "மோசமானது" },
   "change.same": { en: "No change", bm: "Tiada perubahan", zh: "无变化", ta: "மாற்றமில்லை" },
   "change.unknown": { en: "Ask your doctor", bm: "Tanya doktor", zh: "请问医生", ta: "மருத்துவரிடம் கேளுங்கள்" },
+  "trends.title": {
+    en: "Your results over time",
+    bm: "Keputusan anda dari semasa ke semasa",
+    zh: "您的指标变化趋势",
+    ta: "காலப்போக்கில் உங்கள் முடிவுகள்",
+  },
+  "trends.pick": { en: "Choose a test:", bm: "Pilih ujian:", zh: "选择检查项目：", ta: "ஒரு பரிசோதனையைத் தேர்ந்தெடுக்கவும்:" },
+  "trends.normalBand": {
+    en: "Shaded area = normal range",
+    bm: "Kawasan berlorek = julat normal",
+    zh: "阴影区域 = 正常范围",
+    ta: "நிழலிட்ட பகுதி = இயல்பு வரம்பு",
+  },
+  "trends.date": { en: "Date", bm: "Tarikh", zh: "日期", ta: "தேதி" },
+  "trends.value": { en: "Result", bm: "Keputusan", zh: "结果", ta: "முடிவு" },
+  "trends.chartAria": {
+    en: "{name} over time",
+    bm: "{name} dari semasa ke semasa",
+    zh: "{name} 的变化趋势",
+    ta: "காலப்போக்கில் {name}",
+  },
 
   // Meal advisor
   "meal.title": { en: "Dietary Meal Advisor", bm: "Penasihat Pemakanan", zh: "饮食建议", ta: "உணவு ஆலோசகர்" },
