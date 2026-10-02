@@ -75,3 +75,25 @@ describe("Localized medical disclaimer", () => {
     expect(ensureDisclaimer(text, "en")).toBe(text);
   });
 });
+
+describe("Medication context", () => {
+  it("uses the confirmed medicine list instead of old pill scans and skips stopped medicines", () => {
+    const med = (name: string, active: boolean) => ({
+      id: name,
+      name,
+      genericName: name.toLowerCase(),
+      analysis: { purpose: "p", dosage: "", sideEffects: [], foodInteractions: ["Grapefruit"], drugInteractions: [] },
+      schedule: ["night" as const],
+      active,
+      createdAt: 1,
+    });
+    const prompt = buildHealthMatePrompt({
+      medications: [med("Atorvastatin", true), med("Ibuprofen", false)],
+      knownPills: [{ id: "s", date: "", createdAt: 1, analysis: { pills: [{ name: "OldScanDrug", genericName: "", purpose: "", dosage: "", sideEffects: [], foodInteractions: [], drugInteractions: [] }] } }],
+    });
+    expect(prompt).toContain("CONFIRMS THEY CURRENTLY TAKE");
+    expect(prompt).toContain("Atorvastatin (atorvastatin), dose not recorded; follow the pharmacy label, taken: night");
+    expect(prompt).not.toContain("Ibuprofen");
+    expect(prompt).not.toContain("OldScanDrug");
+  });
+});

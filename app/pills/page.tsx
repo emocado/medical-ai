@@ -9,7 +9,16 @@ import { SampleChips } from "@/components/SampleChips";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
-import { deletePillRecord, getAllPillRecords, savePillRecord, getAllReports } from "@/lib/db";
+import {
+  deletePillRecord,
+  getAllMedications,
+  getAllPillRecords,
+  getAllReports,
+  saveMedication,
+  savePillRecord,
+} from "@/lib/db";
+import { findSameMedication, medicationFromPill } from "@/lib/medications";
+import Link from "next/link";
 import {
   Pill,
   Camera,
@@ -21,14 +30,17 @@ import {
   Sparkles,
   ShieldAlert,
   Trash2,
+  Plus,
+  CheckCircle2,
 } from "lucide-react";
-import type { Language, PillRecord, ReportRecord } from "@/types";
+import type { MedicationEntry, PillInfo, PillRecord, ReportRecord } from "@/types";
 
 export default function PillsPage() {
   const { language: lang } = useLanguage();
   const t = useT();
   const [pillRecords, setPillRecords] = useState<PillRecord[]>([]);
   const [latestReport, setLatestReport] = useState<ReportRecord | null>(null);
+  const [medications, setMedications] = useState<MedicationEntry[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
@@ -40,11 +52,13 @@ export default function PillsPage() {
 
   async function loadData() {
     try {
-      const [records, reports] = await Promise.all([
+      const [records, reports, meds] = await Promise.all([
         getAllPillRecords(),
         getAllReports(),
+        getAllMedications(),
       ]);
       setPillRecords(records);
+      setMedications(meds);
       if (reports.length > 0) {
         setLatestReport(reports[0]);
       }
@@ -81,6 +95,7 @@ export default function PillsPage() {
         imageBase64: base64,
         mimeType: file.type || "image/jpeg",
         latestReport,
+        medications: medications.filter((m) => m.active),
         language: lang,
       });
       await savePillRecord(analyzedRecord);
@@ -93,6 +108,12 @@ export default function PillsPage() {
     } finally {
       setIsAnalyzing(false);
     }
+  }
+
+  async function addToMedicines(pill: PillInfo) {
+    const med = medicationFromPill(pill, { scanId: activeRecord?.id, language: lang });
+    await saveMedication(med);
+    setMedications((prev) => [med, ...prev]);
   }
 
   async function handleDeleteScan(id: string) {
@@ -356,6 +377,31 @@ export default function PillsPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Adding is the patient's confirmation that the identification is right. */}
+                <div className="border-t border-slate-200 pt-3 space-y-1">
+                  {findSameMedication(medications, pill) ? (
+                    <Link
+                      href="/medicines"
+                      className="w-full py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-emerald-50 text-emerald-900 border-2 border-emerald-300"
+                    >
+                      <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
+                      {t("meds.added")}
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => addToMedicines(pill)}
+                        className="w-full py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white"
+                      >
+                        <Plus className="w-6 h-6" aria-hidden="true" />
+                        {t("meds.add")}
+                      </button>
+                      <p className="text-sm font-medium text-slate-600 text-center">{t("meds.addHint")}</p>
+                    </>
+                  )}
+                </div>
               </article>
             ))}
           </div>

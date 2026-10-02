@@ -6,7 +6,7 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { audioBase64, mimeType, history, language, latestReport, knownPills } = body;
+    const { audioBase64, mimeType, history, language, latestReport, knownPills, medications } = body;
 
     if (!audioBase64 || !mimeType) {
       return NextResponse.json(
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       history: Array.isArray(history) ? history : [],
       language: language || "en",
       latestReport,
+      medications,
       knownPills,
     });
 

@@ -18,7 +18,7 @@ import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { loadSampleFile, SAMPLE_MEAL_TEXTS, type SampleFile } from "@/lib/samples";
 import { SampleChips } from "./SampleChips";
 import { MealScoreChip } from "./MealScoreChip";
-import type { Language, MealRecord, PillRecord, ReportRecord } from "@/types";
+import type { Language, MealRecord, MedicationEntry, PillRecord, ReportRecord } from "@/types";
 
 interface MealAdvisorModalProps {
   isOpen: boolean;
@@ -26,6 +26,7 @@ interface MealAdvisorModalProps {
   language: Language;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  medications?: MedicationEntry[] | null;
   onMealSaved: (record: MealRecord) => void;
 }
 
@@ -35,6 +36,7 @@ export function MealAdvisorModal({
   language,
   latestReport,
   knownPills,
+  medications,
   onMealSaved,
 }: MealAdvisorModalProps) {
   const t = useT();
@@ -57,6 +59,7 @@ export function MealAdvisorModal({
         ...input,
         latestReport,
         knownPills,
+        medications,
         language,
       });
       await saveMealRecord(mealRecord);

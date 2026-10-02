@@ -6,7 +6,7 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { messages, language, latestReport, knownPills } = body;
+    const { messages, language, latestReport, knownPills, medications } = body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       messages,
       language: language || "en",
       latestReport,
+      medications,
       knownPills,
     });
 

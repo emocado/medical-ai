@@ -5,18 +5,26 @@ import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { ReportView } from "@/components/ReportView";
 import { ChatInterface } from "@/components/ChatInterface";
-import { deleteReport, getAllReports, saveReport, getAllPillRecords, sortReportsNewestFirst } from "@/lib/db";
+import {
+  deleteReport,
+  getAllMedications,
+  getAllPillRecords,
+  getAllReports,
+  saveReport,
+  sortReportsNewestFirst,
+} from "@/lib/db";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { loadSampleFile, type SampleFile } from "@/lib/samples";
 import { SampleChips } from "@/components/SampleChips";
 import { FileUp, Loader2, Plus, AlertCircle, History } from "lucide-react";
-import type { ReportRecord, PillRecord } from "@/types";
+import type { MedicationEntry, ReportRecord, PillRecord } from "@/types";
 
 export default function ReportsPage() {
   const { language: lang } = useLanguage();
   const t = useT();
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
+  const [medications, setMedications] = useState<MedicationEntry[]>([]);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -28,12 +36,14 @@ export default function ReportsPage() {
 
   async function loadData() {
     try {
-      const [reportRecords, pillRecords] = await Promise.all([
+      const [reportRecords, pillRecords, meds] = await Promise.all([
         getAllReports(),
         getAllPillRecords(),
+        getAllMedications(),
       ]);
       setReports(reportRecords);
       setKnownPills(pillRecords);
+      setMedications(meds.filter((m) => m.active));
       if (reportRecords.length > 0 && !selectedReportId) {
         setSelectedReportId(reportRecords[0].id);
       }
@@ -206,6 +216,7 @@ export default function ReportsPage() {
         language={lang}
         latestReport={activeReport || null}
         knownPills={knownPills}
+        medications={medications}
       />
     </div>
   );

@@ -16,7 +16,7 @@ const report: ReportRecord = {
 
 describe("Backup and restore", () => {
   it("round-trips records through a backup file", async () => {
-    const text = JSON.stringify(createBackup({ reports: [report], pills: [], meals: [] }));
+    const text = JSON.stringify(createBackup({ reports: [report], pills: [], meals: [], medications: [], doses: [] }));
     const count = await importAllData(parseBackup(text));
     expect(count).toBe(1);
     expect((await getReport("backup-report"))?.keyMarkers.HbA1c.value).toBe(7.9);

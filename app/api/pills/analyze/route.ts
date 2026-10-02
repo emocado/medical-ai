@@ -6,7 +6,7 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { imageBase64, mimeType, latestReport, language } = body;
+    const { imageBase64, mimeType, latestReport, language, medications } = body;
 
     if (!imageBase64 || !mimeType) {
       return NextResponse.json(
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       imageBase64,
       mimeType,
       latestReport,
+      medications,
       language: language || "en",
     });
 
