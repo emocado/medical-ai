@@ -83,6 +83,7 @@ const STEPS: StringKey[] = [
   "samples.step.urgent",
   "samples.step.pills",
   "samples.step.meals",
+  "samples.step.visit",
   "samples.step.language",
 ];
 
