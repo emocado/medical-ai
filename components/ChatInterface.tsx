@@ -101,10 +101,11 @@ export function ChatInterface({
 
   return (
     <section
+      id="chat"
       aria-label={t("chat.aria")}
       className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
     >
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
         <div className="flex items-center space-x-2">
           <Bot className="w-7 h-7 text-blue-800" aria-hidden="true" />
           <h3 className="text-xl font-bold text-slate-900">{t("chat.title")}</h3>
