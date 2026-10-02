@@ -6,6 +6,7 @@ import { useLanguage, useT } from "@/components/LanguageProvider";
 import { errorMessageKey, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
+import { MealScoreChip } from "@/components/MealScoreChip";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { ensureDisclaimer } from "@/lib/prompts";
@@ -378,17 +379,7 @@ export default function TimelinePage() {
                       </div>
                     </div>
 
-                    <span
-                      className={`px-3 py-1 rounded-full text-base font-black ${
-                        mealAnalysis.healthScore >= 70
-                          ? "bg-emerald-100 text-emerald-950"
-                          : mealAnalysis.healthScore >= 50
-                          ? "bg-amber-100 text-amber-950"
-                          : "bg-red-100 text-red-950"
-                      }`}
-                    >
-                      {t("meal.score", { score: mealAnalysis.healthScore })}
-                    </span>
+                    <MealScoreChip score={mealAnalysis.healthScore} />
                   </div>
 
                   <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">

@@ -661,6 +661,7 @@ export const STRINGS = {
   },
   "meal.dishes": { en: "Dishes: {dishes}", bm: "Hidangan: {dishes}", zh: "菜肴：{dishes}", ta: "உணவுகள்: {dishes}" },
   "meal.score": { en: "Score: {score}/100", bm: "Skor: {score}/100", zh: "评分：{score}/100", ta: "மதிப்பெண்: {score}/100" },
+  "meal.notScored": { en: "Not scored", bm: "Tiada skor", zh: "未评分", ta: "மதிப்பெண் இல்லை" },
   "meal.saved": {
     en: "Saved to your Health Timeline!",
     bm: "Disimpan ke Garis Masa Kesihatan anda!",
