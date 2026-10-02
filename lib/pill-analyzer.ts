@@ -17,15 +17,21 @@ export function parsePillResponse(
   }
 
   const rawPills = Array.isArray(parsed.pills) ? parsed.pills : [];
-  const pills: PillInfo[] = rawPills.map((p: any) => ({
-    name: p.name || "Unknown Medication",
-    genericName: p.genericName || "",
-    purpose: p.purpose || "Health management",
-    dosage: p.dosage || "As prescribed by doctor",
-    sideEffects: Array.isArray(p.sideEffects) ? p.sideEffects : [],
-    foodInteractions: Array.isArray(p.foodInteractions) ? p.foodInteractions : [],
-    drugInteractions: Array.isArray(p.drugInteractions) ? p.drugInteractions : [],
-  }));
+  const pills: PillInfo[] = rawPills.map((p: any) => {
+    const dosage = typeof p.dosage === "string" ? p.dosage.trim() : "";
+    return {
+      name: p.name || "Unknown Medication",
+      genericName: p.genericName || "",
+      purpose: p.purpose || "Health management",
+      // Only label text counts as a dose; the model must never invent one.
+      dosage: p.dosageSource === "not-visible" ? "" : dosage,
+      dosageSource: p.dosageSource !== "not-visible" && dosage ? "label" : "not-visible",
+      confidence: ["high", "medium", "low"].includes(p.confidence) ? p.confidence : "low",
+      sideEffects: Array.isArray(p.sideEffects) ? p.sideEffects : [],
+      foodInteractions: Array.isArray(p.foodInteractions) ? p.foodInteractions : [],
+      drugInteractions: Array.isArray(p.drugInteractions) ? p.drugInteractions : [],
+    };
+  });
 
   const now = new Date();
   const dateStr = now.toISOString().split("T")[0];
@@ -60,7 +66,9 @@ Return a structured JSON object with:
    - "name": Brand or familiar name (e.g. "Panadol", "Lipitor")
    - "genericName": Active ingredient (e.g. "Paracetamol", "Atorvastatin")
    - "purpose": Plain language explanation of what this medication does for the patient
-   - "dosage": Safe dosage and timing instructions (e.g. "500mg with meals twice daily")
+   - "dosage": the dosing instructions EXACTLY as printed on the pharmacy or prescription label (e.g. "Take 1 tablet twice daily after meals"), translated into the reply language if needed. If no dosing instructions are visible, return "". NEVER suggest, estimate or fill in a dose yourself.
+   - "dosageSource": "label" if the dosage was read from a label in the photo, otherwise "not-visible"
+   - "confidence": how sure you are of the identification: "high" if the drug name is clearly printed on a label or box, "medium" if partly readable, "low" if identified only from the pill's appearance
    - "sideEffects": Array of key symptoms or side effects the patient should watch out for
    - "foodInteractions": Array of foods, drinks, or herbs to avoid while taking this pill (e.g. "Grapefruit", "Alcohol")
    - "drugInteractions": Array of other medications or substances to watch out for

@@ -40,6 +40,10 @@ export interface PillInfo {
   sideEffects: string[];
   foodInteractions: string[];
   drugInteractions: string[];
+  /** Whether `dosage` was read from the label. Missing on records from before this was tracked. */
+  dosageSource?: "label" | "not-visible";
+  /** How sure the identification is: "low" means identified from appearance only. */
+  confidence?: "high" | "medium" | "low";
 }
 
 export interface PillRecord {
