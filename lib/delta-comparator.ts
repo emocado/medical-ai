@@ -1,5 +1,5 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt, ensureDisclaimer } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
 import type { Language, ReportRecord } from "@/types";
 
@@ -17,7 +17,7 @@ export interface DeltaComparisonResult {
   markerDeltas: MarkerDelta[];
 }
 
-export function parseDeltaResponse(rawText: string): DeltaComparisonResult {
+export function parseDeltaResponse(rawText: string, language: Language = "en"): DeltaComparisonResult {
   const cleaned = cleanJsonText(rawText);
   let parsed: any;
   try {
@@ -31,10 +31,7 @@ export function parseDeltaResponse(rawText: string): DeltaComparisonResult {
       ? parsed.progression
       : "stable";
 
-  let summary = (parsed.summary || "Report comparison completed.").trim();
-  if (!summary.includes(MEDICAL_DISCLAIMER)) {
-    summary = `${summary}\n\n${MEDICAL_DISCLAIMER}`;
-  }
+  const summary = ensureDisclaimer(parsed.summary || "Report comparison completed.", language);
 
   const rawDeltas = Array.isArray(parsed.markerDeltas) ? parsed.markerDeltas : [];
   const markerDeltas: MarkerDelta[] = rawDeltas.map((d: any) => ({
@@ -101,5 +98,5 @@ Return ONLY valid JSON matching { "progression", "summary", "markerDeltas": [...
   });
 
   const responseText = response.text || "";
-  return parseDeltaResponse(responseText);
+  return parseDeltaResponse(responseText, params.language);
 }

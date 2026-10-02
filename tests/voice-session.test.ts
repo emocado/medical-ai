@@ -4,7 +4,7 @@ import {
   parseVoiceTurnResponse,
   stripMarkdown,
 } from "@/lib/voice-session";
-import { MEDICAL_DISCLAIMER } from "@/lib/prompts";
+import { MEDICAL_DISCLAIMERS } from "@/lib/prompts";
 import type { ReportRecord, PillRecord } from "@/types";
 
 describe("Voice Chat Session", () => {
@@ -12,7 +12,7 @@ describe("Voice Chat Session", () => {
     const prompt = buildVoiceSystemPrompt({ language: "bm" });
     expect(prompt).toContain("HealthMate");
     expect(prompt).toContain("Bahasa Malaysia");
-    expect(prompt).toContain(MEDICAL_DISCLAIMER);
+    expect(prompt).toContain(MEDICAL_DISCLAIMERS.bm);
     expect(prompt).toContain('"transcript"');
   });
 

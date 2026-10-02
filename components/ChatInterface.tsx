@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Bot, User, Sparkles, Mic } from "lucide-react";
 import { VoiceChatModal } from "./VoiceChatModal";
+import { useT } from "./LanguageProvider";
+import { errorMessageKey, postJson } from "@/lib/api-client";
 import type { Language, ReportRecord, PillRecord } from "@/types";
 
 interface Message {
@@ -22,18 +24,13 @@ export function ChatInterface({
   latestReport,
   knownPills,
 }: ChatInterfaceProps) {
+  const t = useT();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "initial",
       role: "assistant",
-      content:
-        language === "bm"
-          ? "Hai, saya HealthMate. Ada apa-apa soalan tentang laporan kesihatan atau ubat anda yang boleh saya bantu?"
-          : language === "zh"
-          ? "您好，我是 HealthMate。关于您的健康报告或药物，您有什么想问的吗？"
-          : language === "ta"
-          ? "வணக்கம், நான் ஹெல்த்மேட். உங்கள் உடல்நல அறிக்கை அல்லது மருந்துகள் குறித்து ஏதேனும் கேள்விகள் உள்ளதா?"
-          : "Hello, I am HealthMate. Do you have any questions about your report or medications that I can help explain?",
+      // Greeting text is resolved at render time so it follows the current language.
+      content: "",
     },
   ]);
   const [input, setInput] = useState("");
@@ -62,26 +59,15 @@ export function ChatInterface({
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: nextHistory.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-          language,
-          latestReport,
-          knownPills,
-        }),
+      const data = await postJson<{ content: string }>("/api/chat", {
+        // The greeting and error bubbles are UI only; the model sees the real exchange.
+        messages: nextHistory
+          .filter((m) => m.id !== "initial" && !m.id.startsWith("err-"))
+          .map((m) => ({ role: m.role, content: m.content })),
+        language,
+        latestReport,
+        knownPills,
       });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Server responded with ${res.status}`);
-      }
-
-      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         {
@@ -97,14 +83,7 @@ export function ChatInterface({
         {
           id: `err-${Date.now()}`,
           role: "assistant",
-          content:
-            language === "bm"
-              ? "Maaf, berlaku masalah menyambung ke pembantu. Sila cuba lagi sebentar lagi."
-              : language === "zh"
-              ? "抱歉，连接助手时出现问题。请稍后重试。"
-              : language === "ta"
-              ? "மன்னிக்கவும், உதவியாளருடன் இணைப்பதில் சிக்கல் ஏற்பட்டது. சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்."
-              : "Sorry, I had trouble answering that. Please try asking again.",
+          content: t(errorMessageKey(err, "chat.error")),
         },
       ]);
     } finally {
@@ -114,19 +93,19 @@ export function ChatInterface({
 
   return (
     <section
-      aria-label="Health Assistant Chat"
+      aria-label={t("chat.aria")}
       className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
     >
       <div className="flex items-center justify-between border-b border-slate-200 pb-3">
         <div className="flex items-center space-x-2">
           <Bot className="w-7 h-7 text-blue-800" aria-hidden="true" />
-          <h3 className="text-xl font-bold text-slate-900">Health Assistant Chat</h3>
+          <h3 className="text-xl font-bold text-slate-900">{t("chat.title")}</h3>
         </div>
         <div className="flex items-center gap-2">
           {latestReport && (
             <span className="text-sm font-semibold bg-blue-100 text-blue-900 px-3 py-1 rounded-full flex items-center gap-1">
               <Sparkles className="w-4 h-4 text-blue-700" />
-              Report Connected
+              {t("chat.reportConnected")}
             </span>
           )}
         </div>
@@ -160,7 +139,7 @@ export function ChatInterface({
                     : "bg-slate-100 text-slate-900 rounded-tl-none border border-slate-300"
                 }`}
               >
-                {m.content}
+                {m.id === "initial" ? t("chat.greeting") : m.content}
               </div>
             </div>
           );
@@ -169,7 +148,7 @@ export function ChatInterface({
         {isLoading && (
           <div className="flex items-center gap-3 text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 w-fit">
             <Loader2 className="w-6 h-6 animate-spin text-blue-700" aria-hidden="true" />
-            <span className="text-base font-semibold">HealthMate is thinking kindly...</span>
+            <span className="text-base font-semibold">{t("chat.thinking")}</span>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -178,7 +157,7 @@ export function ChatInterface({
       {/* Input bar with Send and Microphone buttons */}
       <form onSubmit={handleSend} className="flex items-center gap-2 pt-2">
         <label htmlFor="chat-input" className="sr-only">
-          Ask a health question
+          {t("chat.inputLabel")}
         </label>
         <input
           id="chat-input"
@@ -187,8 +166,8 @@ export function ChatInterface({
           onChange={(e) => setInput(e.target.value)}
           placeholder={
             latestReport
-              ? "Ask anything about this report or test..."
-              : "Ask any general health question..."
+              ? t("chat.placeholderReport")
+              : t("chat.placeholderGeneral")
           }
           disabled={isLoading}
           className="flex-1 px-4 py-3 border-2 border-slate-300 rounded-xl text-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-800 bg-slate-50 focus:bg-white min-h-[48px]"
@@ -198,7 +177,7 @@ export function ChatInterface({
         <button
           type="button"
           onClick={() => setIsVoiceModalOpen(true)}
-          aria-label="Start a voice conversation with HealthMate"
+          aria-label={t("chat.voice.aria")}
           className="px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm transition-colors active:bg-emerald-900"
         >
           <Mic className="w-5 h-5" aria-hidden="true" />
@@ -208,7 +187,7 @@ export function ChatInterface({
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          aria-label="Send message"
+          aria-label={t("chat.send.aria")}
           className={`px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg transition-colors ${
             isLoading || !input.trim()
               ? "bg-slate-200 text-slate-400 cursor-not-allowed"

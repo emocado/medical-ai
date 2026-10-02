@@ -1,12 +1,13 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt, ensureDisclaimer } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
 import type { Language, MealRecord, PillRecord, ReportRecord } from "@/types";
 
 export function parseMealResponse(
   rawText: string,
   inputType: "photo" | "text",
-  extra?: { imageBase64?: string; textInput?: string }
+  extra?: { imageBase64?: string; textInput?: string },
+  language: Language = "en"
 ): MealRecord {
   const cleaned = cleanJsonText(rawText);
   let parsed: any;
@@ -19,10 +20,7 @@ export function parseMealResponse(
   const rawDishes = Array.isArray(parsed.dishes) ? parsed.dishes : [];
   const dishes: string[] = rawDishes.map((d: any) => String(d).trim()).filter(Boolean);
 
-  let advice = (parsed.advice || "Meal analysis completed.").trim();
-  if (!advice.includes(MEDICAL_DISCLAIMER)) {
-    advice = `${advice}\n\n${MEDICAL_DISCLAIMER}`;
-  }
+  const advice = ensureDisclaimer(parsed.advice || "Meal analysis completed.", language);
 
   const scoreNum = Number(parsed.healthScore);
   const healthScore = !isNaN(scoreNum) ? Math.max(0, Math.min(100, Math.round(scoreNum))) : 60;
@@ -42,6 +40,7 @@ export function parseMealResponse(
       healthScore,
     },
     createdAt: Date.now(),
+    language,
   };
 }
 
@@ -111,5 +110,5 @@ Return ONLY valid JSON matching { "dishes": [...], "healthScore": 75, "advice": 
   return parseMealResponse(responseText, params.inputType, {
     imageBase64: params.imageBase64,
     textInput: params.textInput,
-  });
+  }, params.language);
 }

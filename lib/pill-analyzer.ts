@@ -1,9 +1,13 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
 import type { Language, PillInfo, PillRecord, ReportRecord } from "@/types";
 
-export function parsePillResponse(rawText: string, imageBase64?: string): PillRecord {
+export function parsePillResponse(
+  rawText: string,
+  imageBase64?: string,
+  language: Language = "en"
+): PillRecord {
   const cleaned = cleanJsonText(rawText);
   let parsed: any;
   try {
@@ -35,6 +39,7 @@ export function parsePillResponse(rawText: string, imageBase64?: string): PillRe
       crossRefWithReports: parsed.crossRefWithReports || undefined,
     },
     createdAt: Date.now(),
+    language,
   };
 }
 
@@ -88,5 +93,5 @@ Return ONLY valid JSON matching { "pills": [...], "crossRefWithReports": "..." }
   });
 
   const responseText = response.text || "";
-  return parsePillResponse(responseText, params.imageBase64);
+  return parsePillResponse(responseText, params.imageBase64, params.language);
 }

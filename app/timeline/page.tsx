@@ -2,9 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
+import { useLanguage, useT } from "@/components/LanguageProvider";
+import { errorMessageKey, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
-import { getAllReports, getAllMealRecords, getAllPillRecords } from "@/lib/db";
+import { TranslationStatus } from "@/components/TranslationStatus";
+import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
+import { ensureDisclaimer } from "@/lib/prompts";
+import { getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
 import {
   Clock,
   FileText,
@@ -27,13 +32,15 @@ type TimelineItem =
   | { type: "meal"; item: MealRecord; timestamp: number };
 
 export default function TimelinePage() {
-  const [lang, setLang] = useState<Language>("en");
+  const { language: lang } = useLanguage();
+  const t = useT();
   const [reports, setReports] = useState<ReportRecord[]>([]);
   const [meals, setMeals] = useState<MealRecord[]>([]);
   const [knownPills, setKnownPills] = useState<PillRecord[]>([]);
   const [selectedReportIds, setSelectedReportIds] = useState<string[]>([]);
   const [isComparing, setIsComparing] = useState(false);
   const [deltaResult, setDeltaResult] = useState<DeltaComparisonResult | null>(null);
+  const [deltaLanguage, setDeltaLanguage] = useState<Language>("en");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isMealModalOpen, setIsMealModalOpen] = useState(false);
 
@@ -83,26 +90,16 @@ export default function TimelinePage() {
     setDeltaResult(null);
 
     try {
-      const res = await fetch("/api/timeline/compare", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reportA: rA,
-          reportB: rB,
-          language: lang,
-        }),
+      const result = await postJson<DeltaComparisonResult>("/api/timeline/compare", {
+        reportA: rA,
+        reportB: rB,
+        language: lang,
       });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server responded with ${res.status}`);
-      }
-
-      const result: DeltaComparisonResult = await res.json();
       setDeltaResult(result);
-    } catch (err: any) {
+      setDeltaLanguage(lang);
+    } catch (err) {
       console.error("Comparison failed:", err);
-      setErrorMessage(err.message || "Failed to compare reports. Please try again.");
+      setErrorMessage(t(errorMessageKey(err, "timeline.compareError")));
     } finally {
       setIsComparing(false);
     }
@@ -123,16 +120,49 @@ export default function TimelinePage() {
 
   const latestReport = reports.length > 0 ? reports[0] : null;
 
+  const mealTranslation = useAutoTranslate(
+    meals,
+    lang,
+    saveMealRecord,
+    (updated) => setMeals((prev) => prev.map((m) => updated.find((u) => u.id === m.id) ?? m)),
+    (analysis) => ({ ...analysis, advice: ensureDisclaimer(analysis.advice, lang) })
+  );
+
+  // A comparison is not stored, so when the language changes we translate the one on screen.
+  const [deltaTranslation, setDeltaTranslation] = useState<"idle" | "translating" | "error">("idle");
+  const [deltaRetry, setDeltaRetry] = useState(0);
+  useEffect(() => {
+    if (!deltaResult || deltaLanguage === lang) {
+      setDeltaTranslation("idle");
+      return;
+    }
+    let cancelled = false;
+    setDeltaTranslation("translating");
+    const { progression, ...text } = deltaResult;
+    postJson<{ content: typeof text }>("/api/translate", { content: text, targetLanguage: lang })
+      .then(({ content }) => {
+        if (cancelled) return;
+        setDeltaResult({ progression, ...content, summary: ensureDisclaimer(content.summary, lang) });
+        setDeltaLanguage(lang);
+        setDeltaTranslation("idle");
+      })
+      .catch(() => !cancelled && setDeltaTranslation("error"));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, deltaLanguage, deltaRetry]);
+
   return (
     <div className="space-y-6">
-      <Header currentLang={lang} onLanguageChange={setLang} title="Health Timeline" />
+      <Header title={t("title.timeline")} />
 
       {/* Overview & Actions */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Clock className="w-6 h-6 text-blue-800" aria-hidden="true" />
-            Your Health Journey
+            {t("timeline.journey")}
           </h2>
           <button
             onClick={() => setIsMealModalOpen(true)}
@@ -140,18 +170,18 @@ export default function TimelinePage() {
           >
             <Plus className="w-5 h-5" />
             <Utensils className="w-5 h-5" />
-            <span>Log Meal</span>
+            <span>{t("timeline.logMeal")}</span>
           </button>
         </div>
 
         <p className="text-base text-slate-700 leading-relaxed">
-          Track your past medical reports and meals. Select any <strong>two reports</strong> to compare lab markers and track your health progression over time.
+          {t("timeline.desc")}
         </p>
 
         {reports.length >= 2 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
             <span className="text-base font-bold text-blue-950">
-              {selectedReportIds.length} of 2 reports selected for comparison
+              {t("timeline.selectedCount", { count: selectedReportIds.length })}
             </span>
             <button
               onClick={handleCompare}
@@ -165,12 +195,12 @@ export default function TimelinePage() {
               {isComparing ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
-                  <span>Comparing reports...</span>
+                  <span>{t("timeline.comparing")}</span>
                 </>
               ) : (
                 <>
                   <GitCompare className="w-5 h-5" aria-hidden="true" />
-                  <span>Compare Progression</span>
+                  <span>{t("timeline.compare")}</span>
                 </>
               )}
             </button>
@@ -188,16 +218,18 @@ export default function TimelinePage() {
         )}
       </section>
 
+      <TranslationStatus status={deltaTranslation} onRetry={() => setDeltaRetry((n) => n + 1)} />
+
       {/* Delta Comparison Result Display */}
       {deltaResult && (
         <section
-          aria-label="Report Comparison Result"
+          aria-label={t("timeline.comparison.aria")}
           className="bg-white rounded-2xl border-2 border-blue-400 p-5 shadow-md space-y-4 animate-in fade-in duration-300"
         >
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <h3 className="text-2xl font-black text-slate-900 flex items-center gap-2">
               <TrendingUp className="w-7 h-7 text-blue-800" aria-hidden="true" />
-              Progression Comparison
+              {t("timeline.comparisonTitle")}
             </h3>
 
             <span
@@ -214,7 +246,7 @@ export default function TimelinePage() {
               {deltaResult.progression === "improving" && <TrendingUp className="w-5 h-5 text-emerald-700" />}
               {deltaResult.progression === "declining" && <TrendingDown className="w-5 h-5 text-red-700" />}
               {deltaResult.progression === "stable" && <Minus className="w-5 h-5 text-blue-700" />}
-              {deltaResult.progression.toUpperCase()}
+              {t(`progression.${deltaResult.progression}`)}
             </span>
           </div>
 
@@ -224,7 +256,7 @@ export default function TimelinePage() {
 
           {deltaResult.markerDeltas && deltaResult.markerDeltas.length > 0 && (
             <div className="space-y-3">
-              <h4 className="text-lg font-bold text-slate-900">Marker Changes</h4>
+              <h4 className="text-lg font-bold text-slate-900">{t("timeline.markerChanges")}</h4>
               <div className="space-y-2.5">
                 {deltaResult.markerDeltas.map((delta, i) => (
                   <div
@@ -238,9 +270,9 @@ export default function TimelinePage() {
                       </span>
                     </div>
                     <div className="flex items-center space-x-3 text-base font-semibold text-slate-700">
-                      <span>Previous: {delta.previousValue}</span>
+                      <span>{t("timeline.previous", { value: delta.previousValue })}</span>
                       <ArrowRight className="w-4 h-4 text-slate-400" aria-hidden="true" />
-                      <span className="text-blue-900 font-bold">Latest: {delta.currentValue}</span>
+                      <span className="text-blue-900 font-bold">{t("timeline.latest", { value: delta.currentValue })}</span>
                     </div>
                     {delta.interpretation && (
                       <p className="text-base text-slate-600 leading-snug">
@@ -258,11 +290,12 @@ export default function TimelinePage() {
       )}
 
       {/* Timeline Entries List */}
-      <section aria-label="Timeline History" className="space-y-4">
+      <section aria-label={t("timeline.history.aria")} className="space-y-4">
+        <TranslationStatus status={mealTranslation.status} onRetry={mealTranslation.retry} />
         {timelineItems.length === 0 ? (
           <div className="text-center py-12 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
             <p className="text-lg font-medium text-slate-600">
-              Your timeline is empty. Reports and meal logs will appear here automatically.
+              {t("timeline.empty")}
             </p>
           </div>
         ) : (
@@ -304,7 +337,7 @@ export default function TimelinePage() {
                         className={`w-5 h-5 ${isSelected ? "text-white" : "text-slate-400"}`}
                         aria-hidden="true"
                       />
-                      <span>{isSelected ? "Selected" : "Select to Compare"}</span>
+                      <span>{isSelected ? t("timeline.selected") : t("timeline.selectToCompare")}</span>
                     </button>
                   </div>
 
@@ -326,6 +359,7 @@ export default function TimelinePage() {
               );
             } else {
               const m = entry.item;
+              const mealAnalysis = localizedAnalysis(m, lang) ?? m.analysis;
               return (
                 <article
                   key={m.id}
@@ -336,7 +370,7 @@ export default function TimelinePage() {
                       <Utensils className="w-6 h-6 text-amber-700 flex-shrink-0" aria-hidden="true" />
                       <div>
                         <h3 className="text-xl font-bold text-slate-900">
-                          Meal: {m.analysis.dishes.join(", ") || "Hawker Dish"}
+                          {t("timeline.meal", { dishes: mealAnalysis.dishes.join(", ") })}
                         </h3>
                         <time className="text-sm font-semibold text-slate-500" dateTime={m.date}>
                           {m.date}
@@ -346,19 +380,19 @@ export default function TimelinePage() {
 
                     <span
                       className={`px-3 py-1 rounded-full text-base font-black ${
-                        m.analysis.healthScore >= 70
+                        mealAnalysis.healthScore >= 70
                           ? "bg-emerald-100 text-emerald-950"
-                          : m.analysis.healthScore >= 50
+                          : mealAnalysis.healthScore >= 50
                           ? "bg-amber-100 text-amber-950"
                           : "bg-red-100 text-red-950"
                       }`}
                     >
-                      Score: {m.analysis.healthScore}/100
+                      {t("meal.score", { score: mealAnalysis.healthScore })}
                     </span>
                   </div>
 
                   <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
-                    {m.analysis.advice}
+                    {mealAnalysis.advice}
                   </p>
                 </article>
               );
