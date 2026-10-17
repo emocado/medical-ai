@@ -25,7 +25,7 @@ export function GuideBubble({
   return (
     <aside
       aria-label="Doctor Guide Assistant"
-      className="fixed bottom-20 right-4 sm:right-6 z-40 flex items-center select-none"
+      className="fixed bottom-20 right-4 sm:right-6 z-40 flex items-center select-none print:hidden"
     >
       <button
         onClick={onClick}
