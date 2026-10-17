@@ -12,7 +12,9 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { MedicalDisclaimer } from "./Disclaimer";
+import { useT } from "./LanguageProvider";
 import { saveMealRecord } from "@/lib/db";
+import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import type { Language, MealRecord, PillRecord, ReportRecord } from "@/types";
 
 interface MealAdvisorModalProps {
@@ -32,6 +34,7 @@ export function MealAdvisorModal({
   knownPills,
   onMealSaved,
 }: MealAdvisorModalProps) {
+  const t = useT();
   const [inputType, setInputType] = useState<"photo" | "text">("photo");
   const [textInput, setTextInput] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -41,45 +44,41 @@ export function MealAdvisorModal({
 
   if (!isOpen) return null;
 
-  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    e.target.value = "";
+  async function analyze(input: Record<string, unknown>): Promise<boolean> {
     setErrorMessage(null);
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
     try {
-      const base64 = await fileToBase64(file);
-      const res = await fetch("/api/meals/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          inputType: "photo",
-          imageBase64: base64,
-          mimeType: file.type || "image/jpeg",
-          latestReport,
-          knownPills,
-          language,
-        }),
+      const mealRecord = await postJson<MealRecord>("/api/meals/analyze", {
+        ...input,
+        latestReport,
+        knownPills,
+        language,
       });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server responded with ${res.status}`);
-      }
-
-      const mealRecord: MealRecord = await res.json();
       await saveMealRecord(mealRecord);
       setAnalysisResult(mealRecord);
       onMealSaved(mealRecord);
-    } catch (err: any) {
-      console.error("Meal photo analysis failed:", err);
-      setErrorMessage(err.message || "Failed to analyze meal photo. Please try again.");
+      return true;
+    } catch (err) {
+      console.error("Meal analysis failed:", err);
+      setErrorMessage(t(errorMessageKey(err, "meal.error")));
+      return false;
     } finally {
       setIsAnalyzing(false);
     }
+  }
+
+  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+
+    await analyze({
+      inputType: "photo",
+      imageBase64: await fileToBase64(file),
+      mimeType: file.type || "image/jpeg",
+    });
   }
 
   async function handleTextSubmit(e: React.FormEvent) {
@@ -87,52 +86,9 @@ export function MealAdvisorModal({
     const trimmed = textInput.trim();
     if (!trimmed || isAnalyzing) return;
 
-    setErrorMessage(null);
-    setIsAnalyzing(true);
-    setAnalysisResult(null);
-
-    try {
-      const res = await fetch("/api/meals/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          inputType: "text",
-          textInput: trimmed,
-          latestReport,
-          knownPills,
-          language,
-        }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server responded with ${res.status}`);
-      }
-
-      const mealRecord: MealRecord = await res.json();
-      await saveMealRecord(mealRecord);
-      setAnalysisResult(mealRecord);
-      onMealSaved(mealRecord);
+    if (await analyze({ inputType: "text", textInput: trimmed })) {
       setTextInput("");
-    } catch (err: any) {
-      console.error("Meal text analysis failed:", err);
-      setErrorMessage(err.message || "Failed to analyze meal text. Please try again.");
-    } finally {
-      setIsAnalyzing(false);
     }
-  }
-
-  function fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        const base64 = result.split(",")[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   }
 
   return (
@@ -147,12 +103,12 @@ export function MealAdvisorModal({
           <div className="flex items-center space-x-2">
             <Utensils className="w-7 h-7 text-amber-600" aria-hidden="true" />
             <h3 id="meal-modal-title" className="text-xl font-bold text-slate-900">
-              Dietary Meal Advisor
+              {t("meal.title")}
             </h3>
           </div>
           <button
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t("common.close")}
             className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 min-h-[48px] min-w-[48px] flex items-center justify-center"
           >
             <X className="w-6 h-6" />
@@ -162,7 +118,7 @@ export function MealAdvisorModal({
         {latestReport && (
           <div className="flex items-center gap-1.5 text-sm font-semibold bg-blue-50 text-blue-900 px-3 py-1.5 rounded-xl border border-blue-200">
             <Sparkles className="w-4 h-4 text-blue-700 flex-shrink-0" />
-            <span>Personalized with your recent health report &amp; pills</span>
+            <span>{t("meal.personalized")}</span>
           </div>
         )}
 
@@ -179,7 +135,7 @@ export function MealAdvisorModal({
             }`}
           >
             <Camera className="w-5 h-5" />
-            <span>Photograph Meal</span>
+            <span>{t("meal.photoTab")}</span>
           </button>
           <button
             role="tab"
@@ -192,16 +148,14 @@ export function MealAdvisorModal({
             }`}
           >
             <Type className="w-5 h-5" />
-            <span>Type Meal</span>
+            <span>{t("meal.textTab")}</span>
           </button>
         </div>
 
         {/* Photo Input Area */}
         {inputType === "photo" && (
           <div className="space-y-4">
-            <p className="text-base text-slate-700">
-              Snap a photo of your food, hawker meal, or plate. Gemini will identify the dishes and check suitability.
-            </p>
+            <p className="text-base text-slate-700">{t("meal.photoDesc")}</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -220,12 +174,12 @@ export function MealAdvisorModal({
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  <span>Analyzing meal ingredients...</span>
+                  <span>{t("meal.analyzingPhoto")}</span>
                 </>
               ) : (
                 <>
                   <Camera className="w-6 h-6" />
-                  <span>Take Photo or Upload Dish</span>
+                  <span>{t("meal.photoButton")}</span>
                 </>
               )}
             </button>
@@ -235,13 +189,11 @@ export function MealAdvisorModal({
         {/* Text Input Area */}
         {inputType === "text" && (
           <form onSubmit={handleTextSubmit} className="space-y-4">
-            <p className="text-base text-slate-700">
-              Describe what you are eating (e.g. &ldquo;Chicken rice with chili, soup, and barley water&rdquo;):
-            </p>
+            <p className="text-base text-slate-700">{t("meal.textDesc")}</p>
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="e.g. Nasi lemak with fried egg and sambal, teh tarik..."
+              placeholder={t("meal.textPlaceholder")}
               disabled={isAnalyzing}
               rows={3}
               className="w-full p-4 border-2 border-slate-300 rounded-xl text-lg text-slate-900 focus:outline-none focus:border-blue-800 bg-slate-50 focus:bg-white"
@@ -258,10 +210,10 @@ export function MealAdvisorModal({
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  <span>Evaluating nutrition for you...</span>
+                  <span>{t("meal.analyzingText")}</span>
                 </>
               ) : (
-                <span>Analyze Meal Advice</span>
+                <span>{t("meal.submit")}</span>
               )}
             </button>
           </form>
@@ -282,7 +234,7 @@ export function MealAdvisorModal({
           <div className="bg-slate-50 border-2 border-slate-300 rounded-2xl p-4 space-y-4 animate-in fade-in">
             <div className="flex items-center justify-between">
               <h4 className="text-lg font-bold text-slate-900">
-                Dishes: {analysisResult.analysis.dishes.join(", ")}
+                {t("meal.dishes", { dishes: analysisResult.analysis.dishes.join(", ") })}
               </h4>
               <span
                 className={`px-3 py-1.5 rounded-full text-base font-black ${
@@ -293,7 +245,7 @@ export function MealAdvisorModal({
                     : "bg-red-100 text-red-950 border border-red-300"
                 }`}
               >
-                Score: {analysisResult.analysis.healthScore}/100
+                {t("meal.score", { score: analysisResult.analysis.healthScore })}
               </span>
             </div>
 
@@ -303,7 +255,7 @@ export function MealAdvisorModal({
 
             <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-base">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-              <span>Saved to your Health Timeline!</span>
+              <span>{t("meal.saved")}</span>
             </div>
 
             <MedicalDisclaimer />

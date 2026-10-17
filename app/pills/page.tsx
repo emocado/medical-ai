@@ -1,8 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Header } from "@/components/Header";
+import { useLanguage, useT } from "@/components/LanguageProvider";
+import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
+import { TranslationStatus } from "@/components/TranslationStatus";
+import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { getAllPillRecords, savePillRecord, getAllReports } from "@/lib/db";
 import {
   Pill,
@@ -18,7 +22,8 @@ import {
 import type { Language, PillRecord, ReportRecord } from "@/types";
 
 export default function PillsPage() {
-  const [lang, setLang] = useState<Language>("en");
+  const { language: lang } = useLanguage();
+  const t = useT();
   const [pillRecords, setPillRecords] = useState<PillRecord[]>([]);
   const [latestReport, setLatestReport] = useState<ReportRecord | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -58,71 +63,52 @@ export default function PillsPage() {
 
     try {
       const base64 = await fileToBase64(file);
-      const res = await fetch("/api/pills/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageBase64: base64,
-          mimeType: file.type || "image/jpeg",
-          latestReport,
-          language: lang,
-        }),
+      const analyzedRecord = await postJson<PillRecord>("/api/pills/analyze", {
+        imageBase64: base64,
+        mimeType: file.type || "image/jpeg",
+        latestReport,
+        language: lang,
       });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server responded with ${res.status}`);
-      }
-
-      const analyzedRecord: PillRecord = await res.json();
       await savePillRecord(analyzedRecord);
 
       setPillRecords((prev) => [analyzedRecord, ...prev]);
       setSelectedRecordId(analyzedRecord.id);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Pill analysis failed:", err);
-      setErrorMessage(err.message || "Failed to analyze pills. Please take a clearer photo and try again.");
+      setErrorMessage(t(errorMessageKey(err, "pills.error")));
     } finally {
       setIsAnalyzing(false);
     }
   }
 
-  function fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        const base64 = result.split(",")[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
   const activeRecord = pillRecords.find((r) => r.id === selectedRecordId) || pillRecords[0];
+  const visibleRecords = useMemo(() => (activeRecord ? [activeRecord] : []), [activeRecord]);
+  const translation = useAutoTranslate(visibleRecords, lang, savePillRecord, (updated) =>
+    setPillRecords((prev) => prev.map((r) => updated.find((u) => u.id === r.id) ?? r))
+  );
+  const analysis = activeRecord ? localizedAnalysis(activeRecord, lang) ?? activeRecord.analysis : null;
 
   return (
     <div className="space-y-6">
-      <Header currentLang={lang} onLanguageChange={setLang} title="Pill Analyzer" />
+      <Header title={t("title.pills")} />
 
       {/* Upload / Capture Section */}
       <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Pill className="w-6 h-6 text-blue-800" aria-hidden="true" />
-            Check Your Medications
+            {t("pills.check.title")}
           </h2>
           {latestReport && (
             <span className="text-sm font-semibold bg-emerald-100 text-emerald-900 px-3 py-1 rounded-full flex items-center gap-1">
               <Sparkles className="w-4 h-4 text-emerald-700" />
-              Report Synced
+              {t("pills.reportSynced")}
             </span>
           )}
         </div>
 
         <p className="text-base text-slate-700 leading-relaxed">
-          Take a photo of your pills, blister packs, or prescription boxes. We will identify each pill, explain how to take it, and check for safety interactions.
+          {t("pills.desc")}
         </p>
 
         <input
@@ -148,12 +134,12 @@ export default function PillsPage() {
           {isAnalyzing ? (
             <>
               <Loader2 className="w-6 h-6 animate-spin text-blue-900" aria-hidden="true" />
-              <span>Analyzing medication carefully...</span>
+              <span>{t("pills.analyzing")}</span>
             </>
           ) : (
             <>
               <Camera className="w-6 h-6" aria-hidden="true" />
-              <span>Take Photo or Upload Medication</span>
+              <span>{t("pills.button")}</span>
             </>
           )}
         </button>
@@ -172,12 +158,12 @@ export default function PillsPage() {
       {/* Pill Record History Selector */}
       {pillRecords.length > 1 && (
         <section
-          aria-label="Previous Medication Scans"
+          aria-label={t("pills.history.aria")}
           className="bg-white p-4 rounded-2xl border-2 border-slate-200 space-y-2"
         >
           <div className="flex items-center space-x-2 text-slate-800 font-bold text-base mb-1">
             <History className="w-5 h-5 text-blue-800" aria-hidden="true" />
-            <span>Past Pill Scans:</span>
+            <span>{t("pills.history.label")}</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
             {pillRecords.map((r) => (
@@ -192,7 +178,9 @@ export default function PillsPage() {
                     : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
                 }`}
               >
-                Scan on {r.date} ({r.analysis.pills.length} {r.analysis.pills.length === 1 ? "pill" : "pills"})
+                {r.analysis.pills.length === 1
+                  ? t("pills.scanLabelOne", { date: r.date })
+                  : t("pills.scanLabel", { date: r.date, count: r.analysis.pills.length })}
               </button>
             ))}
           </div>
@@ -200,24 +188,25 @@ export default function PillsPage() {
       )}
 
       {/* Active Pill Analysis Display */}
-      {activeRecord ? (
+      {activeRecord && analysis ? (
         <div className="space-y-5">
+          <TranslationStatus status={translation.status} onRetry={translation.retry} />
           {/* Cross-reference alert */}
-          {activeRecord.analysis.crossRefWithReports && (
+          {analysis.crossRefWithReports && (
             <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-2xl space-y-1">
               <div className="flex items-center space-x-2 text-blue-950 font-bold text-lg">
                 <Sparkles className="w-5 h-5 text-blue-700" />
-                <span>Personalized Health Connection</span>
+                <span>{t("pills.connection")}</span>
               </div>
               <p className="text-base text-slate-800 leading-relaxed font-medium">
-                {activeRecord.analysis.crossRefWithReports}
+                {analysis.crossRefWithReports}
               </p>
             </div>
           )}
 
           {/* Cards for each identified pill */}
           <div className="space-y-4">
-            {activeRecord.analysis.pills.map((pill, idx) => (
+            {analysis.pills.map((pill, idx) => (
               <article
                 key={idx}
                 className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
@@ -237,7 +226,7 @@ export default function PillsPage() {
                 <div className="space-y-1">
                   <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
                     <Info className="w-5 h-5 text-blue-700" />
-                    What It Is For
+                    {t("pills.purpose")}
                   </span>
                   <p className="text-lg text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200 leading-relaxed">
                     {pill.purpose}
@@ -248,7 +237,7 @@ export default function PillsPage() {
                 <div className="space-y-1">
                   <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
                     <Pill className="w-5 h-5 text-blue-700" />
-                    How to Take It
+                    {t("pills.howToTake")}
                   </span>
                   <p className="text-lg font-semibold text-blue-950 bg-blue-50 p-3 rounded-xl border border-blue-200 leading-relaxed">
                     {pill.dosage}
@@ -260,7 +249,7 @@ export default function PillsPage() {
                   <div className="space-y-1.5">
                     <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
                       <AlertTriangle className="w-5 h-5 text-amber-600" />
-                      Side Effects to Watch Out For
+                      {t("pills.sideEffects")}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {pill.sideEffects.map((side, i) => (
@@ -280,7 +269,7 @@ export default function PillsPage() {
                   <div className="space-y-1.5">
                     <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
                       <Utensils className="w-5 h-5 text-red-600" />
-                      Food &amp; Drink Interactions
+                      {t("pills.foodInteractions")}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {pill.foodInteractions.map((food, i) => (
@@ -288,7 +277,7 @@ export default function PillsPage() {
                           key={i}
                           className="px-3 py-1.5 rounded-lg text-base font-semibold bg-red-50 text-red-950 border border-red-200"
                         >
-                          Avoid: {food}
+                          {t("pills.avoid", { item: food })}
                         </span>
                       ))}
                     </div>
@@ -300,7 +289,7 @@ export default function PillsPage() {
                   <div className="space-y-1.5">
                     <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
                       <ShieldAlert className="w-5 h-5 text-slate-700" />
-                      Medication Interactions
+                      {t("pills.drugInteractions")}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {pill.drugInteractions.map((drug, i) => (
@@ -324,7 +313,7 @@ export default function PillsPage() {
         !isAnalyzing && (
           <div className="text-center py-10 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
             <p className="text-lg font-medium text-slate-600">
-              No medications analyzed yet. Take or upload a photo above to identify your pills.
+              {t("pills.empty")}
             </p>
           </div>
         )

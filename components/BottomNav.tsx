@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FileText, Pill, Clock } from "lucide-react";
+import { useT } from "./LanguageProvider";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useT();
 
   const isReportsActive = pathname === "/" || pathname.startsWith("/reports");
   const isPillsActive = pathname.startsWith("/pills");
@@ -14,30 +16,30 @@ export function BottomNav() {
   const tabs = [
     {
       href: "/reports",
-      label: "Reports & Chat",
+      label: t("nav.reports"),
       icon: FileText,
       active: isReportsActive,
-      ariaLabel: "Reports and conversational chat",
+      ariaLabel: t("nav.reports.aria"),
     },
     {
       href: "/pills",
-      label: "Pill Analyzer",
+      label: t("nav.pills"),
       icon: Pill,
       active: isPillsActive,
-      ariaLabel: "Pill identification and safety analysis",
+      ariaLabel: t("nav.pills.aria"),
     },
     {
       href: "/timeline",
-      label: "Timeline",
+      label: t("nav.timeline"),
       icon: Clock,
       active: isTimelineActive,
-      ariaLabel: "Health history timeline and report comparison",
+      ariaLabel: t("nav.timeline.aria"),
     },
   ];
 
   return (
     <nav
-      aria-label="Main Navigation"
+      aria-label={t("nav.main.aria")}
       className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-slate-300 shadow-lg px-2 py-1 safe-area-bottom"
     >
       <div className="max-w-xl mx-auto flex justify-around items-center">

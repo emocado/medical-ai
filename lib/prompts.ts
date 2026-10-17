@@ -1,7 +1,31 @@
 import type { Language, ReportRecord, PillRecord } from "@/types";
 
-export const MEDICAL_DISCLAIMER =
-  "This is not a substitute for professional medical advice. Please consult your doctor.";
+export const MEDICAL_DISCLAIMERS: Record<Language, string> = {
+  en: "This is not a substitute for professional medical advice. Please consult your doctor.",
+  bm: "Ini bukan pengganti nasihat perubatan profesional. Sila berjumpa doktor anda.",
+  zh: "本内容不能替代专业医疗建议。请咨询您的医生。",
+  ta: "இது தொழில்முறை மருத்துவ ஆலோசனைக்கு மாற்றாகாது. தயவுசெய்து உங்கள் மருத்துவரை அணுகவும்.",
+};
+
+export const MEDICAL_DISCLAIMER = MEDICAL_DISCLAIMERS.en;
+
+export function getDisclaimer(language: Language = "en"): string {
+  return MEDICAL_DISCLAIMERS[language] || MEDICAL_DISCLAIMER;
+}
+
+/**
+ * Makes sure AI text ends with the disclaimer in the reader's language. An
+ * English disclaimer the model added to non-English text is swapped out
+ * rather than doubled up.
+ */
+export function ensureDisclaimer(text: string, language: Language = "en"): string {
+  const disclaimer = getDisclaimer(language);
+  let body = text.trim();
+  if (language !== "en" && body.includes(MEDICAL_DISCLAIMER)) {
+    body = body.split(MEDICAL_DISCLAIMER).join("").trim();
+  }
+  return body.includes(disclaimer) ? body : `${body}\n\n${disclaimer}`;
+}
 
 export const LANGUAGE_NAMES: Record<Language, string> = {
   en: "English",
@@ -24,7 +48,7 @@ export function buildHealthMatePrompt(context: PromptContext = {}): string {
 Your role is to explain medical information simply, kindly, and clearly, avoiding unnecessary jargon, in ${langName}.
 Keep all explanations gentle, reassuring, and easy to understand for elderly users.
 Always end your response with this disclaimer verbatim on a new line:
-"${MEDICAL_DISCLAIMER}"\n\n`;
+"${getDisclaimer(context.language)}"\n\n`;
 
   if (context.latestReport) {
     const rSummary =

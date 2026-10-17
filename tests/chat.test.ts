@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { formatChatPrompt, processChatMessage } from "@/lib/chat";
-import { MEDICAL_DISCLAIMER } from "@/lib/prompts";
+import { MEDICAL_DISCLAIMER, MEDICAL_DISCLAIMERS } from "@/lib/prompts";
 import * as geminiModule from "@/lib/gemini";
 import type { ReportRecord, PillRecord } from "@/types";
 
@@ -9,7 +9,7 @@ describe("Chat Logic and Prompt Construction", () => {
     const prompt = formatChatPrompt({ language: "zh" });
     expect(prompt).toContain("HealthMate");
     expect(prompt).toContain("Mandarin (Simplified Chinese)");
-    expect(prompt).toContain(MEDICAL_DISCLAIMER);
+    expect(prompt).toContain(MEDICAL_DISCLAIMERS.zh);
   });
 
   it("injects report and pills context if present", () => {

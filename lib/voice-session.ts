@@ -1,5 +1,5 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
-import { buildHealthMatePrompt, MEDICAL_DISCLAIMER } from "./prompts";
+import { buildHealthMatePrompt, getDisclaimer } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
 import type { Language, PillRecord, ReportRecord } from "@/types";
 
@@ -31,7 +31,7 @@ export function buildVoiceSystemPrompt(params: {
 Do not use markdown formatting, bullet points, numbering, or visual characters in the reply; it will be read aloud.
 If the patient mentions their recent reports or pills, use the injected health context.
 If the recording is silent or unintelligible, set "transcript" to "" and kindly ask them to repeat.
-Conclude your key medical answers with: "${MEDICAL_DISCLAIMER}".
+Conclude your key medical answers with: "${getDisclaimer(params.language)}".
 
 Return ONLY valid JSON matching { "transcript": "...", "reply": "..." }.`,
   });

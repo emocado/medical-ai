@@ -25,6 +25,7 @@ import { playGuideAudio, stopGuideAudio } from "@/lib/guide-audio";
 import { OnboardingOverlay } from "./OnboardingOverlay";
 import { GuideBubble } from "./GuideBubble";
 import { GuideDialogue } from "./GuideDialogue";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface GuideContextValue {
   language: Language;
@@ -51,19 +52,17 @@ export function useGuide() {
 
 interface GuideProviderProps {
   children: React.ReactNode;
-  initialLanguage?: Language;
 }
 
 const INITIAL_IDLE_SECONDS = 30;
 
 export function GuideProvider({
   children,
-  initialLanguage = "en",
 }: GuideProviderProps) {
   const pathname = usePathname() || "/reports";
 
-  // Language state (synced with localStorage)
-  const [language, setLanguageState] = useState<Language>(initialLanguage);
+  // Language is app-wide and persisted by LanguageProvider
+  const { language, setLanguage } = useLanguage();
 
   // Guide UI states
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
@@ -84,22 +83,6 @@ export function GuideProvider({
   // Timers and refs
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize language from localStorage
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedLang = localStorage.getItem("healthmate_lang") as Language;
-      if (savedLang && ["en", "bm", "zh", "ta"].includes(savedLang)) {
-        setLanguageState(savedLang);
-      }
-    }
-  }, []);
-
-  const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("healthmate_lang", lang);
-    }
-  }, []);
 
   // Check onboarding completion on initial mount
   useEffect(() => {
