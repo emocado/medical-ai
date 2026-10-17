@@ -103,17 +103,19 @@ export function ChatInterface({
     <section
       id="chat"
       aria-label={t("chat.aria")}
-      className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
+      className="card p-5 sm:p-6 space-y-4 scroll-mt-28 lg:scroll-mt-36"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
-        <div className="flex items-center space-x-2">
-          <Bot className="w-7 h-7 text-blue-800" aria-hidden="true" />
-          <h3 className="text-xl font-bold text-slate-900">{t("chat.title")}</h3>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.08] pb-4">
+        <div className="flex items-center gap-3">
+          <span className="w-11 h-11 rounded-[13px] bg-accent-soft flex items-center justify-center flex-shrink-0">
+            <Bot className="w-6 h-6 text-accent" aria-hidden="true" />
+          </span>
+          <h3 className="text-xl font-bold text-ink">{t("chat.title")}</h3>
         </div>
         <div className="flex items-center gap-2">
           {latestReport && (
-            <span className="text-sm font-semibold bg-blue-100 text-blue-900 px-3 py-1 rounded-full flex items-center gap-1">
-              <Sparkles className="w-4 h-4 text-blue-700" />
+            <span className="chip !text-sm bg-accent-soft text-accent-ink">
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
               {t("chat.reportConnected")}
             </span>
           )}
@@ -122,7 +124,7 @@ export function ChatInterface({
 
       {/* Messages Scroll Area */}
       <div
-        className="space-y-4 max-h-[380px] overflow-y-auto pr-1"
+        className="space-y-4 max-h-[380px] lg:max-h-[520px] overflow-y-auto overscroll-contain pr-1"
         role="log"
         aria-live="polite"
       >
@@ -131,21 +133,21 @@ export function ChatInterface({
           return (
             <div
               key={m.id}
-              className={`flex items-start gap-2.5 ${isUser ? "flex-row-reverse" : "flex-row"}`}
+              className={`flex items-end gap-2.5 ${isUser ? "flex-row-reverse" : "flex-row"}`}
             >
               <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${
-                  isUser ? "bg-blue-900 text-white" : "bg-blue-100 text-blue-900"
+                className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  isUser ? "bg-accent text-white" : "bg-accent-soft text-accent"
                 }`}
               >
                 {isUser ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
               </div>
 
               <div
-                className={`max-w-[85%] p-4 rounded-2xl text-lg leading-relaxed whitespace-pre-line ${
+                className={`max-w-[85%] lg:max-w-[75%] px-4 py-3 rounded-[22px] text-lg leading-relaxed whitespace-pre-line ${
                   isUser
-                    ? "bg-blue-900 text-white rounded-tr-none font-medium"
-                    : "bg-slate-100 text-slate-900 rounded-tl-none border border-slate-300"
+                    ? "bg-accent text-white rounded-br-md"
+                    : "bg-canvas text-ink rounded-bl-md"
                 }`}
               >
                 {m.id === "initial" ? t("chat.greeting") : m.content}
@@ -155,8 +157,8 @@ export function ChatInterface({
         })}
 
         {isLoading && (
-          <div className="flex items-center gap-3 text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 w-fit">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-700" aria-hidden="true" />
+          <div className="flex items-center gap-3 text-ink-tertiary bg-canvas px-4 py-3 rounded-[22px] w-fit">
+            <Loader2 className="w-6 h-6 animate-spin text-accent" aria-hidden="true" />
             <span className="text-base font-semibold">{t("chat.thinking")}</span>
           </div>
         )}
@@ -165,14 +167,14 @@ export function ChatInterface({
 
       {messages.length === 1 && !isLoading && (
         <div className="space-y-2">
-          <p className="text-base font-semibold text-slate-700">{t("chat.suggestions")}</p>
+          <p className="eyebrow">{t("chat.suggestions")}</p>
           <div className="flex flex-wrap gap-2">
             {SAMPLE_QUESTIONS.map((key) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => sendMessage(t(key))}
-                className="px-3 py-2 rounded-xl min-h-[48px] text-base font-semibold border-2 border-blue-200 bg-blue-50 text-blue-950 hover:bg-blue-100 text-left"
+                className="press px-4 py-2 rounded-2xl min-h-[48px] text-base font-medium bg-accent-soft text-accent-ink hover:bg-[#dceafa] text-left"
               >
                 {t(key)}
               </button>
@@ -182,7 +184,7 @@ export function ChatInterface({
       )}
 
       {/* Input bar with Send and Microphone buttons */}
-      <form onSubmit={handleSend} className="flex items-center gap-2 pt-2">
+      <form onSubmit={handleSend} className="flex items-center gap-2 pt-2 border-t border-black/[0.08] mt-2">
         <label htmlFor="chat-input" className="sr-only">
           {t("chat.inputLabel")}
         </label>
@@ -197,7 +199,7 @@ export function ChatInterface({
               : t("chat.placeholderGeneral")
           }
           disabled={isLoading}
-          className="flex-1 px-4 py-3 border-2 border-slate-300 rounded-xl text-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-800 bg-slate-50 focus:bg-white min-h-[48px]"
+          className="field flex-1 min-w-0 !rounded-full !px-5 min-h-[52px]"
         />
 
         {/* Microphone Button for hands-free voice chat */}
@@ -205,7 +207,7 @@ export function ChatInterface({
           type="button"
           onClick={() => setIsVoiceModalOpen(true)}
           aria-label={t("chat.voice.aria")}
-          className="px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm transition-colors active:bg-emerald-900"
+          className="press w-[52px] h-[52px] flex-shrink-0 rounded-full flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white shadow-button"
         >
           <Mic className="w-5 h-5" aria-hidden="true" />
         </button>
@@ -215,11 +217,7 @@ export function ChatInterface({
           type="submit"
           disabled={isLoading || !input.trim()}
           aria-label={t("chat.send.aria")}
-          className={`px-4 py-3 rounded-xl min-h-[48px] min-w-[48px] flex items-center justify-center font-bold text-lg transition-colors ${
-            isLoading || !input.trim()
-              ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-              : "bg-blue-800 hover:bg-blue-900 text-white shadow-sm"
-          }`}
+          className="btn btn-primary !px-0 w-[52px] h-[52px] flex-shrink-0"
         >
           <Send className="w-5 h-5" aria-hidden="true" />
         </button>

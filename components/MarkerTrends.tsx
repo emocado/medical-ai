@@ -12,10 +12,10 @@ const HEIGHT = 180;
 const PAD = { top: 24, right: 44, bottom: 30, left: 40 };
 
 const STATUS_TEXT: Record<string, string> = {
-  high: "text-amber-900",
-  low: "text-amber-900",
-  abnormal: "text-amber-900",
-  critical: "text-red-800",
+  high: "text-amber-800",
+  low: "text-amber-800",
+  abnormal: "text-amber-800",
+  critical: "text-red-700",
 };
 
 function shortDate(date: string): string {
@@ -48,10 +48,10 @@ function TrendChart({ trend }: { trend: MarkerTrend }) {
   const last = trend.points.length - 1;
 
   return (
-    <figure className="space-y-2">
+    <figure className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-x-8 lg:gap-y-2 lg:items-start">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="w-full h-auto"
+        className="w-full h-auto lg:col-start-1 lg:row-start-1"
         role="img"
         aria-label={t("trends.chartAria", { name: trend.name })}
       >
@@ -61,19 +61,20 @@ function TrendChart({ trend }: { trend: MarkerTrend }) {
             y={bandTop}
             width={plotW}
             height={Math.max(0, bandBottom - bandTop)}
-            className="fill-emerald-100"
+            className="fill-emerald-100/70"
+            rx={6}
           />
         )}
         {/* Recessive baseline */}
-        <line x1={PAD.left} x2={WIDTH - PAD.right} y1={HEIGHT - PAD.bottom} y2={HEIGHT - PAD.bottom} className="stroke-slate-300" strokeWidth={1} />
-        <path d={path} fill="none" className="stroke-blue-800" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <line x1={PAD.left} x2={WIDTH - PAD.right} y1={HEIGHT - PAD.bottom} y2={HEIGHT - PAD.bottom} className="stroke-black/10" strokeWidth={1} />
+        <path d={path} fill="none" className="stroke-accent" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {trend.points.map((p, i) => (
           <g key={`${p.date}-${i}`}>
             <title>{`${p.date}: ${p.label} ${trend.unit}`}</title>
             {/* Larger invisible hit target for touch and hover */}
             <circle cx={x(i)} cy={y(p.value)} r={14} fill="transparent" />
-            <circle cx={x(i)} cy={y(p.value)} r={5} className="fill-blue-800 stroke-white" strokeWidth={2} />
-            <text x={x(i)} y={HEIGHT - 10} textAnchor="middle" className="fill-slate-600" fontSize={12}>
+            <circle cx={x(i)} cy={y(p.value)} r={5} className="fill-accent stroke-white" strokeWidth={2.5} />
+            <text x={x(i)} y={HEIGHT - 10} textAnchor="middle" className="fill-ink-tertiary tabular" fontSize={12}>
               {shortDate(p.date)}
             </text>
             {(i === 0 || i === last) && (
@@ -81,7 +82,7 @@ function TrendChart({ trend }: { trend: MarkerTrend }) {
                 x={x(i)}
                 y={y(p.value) - 10}
                 textAnchor={i === 0 && last > 0 ? "start" : i === last && last > 0 ? "end" : "middle"}
-                className="fill-slate-900 font-bold"
+                className="fill-ink font-semibold tabular"
                 fontSize={13}
               >
                 {p.label}
@@ -91,28 +92,28 @@ function TrendChart({ trend }: { trend: MarkerTrend }) {
         ))}
       </svg>
       {range && (
-        <figcaption className="text-sm font-medium text-slate-600 flex items-center gap-2">
-          <span className="inline-block w-4 h-3 rounded-sm bg-emerald-100 border border-emerald-300" aria-hidden="true" />
+        <figcaption className="text-sm font-medium text-ink-tertiary flex items-center gap-2 lg:col-start-1 lg:row-start-2">
+          <span className="inline-block w-4 h-3 rounded bg-emerald-100 ring-1 ring-inset ring-emerald-300" aria-hidden="true" />
           {t("trends.normalBand")} ({trend.referenceRange})
         </figcaption>
       )}
 
       {/* Table view: the accessible, exact-value companion to the chart */}
-      <table className="w-full text-base">
+      <table className="w-full text-base tabular lg:col-start-2 lg:row-start-1 lg:row-span-2">
         <thead>
-          <tr className="text-left text-slate-600 border-b border-slate-200">
+          <tr className="text-left text-ink-tertiary border-b border-black/[0.08]">
             <th className="py-1.5 font-semibold">{t("trends.date")}</th>
             <th className="py-1.5 font-semibold">{t("trends.value")}</th>
           </tr>
         </thead>
         <tbody>
           {trend.points.map((p, i) => (
-            <tr key={`${p.date}-${i}`} className="border-b border-slate-100">
-              <td className="py-1.5 pr-3 text-slate-700 whitespace-nowrap align-top">{p.date}</td>
-              <td className={`py-1.5 font-bold ${STATUS_TEXT[p.status ?? ""] ?? "text-slate-900"}`}>
+            <tr key={`${p.date}-${i}`} className="border-b border-black/[0.05] last:border-0">
+              <td className="py-2 pr-3 text-ink-secondary whitespace-nowrap align-top">{p.date}</td>
+              <td className={`py-2 font-semibold ${STATUS_TEXT[p.status ?? ""] ?? "text-ink"}`}>
                 {p.label} {trend.unit}
                 {p.status && p.status !== "normal" && p.status !== "unknown" && (
-                  <span className="ml-2 text-sm font-bold">({t(`status.${p.status}` as StringKey)})</span>
+                  <span className="ml-2 text-sm font-semibold">({t(`status.${p.status}` as StringKey)})</span>
                 )}
               </td>
             </tr>
@@ -139,18 +140,18 @@ export function MarkerTrends({ trends }: { trends: MarkerTrend[] }) {
   if (!active) return null;
 
   return (
-    <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
-      <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-        <LineChart className="w-6 h-6 text-blue-800" aria-hidden="true" />
+    <section className="card p-5 sm:p-6 space-y-4">
+      <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+        <LineChart className="w-6 h-6 text-accent" aria-hidden="true" />
         {t("trends.title")}
       </h2>
       {/* A native select keeps a long list of tests compact and easy to use on a phone. */}
-      <label className="block space-y-2">
-        <span className="text-base font-semibold text-slate-700">{t("trends.pick")}</span>
+      <label className="block space-y-2 lg:max-w-md">
+        <span className="text-base font-medium text-ink-secondary">{t("trends.pick")}</span>
         <select
           value={active.key}
           onChange={(e) => setSelected(e.target.value)}
-          className="w-full px-4 py-3 min-h-[56px] rounded-xl border-2 border-blue-800 bg-blue-50 text-lg font-bold text-blue-950"
+          className="field min-h-[56px] font-semibold"
         >
           {trends.map((tr) => (
             <option key={tr.key} value={tr.key}>

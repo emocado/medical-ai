@@ -1,12 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { BottomNav } from "@/components/BottomNav";
+import { BottomNav, Sidebar } from "@/components/BottomNav";
 import { GuideProvider } from "@/components/DoctorGuide";
 import { LanguageProvider } from "@/components/LanguageProvider";
 
 export const metadata: Metadata = {
   title: "HealthMate - Elderly-Safe AI Medical Companion",
   description: "Simple multilingual summaries for medical reports, pill guidance, and dietary health tracking.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f5f5f7",
 };
 
 export default function RootLayout({
@@ -16,11 +23,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased">
+      <body className="min-h-screen bg-canvas text-ink flex flex-col antialiased">
         <LanguageProvider>
           <GuideProvider>
-            <main className="flex-1 pb-24 max-w-xl w-full mx-auto px-4 pt-4">
-              {children}
+            <Sidebar />
+            <main className="flex-1 w-full pb-28 lg:pb-16 lg:pl-[var(--sidebar-width)]">
+              <div className="max-w-xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-10">
+                {children}
+              </div>
             </main>
             <BottomNav />
           </GuideProvider>

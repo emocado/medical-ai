@@ -25,13 +25,13 @@ export function GuideBubble({
   return (
     <aside
       aria-label="Doctor Guide Assistant"
-      className="fixed bottom-20 right-4 sm:right-6 z-40 flex items-center select-none print:hidden"
+      className="fixed bottom-24 right-4 sm:right-6 lg:bottom-8 lg:right-8 z-40 flex items-center select-none print:hidden"
     >
       <button
         onClick={onClick}
         aria-label="Ask Dr. Aisha for help"
-        className={`group relative flex items-center justify-center p-1 rounded-full bg-white shadow-xl border-2 border-blue-600 hover:scale-105 active:scale-95 transition-transform min-h-[56px] min-w-[56px] ${
-          isPulsing ? "ring-4 ring-emerald-400 ring-opacity-80 animate-bounce" : ""
+        className={`press group relative flex items-center justify-center p-1 rounded-full material border border-transparent shadow-float motion-safe:hover:scale-105 min-h-[56px] min-w-[56px] ${
+          isPulsing ? "ring-4 ring-emerald-400/70 motion-safe:animate-pulse" : ""
         }`}
       >
         <DrAishaAvatar
@@ -41,7 +41,7 @@ export function GuideBubble({
         />
 
         {/* Small badge */}
-        <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-700 text-white shadow-md border-2 border-white">
+        <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white shadow-button border-2 border-white">
           <Sparkles className="w-3.5 h-3.5 text-amber-300" />
         </span>
       </button>

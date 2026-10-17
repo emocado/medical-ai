@@ -58,15 +58,15 @@ export default function MedicinesPage() {
   function renderCard(med: MedicationEntry) {
     const details = localizedAnalysis(med, lang) ?? med.analysis;
     return (
-      <article key={med.id} className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-3">
+      <article key={med.id} className="card p-5 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-2xl font-black text-blue-950">{med.name}</h3>
-          {med.genericName && <span className="text-base font-medium text-slate-600 italic">({med.genericName})</span>}
+          <h3 className="text-2xl font-bold text-ink">{med.name}</h3>
+          {med.genericName && <span className="text-base font-medium text-ink-tertiary italic">({med.genericName})</span>}
         </div>
-        {details.purpose && <p className="text-lg text-slate-800">{details.purpose}</p>}
+        {details.purpose && <p className="text-lg text-ink-secondary">{details.purpose}</p>}
         <p
-          className={`text-lg font-semibold p-3 rounded-xl border ${
-            details.dosage ? "text-blue-950 bg-blue-50 border-blue-200" : "text-amber-950 bg-amber-50 border-amber-300"
+          className={`text-lg font-semibold p-4 rounded-2xl ${
+            details.dosage ? "text-accent-ink bg-accent-soft" : "text-amber-950 bg-amber-50 ring-1 ring-inset ring-amber-300"
           }`}
         >
           {details.dosage || t("pills.dosageNotVisible")}
@@ -74,18 +74,18 @@ export default function MedicinesPage() {
 
         {med.active && (
           <fieldset>
-            <legend className="text-base font-bold text-slate-900 mb-2">{t("meds.whenTaken")}</legend>
-            <div className="grid grid-cols-2 gap-2">
+            <legend className="eyebrow mb-2">{t("meds.whenTaken")}</legend>
+            <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-2">
               {DOSE_SLOTS.map((slot) => (
                 <button
                   key={slot}
                   type="button"
                   onClick={() => toggleSlot(med, slot)}
                   aria-pressed={med.schedule.includes(slot)}
-                  className={`px-3 py-2 rounded-xl min-h-[48px] text-base font-bold border-2 ${
+                  className={`press px-3 py-2 rounded-2xl min-h-[52px] text-base font-semibold border ${
                     med.schedule.includes(slot)
-                      ? "border-blue-800 bg-blue-100 text-blue-950"
-                      : "border-slate-200 bg-slate-50 text-slate-600"
+                      ? "border-accent bg-accent-soft text-accent-ink"
+                      : "border-transparent bg-canvas text-ink-secondary hover:bg-[#ececf0]"
                   }`}
                 >
                   {t(`slot.${slot}`)}
@@ -99,7 +99,7 @@ export default function MedicinesPage() {
           <button
             type="button"
             onClick={() => update({ ...med, active: !med.active, stoppedAt: med.active ? Date.now() : undefined })}
-            className="px-3 py-2 rounded-xl min-h-[48px] flex items-center gap-1.5 text-base font-bold text-slate-800 border-2 border-slate-300 hover:bg-slate-50"
+            className="btn btn-secondary text-base px-5"
           >
             {med.active ? (
               <PauseCircle className="w-5 h-5" aria-hidden="true" />
@@ -111,7 +111,7 @@ export default function MedicinesPage() {
           <button
             type="button"
             onClick={() => window.confirm(t("confirm.deleteMedicine")) && remove(med.id)}
-            className="px-3 py-2 rounded-xl min-h-[48px] flex items-center gap-1.5 text-base font-bold text-red-800 border-2 border-red-200 hover:bg-red-50"
+            className="btn text-base px-5 bg-red-50 text-red-700 hover:bg-red-100"
           >
             <Trash2 className="w-5 h-5" aria-hidden="true" />
             {t("common.delete")}
@@ -127,35 +127,37 @@ export default function MedicinesPage() {
 
       <Link
         href="/pills"
-        className="w-full py-4 px-6 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-3 bg-blue-800 hover:bg-blue-900 text-white shadow-sm"
+        className="btn btn-primary w-full lg:w-auto min-h-[56px]"
       >
         <Camera className="w-6 h-6" aria-hidden="true" />
         {t("meds.scan")}
       </Link>
 
-      <TodayDoses medications={medications} />
-      <InteractionCheck medications={medications} latestReport={latestReport} />
+      <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
+        <TodayDoses medications={medications} />
+        <InteractionCheck medications={medications} latestReport={latestReport} />
+      </div>
 
       <section className="space-y-4" aria-label={t("meds.list")}>
-        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-          <Pill className="w-6 h-6 text-blue-800" aria-hidden="true" />
+        <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+          <Pill className="w-6 h-6 text-accent" aria-hidden="true" />
           {t("meds.list")}
         </h2>
         <TranslationStatus status={translation.status} onRetry={translation.retry} />
         {loaded && active.length === 0 && (
-          <div className="text-center py-8 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
-            <p className="text-lg font-medium text-slate-600">{t("meds.empty")}</p>
+          <div className="text-center py-10 px-4 rounded-3xl border-2 border-dashed border-black/[0.12]">
+            <p className="text-lg font-medium text-ink-tertiary">{t("meds.empty")}</p>
           </div>
         )}
-        {active.map(renderCard)}
+        <div className="grid gap-4 xl:grid-cols-2 xl:items-start">{active.map(renderCard)}</div>
       </section>
 
       {stopped.length > 0 && (
         <details className="space-y-3">
-          <summary className="text-lg font-bold text-slate-700 cursor-pointer min-h-[48px] flex items-center">
+          <summary className="text-lg font-semibold text-ink-secondary cursor-pointer min-h-[48px] flex items-center rounded-xl">
             {t("meds.stopped")} ({stopped.length})
           </summary>
-          <div className="space-y-3 pt-2">{stopped.map(renderCard)}</div>
+          <div className="grid gap-4 pt-2 xl:grid-cols-2 xl:items-start">{stopped.map(renderCard)}</div>
         </details>
       )}
 

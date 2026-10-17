@@ -38,19 +38,19 @@ export function BackupSection({ onRestored }: { onRestored: () => void }) {
   }
 
   return (
-    <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-3">
-      <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-        <DatabaseBackup className="w-6 h-6 text-blue-800" aria-hidden="true" />
+    <section className="card p-5 sm:p-6 space-y-3">
+      <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+        <DatabaseBackup className="w-6 h-6 text-accent" aria-hidden="true" />
         {t("backup.title")}
       </h2>
-      <p className="text-base text-slate-700 leading-relaxed">{t("backup.desc")}</p>
-      <p className="text-sm font-medium text-slate-600">{t("backup.privacy")}</p>
+      <p className="text-base text-ink-secondary leading-relaxed">{t("backup.desc")}</p>
+      <p className="text-sm font-medium text-ink-tertiary">{t("backup.privacy")}</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <button
           type="button"
           onClick={handleExport}
-          className="py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white"
+          className="btn btn-primary min-h-[56px]"
         >
           <Download className="w-6 h-6" aria-hidden="true" />
           {t("backup.export")}
@@ -58,7 +58,7 @@ export function BackupSection({ onRestored }: { onRestored: () => void }) {
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 border-2 border-blue-800 text-blue-900 bg-white hover:bg-blue-50"
+          className="btn btn-tinted min-h-[56px]"
         >
           <Upload className="w-6 h-6" aria-hidden="true" />
           {t("backup.import")}
@@ -69,7 +69,7 @@ export function BackupSection({ onRestored }: { onRestored: () => void }) {
       {message && (
         <p
           role={message.ok ? "status" : "alert"}
-          className={`text-base font-semibold flex items-center gap-2 ${message.ok ? "text-emerald-800" : "text-red-800"}`}
+          className={`text-base font-semibold flex items-center gap-2 ${message.ok ? "text-emerald-700" : "text-red-700"}`}
         >
           {message.ok ? (
             <CheckCircle2 className="w-5 h-5" aria-hidden="true" />

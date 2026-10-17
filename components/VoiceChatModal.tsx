@@ -249,17 +249,17 @@ export function VoiceChatModal({
       role="dialog"
       aria-modal="true"
       aria-label={t("voice.aria")}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center scrim p-3 sm:p-4 overflow-y-auto overscroll-contain"
     >
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-slate-300 flex flex-col items-center space-y-6 text-center">
-        <div className="w-full flex items-center justify-between border-b border-slate-200 pb-3">
-          <div className="flex items-center space-x-2 text-blue-900 font-bold text-lg">
-            <Mic className="w-6 h-6 text-blue-700" />
+      <div className="sheet max-w-md w-full p-6 flex flex-col items-center space-y-6 text-center">
+        <div className="w-full flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-2 text-ink font-bold text-lg">
+            <Mic className="w-6 h-6 text-accent" />
             <span>{t("voice.title")}</span>
           </div>
           {latestReport && (
-            <span className="text-xs font-bold bg-blue-100 text-blue-900 px-2.5 py-1 rounded-full flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-blue-700" />
+            <span className="text-xs font-semibold bg-accent-soft text-accent-ink px-2.5 py-1 rounded-full flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
               {t("voice.reportActive")}
             </span>
           )}
@@ -271,16 +271,16 @@ export function VoiceChatModal({
             onClick={handleMainButton}
             disabled={status === "listening" || status === "thinking"}
             aria-label={status === "speaking" ? t("voice.interrupt.aria") : t("voice.start.aria")}
-            className={`w-28 h-28 rounded-full flex items-center justify-center transition-all ${
+            className={`press w-28 h-28 rounded-full flex items-center justify-center transition-[background-color,box-shadow,color,scale] duration-300 ease-fluid ${
               status === "listening"
-                ? "bg-blue-100 ring-8 ring-blue-300 animate-pulse text-blue-900"
+                ? "bg-accent-soft ring-8 ring-accent/25 motion-safe:animate-pulse text-accent-ink"
                 : status === "speaking"
-                ? "bg-emerald-100 ring-8 ring-emerald-300 text-emerald-900"
+                ? "bg-emerald-50 ring-8 ring-emerald-300/70 text-emerald-800"
                 : status === "thinking"
-                ? "bg-slate-100 ring-4 ring-slate-200 text-slate-500"
+                ? "bg-canvas ring-4 ring-black/5 text-ink-tertiary"
                 : status === "error"
-                ? "bg-red-100 ring-4 ring-red-300 text-red-900"
-                : "bg-blue-50 ring-4 ring-blue-200 text-blue-800 hover:bg-blue-100"
+                ? "bg-red-50 ring-4 ring-red-200 text-red-800"
+                : "bg-accent text-white ring-8 ring-accent/15 shadow-button hover:bg-accent-hover"
             }`}
           >
             {status === "speaking" ? (
@@ -296,21 +296,21 @@ export function VoiceChatModal({
         </div>
 
         <div className="space-y-1" aria-live="polite">
-          <h4 className="text-2xl font-black text-slate-900">{headline}</h4>
-          {hint && <p className="text-base text-slate-600 font-medium">{hint}</p>}
+          <h4 className="text-2xl font-bold text-ink">{headline}</h4>
+          {hint && <p className="text-base text-ink-tertiary font-medium">{hint}</p>}
         </div>
 
         {(lastTranscript || lastReply) && (
-          <div className="w-full bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-base text-slate-700 text-left max-h-40 overflow-y-auto leading-relaxed space-y-2">
+          <div className="well w-full p-4 text-base text-ink-secondary text-left max-h-40 overflow-y-auto overscroll-contain leading-relaxed space-y-2">
             {lastTranscript && (
               <p>
-                <span className="font-bold text-slate-900">{t("voice.you")}: </span>
+                <span className="font-semibold text-ink">{t("voice.you")}: </span>
                 {lastTranscript}
               </p>
             )}
             {lastReply && (
               <p>
-                <span className="font-bold text-blue-900">HealthMate: </span>
+                <span className="font-semibold text-accent-ink">HealthMate: </span>
                 {lastReply}
               </p>
             )}
@@ -320,7 +320,7 @@ export function VoiceChatModal({
         {errorMessage && (
           <div
             role="alert"
-            className="w-full p-4 rounded-xl bg-red-50 border-2 border-red-300 text-red-900 flex items-start space-x-2 text-left"
+            className="w-full p-4 rounded-2xl bg-red-50 ring-1 ring-inset ring-red-200 text-red-900 flex items-start space-x-2 text-left"
           >
             <AlertCircle className="w-6 h-6 text-red-700 flex-shrink-0 mt-0.5" />
             <div className="text-base">
@@ -333,7 +333,7 @@ export function VoiceChatModal({
         <div className="w-full pt-2 flex flex-col gap-2">
           <button
             onClick={handleClose}
-            className="w-full py-4 px-6 rounded-2xl min-h-[56px] text-lg font-bold flex items-center justify-center space-x-2 bg-red-700 hover:bg-red-800 text-white shadow-md active:bg-red-900 transition-colors"
+            className="btn btn-danger w-full min-h-[56px]"
           >
             <PhoneOff className="w-6 h-6" />
             <span>{t("voice.end")}</span>
