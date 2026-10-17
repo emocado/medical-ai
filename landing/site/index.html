@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HealthMate</title>
+  <meta name="description" content="HealthMate explains lab reports, medicine labels and doctor visits for older adults, in English, Bahasa Malaysia, Chinese and Tamil, and raises a clear alert when a result needs a doctor today.">
+  <meta name="theme-color" content="#0c1a3a">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HealthMate">
+  <meta property="og:description" content="Medical reports, explained in your own language. A health companion for older adults and their families.">
+  <meta property="og:image" content="media/tour.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="bar">
+    <div class="wrap">
+      <a class="logo" href="#top" aria-label="HealthMate home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg>
+        HealthMate
+      </a>
+      <nav aria-label="Page sections">
+        <a href="#how">How it works</a>
+        <a href="#safety">Safety</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/emocado/medical-ai">Source code</a>
+        <a class="cta" href="#tour">Watch the tour</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap">
+        <div class="hero-copy" id="hero-copy">
+          <p class="eyebrow">For older adults and the families who help them</p>
+          <h1 id="hero-title">Medical reports, explained in <mark>your own language.</mark></h1>
+          <p class="lede" id="hero-lede">HealthMate reads blood tests, medicine labels and discharge notes, then tells you what they mean in English, Bahasa Malaysia, 中文 or தமிழ். If a result needs a doctor today, it says so plainly.</p>
+          <div class="langs" role="group" aria-label="Show this introduction in another language">
+            <span>Read this in</span>
+            <button type="button" data-lang="en" aria-pressed="true">EN</button>
+            <button type="button" data-lang="bm" aria-pressed="false">BM</button>
+            <button type="button" data-lang="zh" aria-pressed="false" lang="zh">中文</button>
+            <button type="button" data-lang="ta" aria-pressed="false" lang="ta">தமிழ்</button>
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary" href="#tour">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.52.85l10.4-6.5a1 1 0 0 0 0-1.7L9.52 4.65A1 1 0 0 0 8 5.5Z"/></svg>
+              Watch the 80-second tour
+            </a>
+            <a class="btn btn-ghost" href="#how">See what it does</a>
+          </div>
+          <p class="status-note">HealthMate is a working research prototype, tested with sample reports. It is not yet available to download.</p>
+        </div>
+
+        <div class="hero-stage">
+          <div class="slip" aria-hidden="true">
+            <header>LABORATORY REPORT</header>
+            <div class="row"><span>HbA1c</span><b class="hl">7.0 %</b><b>H</b></div>
+            <div class="rng">ref 4.0 – 6.0</div>
+            <div class="row"><span>LDL-Chol</span><b class="hl">3.0</b><b>H</b></div>
+            <div class="rng">ref &lt; 2.6 mmol/L</div>
+            <div class="row"><span>eGFR (CKD-EPI)</span><b class="hl">64</b><b>L</b></div>
+            <div class="rng">ref &gt; 90 mL/min/1.73m²</div>
+            <div class="row"><span>Potassium</span><b>4.6</b><b></b></div>
+            <div class="rng">ref 3.5 – 5.1 mmol/L</div>
+          </div>
+          <div class="phone">
+            <video src="media/report.mp4" poster="media/report.jpg" autoplay muted loop playsinline preload="auto" aria-label="Animation of the app: a lab report photo is read, then each result is listed with its normal range and a summary appears in English, Malay, Chinese and Tamil."></video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="problem-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">The problem</p>
+          <h2 id="problem-title">A report full of numbers. A patient full of questions.</h2>
+          <p class="lede">Clinics hand over results written for other clinicians. Older patients go home unsure whether a number is fine, getting worse, or a reason to call someone today.</p>
+        </div>
+
+        <div class="translate">
+          <div class="pair">
+            <p class="raw">HbA1c ........ 7.0 % <span class="flag">H</span><small>Reference 4.0 – 6.0</small></p>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            <p class="plain"><span class="tag">HealthMate says</span>Your average blood sugar over the last three months is better than in March (7.9), but still a little above the healthy range.</p>
+          </div>
+          <div class="pair">
+            <p class="raw">eGFR (CKD-EPI) .. 64 mL/min/1.73m² <span class="flag">L</span><small>Reference &gt; 90</small></p>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            <p class="plain"><span class="tag">HealthMate says</span>Your kidneys are filtering a little less well than expected. This is not an emergency. Ask your doctor about it at your next visit.</p>
+          </div>
+        </div>
+
+        <div class="struggles">
+          <div>
+            <h3>Jargon and abbreviations</h3>
+            <p>HbA1c, eGFR, LDL. Flags like H, L and HH. Without help, it is hard to tell a small change from a serious one.</p>
+          </div>
+          <div>
+            <h3>Many medicines, many doctors</h3>
+            <p>Pills from a GP, a specialist and a pharmacy, each with a different label. Dangerous combinations slip through.</p>
+          </div>
+          <div>
+            <h3>The wrong language</h3>
+            <p>Reports come in clinical English. Many grandparents read Mandarin, Tamil or Malay best, and rely on busy children to explain.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">How it works</p>
+          <h2 id="how-title">Photograph it. HealthMate explains it.</h2>
+          <p class="lede">Each video below recreates the app’s real screens, using its built-in sample reports and labels. Text is large, buttons are big, and every screen is in four languages.</p>
+        </div>
+
+        <div class="features">
+          <article class="feature">
+            <div class="media">
+              <div class="phone"><video data-src="media/report.mp4" poster="media/report.jpg" muted loop playsinline preload="none" aria-label="Animation of the app: a lab report being explained."></video></div>
+            </div>
+            <div class="feature-copy">
+              <p class="eyebrow">Reports</p>
+              <h3>Every result, with the lab’s own normal range.</h3>
+              <p>Upload a photo or PDF of a blood test or discharge summary. You get each marker with its printed range, and a short summary you can switch between four languages or listen to.</p>
+              <ul class="ticks">
+                <li>A result with no flag or range shows “Ask doctor”. It is never shown as normal.</li>
+                <li>Read-aloud, plus follow-up questions in a chat that already knows the report.</li>
+                <li>Drug names, numbers and units stay exactly as printed in every language.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="feature flip alert">
+            <div class="media">
+              <div class="phone"><video data-src="media/urgent.mp4" poster="media/urgent.jpg" muted loop playsinline preload="none" aria-label="Animation of the app: a red alert appears on the home screen and on the report, with a Call 999 button."></video></div>
+            </div>
+            <div class="feature-copy">
+              <p class="eyebrow">Urgent results</p>
+              <h3>A dangerous number is never hidden in gentle words.</h3>
+              <p>When a result crosses a fixed safety limit, or the lab marks it critical, a red banner appears on the home screen and above the summary. It tells you to contact your clinic today and lists emergency signs.</p>
+              <ul class="ticks">
+                <li>The rules are written in code, so they work even if the AI misreads the tone.</li>
+                <li>One large button calls 999.</li>
+                <li>The flagged values are listed so you can read them out over the phone.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="feature">
+            <div class="media">
+              <div class="phone"><video data-src="media/medicines.mp4" poster="media/medicines.jpg" muted loop playsinline preload="none" aria-label="Animation of the app: a medicine label is scanned, a dangerous combination with a statin is flagged, then doses are ticked off for the day."></video></div>
+            </div>
+            <div class="feature-copy">
+              <p class="eyebrow">Medicines</p>
+              <h3>Scan the label. Know what each pill is for.</h3>
+              <p>Point the camera at a pharmacy label or box. HealthMate copies the dose exactly as printed and checks the new medicine against everything you already take.</p>
+              <ul class="ticks">
+                <li>Doses come from the label only. When it isn’t sure what a medicine is, it says “check with your pharmacist”.</li>
+                <li>Well-known dangerous pairs, such as clarithromycin with a statin, are flagged straight away.</li>
+                <li>A daily checklist for morning, afternoon, evening and night.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="feature flip">
+            <div class="media">
+              <div class="phone"><video data-src="media/trends.mp4" poster="media/trends.jpg" muted loop playsinline preload="none" aria-label="Animation of the app: a chart of HbA1c over three reports with the normal range shaded, then a list of results marked better or worse."></video></div>
+            </div>
+            <div class="feature-copy">
+              <p class="eyebrow">Timeline</p>
+              <h3>See whether things are getting better.</h3>
+              <p>Every saved report goes on one timeline, ordered by the date printed on the report. Pick a test to see it charted over time, with the normal range shaded.</p>
+              <ul class="ticks">
+                <li>“Better” or “worse” is worked out from the lab’s numbers and flags. The AI only writes the explanation.</li>
+                <li>Tests are matched even when two labs name them differently.</li>
+                <li>Download a backup file and restore it on a new phone.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="feature">
+            <div class="media">
+              <div class="phone"><video data-src="media/voice.mp4" poster="media/voice.jpg" muted loop playsinline preload="none" aria-label="Animation of the app: a spoken question about nasi lemak is answered aloud with advice based on the latest report."></video></div>
+            </div>
+            <div class="feature-copy">
+              <p class="eyebrow">Voice and meals</p>
+              <h3>Ask out loud, about the food you actually eat.</h3>
+              <p>Tap once and talk. HealthMate waits for you to pause, answers aloud, then listens again. Ask about nasi lemak, roti canai or chicken rice and get advice that fits your latest results and medicines.</p>
+              <ul class="ticks">
+                <li>No typing needed. Tap any time to interrupt.</li>
+                <li>Spoken questions and answers are saved in the chat to re-read later.</li>
+                <li>If a meal can’t be scored, it says “Not scored” rather than inventing a number.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="feature flip">
+            <div class="media">
+              <div class="phone"><video data-src="media/visit.mp4" poster="media/visit.jpg" muted loop playsinline preload="none" aria-label="Animation of the app: a one-page health summary scrolls by, then is shared from the phone."></video></div>
+            </div>
+            <div class="feature-copy">
+              <p class="eyebrow">For my doctor</p>
+              <h3>Walk into the appointment with one clear page.</h3>
+              <p>HealthMate builds a one-page summary from your saved records: medicines with their label doses, results outside the range, what changed since last time, and the questions you want to ask.</p>
+              <ul class="ticks">
+                <li>Print it, show it on screen, or send it to family through the phone’s share menu.</li>
+                <li>It can be in English for the doctor while the app stays in your language.</li>
+                <li>Built only from stored records, never from a fresh AI guess.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="safety" aria-labelledby="safety-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Safety</p>
+          <h2 id="safety-title">Four things HealthMate will not do.</h2>
+          <p class="lede">An AI that sounds calm about a dangerous result is worse than no AI at all. These limits are built into the app, outside the AI.</p>
+        </div>
+
+        <div class="promises">
+          <div class="promise">
+            <h3>Call an unknown result normal</h3>
+            <p>If the report gives no flag or range, the result is marked “Ask doctor”. Green is only shown when the lab’s own range says so.</p>
+          </div>
+          <div class="promise">
+            <h3>Invent a dose</h3>
+            <p>Doses are copied from the pharmacy label. If no dose can be read, none is made up, and the doctor summary says “dose not recorded”.</p>
+          </div>
+          <div class="promise">
+            <h3>Hide an urgent result</h3>
+            <p>Fixed limits trigger a same-day alert no matter how the summary is worded. The alert sits above everything else on the screen.</p>
+          </div>
+          <div class="promise">
+            <h3>Pretend to be your doctor</h3>
+            <p>The guide, Dr. Aisha, introduces herself as an AI helper. A medical disclaimer appears in the reader’s language.</p>
+          </div>
+        </div>
+
+        <div class="rules">
+          <div class="rules-copy">
+            <h3>When the red alert appears</h3>
+            <p>These are conservative screening limits for adults, written into the app. Any value the lab itself marks as critical also raises the alert.</p>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th scope="col">Test</th><th scope="col">Alert at</th><th scope="col">Unit</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Potassium</td><td class="v">≤ 2.8 or ≥ 6.0</td><td class="u">mmol/L</td></tr>
+                <tr><td>Sodium</td><td class="v">≤ 120 or ≥ 155</td><td class="u">mmol/L</td></tr>
+                <tr><td>Glucose</td><td class="v">≤ 3.0 or ≥ 16.7</td><td class="u">mmol/L</td></tr>
+                <tr><td>Haemoglobin</td><td class="v">≤ 7.0</td><td class="u">g/dL</td></tr>
+                <tr><td>eGFR</td><td class="v">≤ 15</td><td class="u">mL/min/1.73m²</td></tr>
+                <tr><td>Platelets</td><td class="v">≤ 50</td><td class="u">×10⁹/L</td></tr>
+                <tr><td>Blood pressure</td><td class="v">≥ 180 / 120</td><td class="u">mmHg</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="privacy" aria-labelledby="privacy-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Privacy</p>
+          <h2 id="privacy-title">Your records stay on your phone.</h2>
+          <p class="lede">There is no account to create and no central database. Reports, photos, medicines and dose history are stored in the phone’s browser, and backups are files you keep.</p>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <p class="eyebrow">Kept on your device</p>
+            <h3>Everything you save</h3>
+            <ul>
+              <li>Reports, photos and their summaries</li>
+              <li>Your medicine list and daily dose ticks</li>
+              <li>Meals, chats and your own notes</li>
+              <li>Backup files, which only you hold</li>
+            </ul>
+          </div>
+          <div class="panel quiet">
+            <p class="eyebrow">Sent only when you ask</p>
+            <h3>The item being explained</h3>
+            <ul>
+              <li>When you analyse a report, photo, meal, question or voice clip, that item goes through HealthMate’s server to the AI model, with the context it needs.</li>
+              <li>The AI key stays on the server and never reaches your phone.</li>
+              <li>Requests are rate-limited and size-capped.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="access-title">
+      <div class="wrap access">
+        <div>
+          <div class="section-head" style="margin-bottom:0">
+            <p class="eyebrow">Made for older eyes and hands</p>
+            <h2 id="access-title">Big text. Big buttons. No small print.</h2>
+            <p class="lede">Most patient portals are built for people who read fine print and tap tiny links. HealthMate starts from the opposite end.</p>
+          </div>
+          <div class="specs">
+            <div class="spec"><b>18&nbsp;px</b><span>smallest text anywhere</span></div>
+            <div class="spec"><b>48&nbsp;px</b><span>smallest button you tap</span></div>
+            <div class="spec"><b>4</b><span>languages on every screen</span></div>
+            <div class="spec"><b>0</b><span>accounts or passwords</span></div>
+          </div>
+        </div>
+        <div class="guide">
+          <div class="avatar" aria-hidden="true">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" fill="#E6FFFA"/>
+              <path d="M15 95 C 15 72, 35 68, 50 68 C 65 68, 85 72, 85 95 Z" fill="#FFFFFF" stroke="#0D9488" stroke-width="2.5"/>
+              <polygon points="40,68 60,68 50,84" fill="#0D9488"/>
+              <polygon points="43,68 57,68 50,78" fill="#14B8A6"/>
+              <path d="M 33 68 C 33 80, 42 86, 50 86 C 58 86, 67 80, 67 68" stroke="#475569" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="50" cy="88" r="4.5" fill="#334155" stroke="#94A3B8" stroke-width="1"/>
+              <rect x="44" y="52" width="12" height="18" fill="#E2A176" rx="3"/>
+              <ellipse cx="50" cy="42" rx="20" ry="22" fill="#F0B58D"/>
+              <path d="M 28 42 C 28 24, 38 18, 50 18 C 62 18, 72 24, 72 42 C 72 45, 71 52, 69 54 C 67 46, 64 30, 50 30 C 36 30, 33 46, 31 54 C 29 52, 28 45, 28 42 Z" fill="#1E293B"/>
+              <path d="M 38 33 Q 42 30 46 33" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M 54 33 Q 58 30 62 33" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M 38 40 Q 42 36 46 40" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M 54 40 Q 58 36 62 40" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <ellipse cx="36" cy="44" rx="3.5" ry="2" fill="#FB7185" opacity="0.5"/>
+              <ellipse cx="64" cy="44" rx="3.5" ry="2" fill="#FB7185" opacity="0.5"/>
+              <path d="M 50 40 L 49 46 L 52 46" stroke="#D97746" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M 42 51 Q 50 60 58 51 Z" fill="#FFFFFF" stroke="#BE123C" stroke-width="1.8"/>
+              <circle cx="75" cy="80" r="7" fill="#0D9488"/>
+              <path d="M 72 80 L 78 80 M 75 77 L 75 83" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="bubble">“Hello, I’m Dr. Aisha. I’m an AI helper, not a real doctor. I’ll show you around, and I’ll always tell you when to call your clinic.”</p>
+          <small>Dr. Aisha guides first-time users with spoken, captioned steps, and offers a gentle hint if someone seems stuck on a screen.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="tour" id="tour" aria-labelledby="tour-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">The tour</p>
+          <h2 id="tour-title">See a full morning with HealthMate.</h2>
+          <p class="lede">Eighty seconds, six moments: a new report, an urgent result, a new prescription, the trend, a spoken question and the doctor visit.</p>
+        </div>
+        <div class="screen">
+          <video id="tour-video" src="media/tour.mp4" poster="media/tour.jpg" controls muted playsinline preload="metadata" aria-label="HealthMate tour video, 80 seconds, no sound. Captions are shown on screen."></video>
+        </div>
+        <ol class="chapters" aria-label="Jump to a moment in the tour">
+          <li><button type="button" data-t="3.5"><time>0:03</time>Reports</button></li>
+          <li><button type="button" data-t="16.5"><time>0:16</time>Safety</button></li>
+          <li><button type="button" data-t="26.5"><time>0:26</time>Medicines</button></li>
+          <li><button type="button" data-t="41.5"><time>0:41</time>Timeline</button></li>
+          <li><button type="button" data-t="52.5"><time>0:52</time>Voice</button></li>
+          <li><button type="button" data-t="64.5"><time>1:04</time>Doctor visit</button></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="wrap">
+        <div class="closing-copy">
+          <p class="eyebrow">Why it matters</p>
+          <h2 id="closing-title">Clear answers, in your language, with a <mark>safe next step.</mark></h2>
+          <p class="lede">HealthMate does not replace your doctor. It helps you understand what the doctor wrote, remember what to take, and know when to pick up the phone.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="https://github.com/emocado/medical-ai">View the source on GitHub</a>
+          </div>
+          <p class="status-note">The code is open, including the safety rules and the interaction table, so anyone can check how HealthMate decides what to show.</p>
+        </div>
+        <ul class="who">
+          <li><b>For patients</b><span>Understand your own results without waiting for someone to explain.</span></li>
+          <li><b>For families</b><span>Help a parent from far away with one shared summary.</span></li>
+          <li><b>For clinics</b><span>Patients who arrive with their medicines listed and their questions ready.</span></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><strong>HealthMate</strong> is a research prototype and is not a medical device. It does not diagnose or treat any condition. Always follow your doctor’s and pharmacist’s advice. In an emergency in Malaysia, call 999.</p>
+      <p>All reports, labels and patients shown are fictional demo samples. <a href="https://github.com/emocado/medical-ai">Source on GitHub</a>.</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
