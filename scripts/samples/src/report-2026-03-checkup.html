@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lab Report 15/03/2026 (SAMPLE)</title>
+<style>
+  @page { size: A4; margin: 0; }
+  html, body { margin: 0; background: #fff; }
+  /* PNG render: 1240px window shows the 794px-wide A4 page scaled up (150 dpi feel). */
+  @media screen { html { zoom: 1.5625; } }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 794px; height: 1122px; box-sizing: border-box; padding: 36px 46px 30px; position: relative; overflow: hidden;
+          font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; color: #111; background: #fff; }
+  .wm { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%) rotate(-32deg); font-size: 58px; font-weight: 700;
+        color: rgba(0,0,0,0.06); white-space: nowrap; letter-spacing: 4px; pointer-events: none; z-index: 0; }
+  .wm-corner { position: absolute; top: 10px; right: 14px; font-size: 9.5px; letter-spacing: 1px; color: #777; border: 1px solid #aaa; padding: 2px 6px; }
+  .content { position: relative; z-index: 1; }
+  .hdr { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #111; padding-bottom: 8px; }
+  .hdr .name { font-size: 19px; font-weight: 700; letter-spacing: .5px; }
+  .hdr .sub { font-size: 11px; line-height: 1.45; margin-top: 2px; }
+  .hdr .right { text-align: right; font-size: 11px; line-height: 1.45; }
+  .hdr .right b { font-size: 13px; }
+  .title { text-align: center; font-weight: 700; font-size: 14.5px; letter-spacing: 2px; margin: 10px 0 8px; }
+  .pt { width: 100%; border: 1px solid #111; border-collapse: collapse; font-size: 12px; }
+  .pt td { padding: 3px 8px; vertical-align: top; }
+  .pt td.k { width: 112px; color: #333; }
+  .res { width: 100%; border-collapse: collapse; margin-top: 12px; font-family: "Courier New", Courier, monospace; font-size: 12.5px; }
+  .res th { font-family: Arial, Helvetica, sans-serif; text-align: left; font-size: 11.5px; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; padding: 4px 6px; }
+  .res td { padding: 2.5px 6px; }
+  .res tr.sec td { font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 12px; padding-top: 9px; text-decoration: underline; }
+  .res td.r { font-weight: 700; text-align: right; width: 70px; }
+  .res td.f { font-weight: 700; text-align: center; width: 44px; }
+  .res td.u { width: 110px; }
+  .note { margin-top: 14px; font-size: 11.5px; line-height: 1.5; border-top: 1px dashed #555; padding-top: 6px; }
+  .foot { position: absolute; left: 46px; right: 46px; bottom: 30px; font-size: 11px; }
+  .sig { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+  .sig .line { border-top: 1px solid #111; width: 230px; padding-top: 3px; text-align: center; line-height: 1.4; }
+  .scrawl { font-family: "Segoe Script", "Brush Script MT", cursive; font-size: 20px; text-align: center; margin-bottom: 2px; color: #223; }
+  .fine { border-top: 1px solid #111; padding-top: 4px; display: flex; justify-content: space-between; color: #333; font-size: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="wm">SAMPLE — FOR DEMO ONLY</div>
+  <div class="wm-corner">SAMPLE — FOR DEMO ONLY</div>
+  <div class="content">
+    <div class="hdr">
+      <div>
+        <div class="name">MEDILAB DEMO SDN BHD</div>
+        <div class="sub">Clinical Laboratory Services (Demo) &middot; Lot 7, Jalan Contoh 3/1, 47300 Petaling Jaya, Selangor<br>
+          Tel: 03-0000 0000 &middot; Fax: 03-0000 0001</div>
+      </div>
+      <div class="right">
+        <b>Referring clinic:</b><br>
+        Klinik Sejahtera Demo, Petaling Jaya<br>
+        No. 12, Jalan Demo 1/2, 46200 Petaling Jaya
+      </div>
+    </div>
+
+    <div class="title">LABORATORY REPORT</div>
+
+    <table class="pt">
+      <tr><td class="k">Patient Name</td><td>: <b>LIM SIEW LAN</b></td><td class="k">Lab No.</td><td>: MLD-2603-04417</td></tr>
+      <tr><td class="k">IC No.</td><td>: XXXXXX-XX-XXXX</td><td class="k">Collected</td><td>: 15/03/2026 08:12</td></tr>
+      <tr><td class="k">Age / Sex</td><td>: 72 Y / Female</td><td class="k">Received</td><td>: 15/03/2026 10:40</td></tr>
+      <tr><td class="k">Requested by</td><td>: Dr. S. Kumar (demo)</td><td class="k">Reported</td><td>: 15/03/2026 16:25</td></tr>
+      <tr><td class="k">Specimen</td><td>: Blood (Serum, EDTA, Fluoride) &mdash; Fasting</td><td class="k">Episode</td><td>: Routine checkup</td></tr>
+    </table>
+
+    <table class="res">
+      <thead><tr><th>Test</th><th style="text-align:right">Result</th><th>Unit</th><th style="text-align:center">Flag</th><th>Reference Range</th></tr></thead>
+      <tbody>
+        <tr class="sec"><td colspan="5">DIABETES</td></tr>
+        <tr><td>Fasting Plasma Glucose</td><td class="r">7.8</td><td class="u">mmol/L</td><td class="f">H</td><td>3.9 – 6.0</td></tr>
+        <tr><td>HbA1c</td><td class="r">7.9</td><td class="u">%</td><td class="f">H</td><td>4.0 – 6.0</td></tr>
+
+        <tr class="sec"><td colspan="5">LIPID PROFILE</td></tr>
+        <tr><td>Total Cholesterol</td><td class="r">6.2</td><td class="u">mmol/L</td><td class="f">H</td><td>&lt; 5.2</td></tr>
+        <tr><td>LDL-Cholesterol</td><td class="r">4.1</td><td class="u">mmol/L</td><td class="f">H</td><td>&lt; 2.6</td></tr>
+        <tr><td>HDL-Cholesterol</td><td class="r">1.0</td><td class="u">mmol/L</td><td class="f">L</td><td>M &gt; 1.0 / F &gt; 1.2</td></tr>
+        <tr><td>Triglycerides</td><td class="r">2.3</td><td class="u">mmol/L</td><td class="f">H</td><td>&lt; 1.7</td></tr>
+
+        <tr class="sec"><td colspan="5">RENAL PROFILE</td></tr>
+        <tr><td>Creatinine</td><td class="r">98</td><td class="u">µmol/L</td><td class="f">H</td><td>45 – 90 (F)</td></tr>
+        <tr><td>eGFR (CKD-EPI)</td><td class="r">68</td><td class="u">mL/min/1.73m²</td><td class="f">L</td><td>&gt; 90</td></tr>
+        <tr><td>Urea</td><td class="r">6.1</td><td class="u">mmol/L</td><td class="f"></td><td>2.5 – 7.1</td></tr>
+
+        <tr class="sec"><td colspan="5">ELECTROLYTES</td></tr>
+        <tr><td>Sodium</td><td class="r">139</td><td class="u">mmol/L</td><td class="f"></td><td>135 – 145</td></tr>
+        <tr><td>Potassium</td><td class="r">4.4</td><td class="u">mmol/L</td><td class="f"></td><td>3.5 – 5.1</td></tr>
+
+        <tr class="sec"><td colspan="5">FULL BLOOD COUNT</td></tr>
+        <tr><td>Haemoglobin</td><td class="r">13.1</td><td class="u">g/dL</td><td class="f"></td><td>12.0 – 15.0</td></tr>
+        <tr><td>White Blood Cells (WBC)</td><td class="r">6.8</td><td class="u">x10^9/L</td><td class="f"></td><td>4.0 – 11.0</td></tr>
+        <tr><td>Platelets</td><td class="r">254</td><td class="u">x10^9/L</td><td class="f"></td><td>150 – 400</td></tr>
+
+        <tr class="sec"><td colspan="5">VITALS (recorded at clinic)</td></tr>
+        <tr><td>Blood Pressure</td><td class="r">148/92</td><td class="u">mmHg</td><td class="f">H</td><td>&lt; 130/80</td></tr>
+        <tr><td>Body Mass Index (BMI)</td><td class="r">27.4</td><td class="u">kg/m²</td><td class="f">H</td><td>18.5 – 22.9 (Asian)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>Legend:</b> H = above reference range &nbsp; L = below reference range &nbsp; HH / LL = critical value<br>
+      Reference ranges are for adult female patients unless otherwise stated. Please interpret results with clinical findings.
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="sig">
+      <div style="line-height:1.5">Validated by: MLT Demo 03<br>Printed: 15/03/2026 16:31 &nbsp; Page 1 of 1</div>
+      <div>
+        <div class="scrawl">A. Rahman</div>
+        <div class="line">Dr. A. Rahman (demo)<br>Consultant Chemical Pathologist</div>
+      </div>
+    </div>
+    <div class="fine"><span>MediLab Demo Sdn Bhd &middot; Fictional laboratory &middot; Sample document for software demo only</span><span>*** END OF REPORT ***</span></div>
+  </div>
+</div>
+</body>
+</html>

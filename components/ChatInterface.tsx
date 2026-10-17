@@ -5,6 +5,7 @@ import { Send, Loader2, Bot, User, Sparkles, Mic } from "lucide-react";
 import { VoiceChatModal } from "./VoiceChatModal";
 import { useT } from "./LanguageProvider";
 import { errorMessageKey, postJson } from "@/lib/api-client";
+import { SAMPLE_QUESTIONS } from "@/lib/samples";
 import type { Language, ReportRecord, PillRecord } from "@/types";
 
 interface Message {
@@ -42,9 +43,13 @@ export function ChatInterface({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  async function handleSend(e: React.FormEvent) {
+  function handleSend(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = input.trim();
+    sendMessage(input);
+  }
+
+  async function sendMessage(text: string) {
+    const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
     const userMsg: Message = {
@@ -153,6 +158,24 @@ export function ChatInterface({
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {messages.length === 1 && !isLoading && (
+        <div className="space-y-2">
+          <p className="text-base font-semibold text-slate-700">{t("chat.suggestions")}</p>
+          <div className="flex flex-wrap gap-2">
+            {SAMPLE_QUESTIONS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => sendMessage(t(key))}
+                className="px-3 py-2 rounded-xl min-h-[48px] text-base font-semibold border-2 border-blue-200 bg-blue-50 text-blue-950 hover:bg-blue-100 text-left"
+              >
+                {t(key)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Input bar with Send and Microphone buttons */}
       <form onSubmit={handleSend} className="flex items-center gap-2 pt-2">

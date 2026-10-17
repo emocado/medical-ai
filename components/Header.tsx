@@ -22,13 +22,13 @@ export function Header({ title = "HealthMate" }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 bg-blue-900 text-white shadow-md">
-      <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="max-w-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
           <HeartPulse className="w-8 h-8 text-red-300" aria-hidden="true" />
           <h1 className="text-xl font-bold tracking-tight text-white">{title}</h1>
         </div>
 
-        <div className="flex items-center space-x-1" role="group" aria-label={t("header.languageSelection")}>
+        <div className="flex flex-wrap items-center gap-1" role="group" aria-label={t("header.languageSelection")}>
           {LANGUAGES.map((l) => (
             <button
               key={l.code}

@@ -7,6 +7,8 @@ import { ReportView } from "@/components/ReportView";
 import { ChatInterface } from "@/components/ChatInterface";
 import { getAllReports, saveReport, getAllPillRecords } from "@/lib/db";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
+import { loadSampleFile, type SampleFile } from "@/lib/samples";
+import { SampleChips } from "@/components/SampleChips";
 import { FileUp, Loader2, Plus, AlertCircle, History } from "lucide-react";
 import type { ReportRecord, PillRecord } from "@/types";
 
@@ -43,8 +45,19 @@ export default function ReportsPage() {
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
     e.target.value = "";
+    await analyzeFile(file);
+  }
+
+  async function handleSample(sample: SampleFile) {
+    try {
+      await analyzeFile(await loadSampleFile(sample));
+    } catch {
+      setErrorMessage(t("samples.loadError"));
+    }
+  }
+
+  async function analyzeFile(file: File) {
     setErrorMessage(null);
     setIsUploading(true);
 
@@ -116,6 +129,8 @@ export default function ReportsPage() {
             </>
           )}
         </button>
+
+        <SampleChips kind="report" onPick={handleSample} disabled={isUploading} />
 
         {errorMessage && (
           <div
