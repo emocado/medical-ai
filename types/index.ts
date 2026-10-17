@@ -56,3 +56,31 @@ export interface MealRecord {
   };
   createdAt: number;
 }
+
+export type DrAishaExpression = "neutral" | "speaking" | "smiling";
+
+export interface GuideState {
+  hasCompletedOnboarding: boolean;
+  updatedAt?: number;
+}
+
+export interface OnboardingStep {
+  id: string;
+  title: Record<Language, string>;
+  speech: Record<Language, string>;
+  expression: DrAishaExpression;
+}
+
+export interface GuideChoice {
+  id: string;
+  label: string;
+  reply: string;
+  expression?: DrAishaExpression;
+  isGlobal?: boolean;
+}
+
+export interface GuideHint {
+  id: string;
+  speech: string;
+  index: number;
+}
