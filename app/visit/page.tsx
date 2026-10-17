@@ -63,19 +63,19 @@ export default function VisitPage() {
     setTimeout(() => setCopied(false), 4000);
   }
 
-  const sectionTitle = "text-lg font-bold text-slate-900 border-b-2 border-slate-300 pb-1";
+  const sectionTitle = "text-lg font-semibold text-ink border-b border-black/[0.08] pb-1.5 print:border-slate-400";
 
   return (
     <div className="space-y-6">
       <Header title={t("title.visit")} />
 
-      <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 space-y-3 print:hidden">
+      <section className="card p-5 sm:p-6 grid gap-4 print:hidden">
         <label className="block space-y-2">
-          <span className="text-base font-semibold text-slate-700">{t("visit.docLanguage")}</span>
+          <span className="text-base font-medium text-ink-secondary">{t("visit.docLanguage")}</span>
           <select
             value={docLang}
             onChange={(e) => setDocLang(e.target.value as Language)}
-            className="w-full px-4 py-3 min-h-[56px] rounded-xl border-2 border-slate-300 text-lg font-bold bg-white"
+            className="field min-h-[56px] font-semibold"
           >
             {(Object.keys(LANGUAGE_NATIVE_NAMES) as Language[]).map((l) => (
               <option key={l} value={l}>
@@ -84,11 +84,11 @@ export default function VisitPage() {
             ))}
           </select>
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => window.print()}
-            className="py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white"
+            className="btn btn-primary min-h-[56px]"
           >
             <Printer className="w-6 h-6" aria-hidden="true" />
             {t("visit.print")}
@@ -96,14 +96,14 @@ export default function VisitPage() {
           <button
             type="button"
             onClick={share}
-            className="py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 border-2 border-blue-800 text-blue-900 bg-white hover:bg-blue-50"
+            className="btn btn-tinted min-h-[56px]"
           >
             <Share2 className="w-6 h-6" aria-hidden="true" />
             {t("visit.share")}
           </button>
         </div>
         {copied && (
-          <p role="status" className="text-base font-semibold text-emerald-800 flex items-center gap-2">
+          <p role="status" className="text-base font-semibold text-emerald-700 flex items-center gap-2 lg:col-span-2">
             <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
             {t("visit.copied")}
           </p>
@@ -111,12 +111,12 @@ export default function VisitPage() {
       </section>
 
       {/* The sheet itself, in the doctor's language. Plain styling so it prints cleanly. */}
-      <article lang={docLang} className="bg-white p-5 rounded-2xl border-2 border-slate-300 space-y-5 print:border-0 print:p-0">
-        <h2 className="text-2xl font-black text-slate-900">{d("visit.heading")}</h2>
+      <article lang={docLang} className="card p-5 sm:p-8 space-y-6 print:border-0 print:p-0 print:shadow-none print:rounded-none">
+        <h2 className="text-2xl font-bold text-ink">{d("visit.heading")}</h2>
 
         {summary.urgent.length > 0 && (
-          <section className="p-3 rounded-xl border-2 border-red-500 bg-red-50">
-            <h3 className="text-lg font-black text-red-900">⚠ {d("visit.urgent")}</h3>
+          <section className="p-4 rounded-2xl border-2 border-red-500 bg-red-50">
+            <h3 className="text-lg font-bold text-red-900">⚠ {d("visit.urgent")}</h3>
             <ul className="text-base text-red-950 font-semibold">
               {summary.urgent.map((u) => (
                 <li key={u.marker}>
@@ -130,16 +130,16 @@ export default function VisitPage() {
         <section className="space-y-2">
           <h3 className={sectionTitle}>{d("visit.medicines")}</h3>
           {summary.medications.length === 0 ? (
-            <p className="text-base text-slate-700">{d("visit.noMedicines")}</p>
+            <p className="text-base text-ink-secondary">{d("visit.noMedicines")}</p>
           ) : (
-            <ul className="space-y-1.5 text-base text-slate-900">
+            <ul className="space-y-1.5 text-base text-ink">
               {summary.medications.map((m) => (
                 <li key={m.id}>
-                  <span className="font-bold">{m.name}</span>
-                  {m.genericName && <span className="text-slate-600"> ({m.genericName})</span>}:{" "}
+                  <span className="font-semibold">{m.name}</span>
+                  {m.genericName && <span className="text-ink-tertiary"> ({m.genericName})</span>}:{" "}
                   {m.analysis.dosage || <em>{d("visit.doseUnknown")}</em>}
                   {m.schedule.length > 0 && (
-                    <span className="text-slate-600">; {m.schedule.map((s) => d(`slot.${s}` as StringKey)).join(", ")}</span>
+                    <span className="text-ink-tertiary">; {m.schedule.map((s) => d(`slot.${s}` as StringKey)).join(", ")}</span>
                   )}
                 </li>
               ))}
@@ -152,19 +152,19 @@ export default function VisitPage() {
             {summary.latestReport ? d("visit.results", { date: summary.latestReport.date }) : d("visit.noResults")}
           </h3>
           {summary.latestReport && summary.outOfRange.length === 0 && (
-            <p className="text-base text-slate-700">{d("today.allNormal")}</p>
+            <p className="text-base text-ink-secondary">{d("today.allNormal")}</p>
           )}
           {summary.outOfRange.length > 0 && (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-black/[0.06]">
               {summary.outOfRange.map(([name, m]) => (
-                <li key={name} className="py-1.5 text-base">
-                  <span className="font-semibold text-slate-900">{name}: </span>
-                  <span className="font-bold whitespace-nowrap">
+                <li key={name} className="py-2 text-base">
+                  <span className="font-semibold text-ink">{name}: </span>
+                  <span className="font-semibold whitespace-nowrap tabular">
                     {m.value} {m.unit}
                   </span>{" "}
-                  <span className="font-bold text-amber-900">{d(`status.${m.status}` as StringKey)}</span>
+                  <span className="font-semibold text-amber-800">{d(`status.${m.status}` as StringKey)}</span>
                   {m.referenceRange && (
-                    <span className="block text-sm text-slate-600">{d("report.normalRange", { range: m.referenceRange })}</span>
+                    <span className="block text-sm text-ink-tertiary tabular">{d("report.normalRange", { range: m.referenceRange })}</span>
                   )}
                 </li>
               ))}
@@ -175,11 +175,11 @@ export default function VisitPage() {
         {summary.previousReport && summary.changes.length > 0 && (
           <section className="space-y-2">
             <h3 className={sectionTitle}>{d("visit.changes", { date: summary.previousReport.date })}</h3>
-            <ul className="space-y-1 text-base text-slate-900">
+            <ul className="space-y-1.5 text-base text-ink tabular">
               {summary.changes.map((c) => (
                 <li key={c.key}>
                   <span className="font-semibold">{c.name}</span>: {c.previous.value} → {c.current.value} {c.current.unit}{" "}
-                  <span className={c.change === "worse" ? "font-bold text-red-800" : "font-bold text-emerald-800"}>
+                  <span className={c.change === "worse" ? "font-semibold text-red-700" : "font-semibold text-emerald-700"}>
                     ({d(`change.${c.change}` as StringKey)})
                   </span>
                 </li>
@@ -191,7 +191,7 @@ export default function VisitPage() {
         {summary.interactions.length > 0 && (
           <section className="space-y-2">
             <h3 className={sectionTitle}>{d("visit.interactions")}</h3>
-            <ul className="text-base text-slate-900 font-semibold">
+            <ul className="text-base text-ink font-semibold">
               {summary.interactions.map((k) => (
                 <li key={k.medicines.join("+")}>{k.medicines.join(" + ")}</li>
               ))}
@@ -202,7 +202,7 @@ export default function VisitPage() {
         {questions.length > 0 && (
           <section className="space-y-2">
             <h3 className={sectionTitle}>{d("visit.questions")}</h3>
-            <ol className="list-decimal pl-6 space-y-1.5 text-base text-slate-900">
+            <ol className="list-decimal pl-6 space-y-1.5 text-base text-ink marker:text-ink-tertiary">
               {questions.map((q) => (
                 <li key={q}>{q}</li>
               ))}
@@ -217,12 +217,12 @@ export default function VisitPage() {
             onChange={(e) => updateNotes(e.target.value)}
             placeholder={t("visit.notesPlaceholder")}
             rows={3}
-            className="w-full p-3 border-2 border-slate-300 rounded-xl text-lg print:hidden"
+            className="field print:hidden"
           />
           <p className="hidden print:block text-base whitespace-pre-line">{notes}</p>
         </section>
 
-        <p className="text-sm text-slate-500">{d("visit.prepared", { date: new Date().toISOString().slice(0, 10) })}</p>
+        <p className="text-sm text-ink-tertiary tabular">{d("visit.prepared", { date: new Date().toISOString().slice(0, 10) })}</p>
       </article>
     </div>
   );

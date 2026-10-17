@@ -13,10 +13,10 @@ export function MedicalDisclaimer() {
     <div
       role="note"
       aria-label={t("disclaimer.aria")}
-      className="bg-amber-50 border-2 border-amber-400 text-amber-950 p-4 rounded-xl flex items-start space-x-3 my-4 shadow-sm"
+      className="bg-amber-50 ring-1 ring-inset ring-amber-300 text-amber-950 p-4 rounded-2xl flex items-start gap-3 my-4"
     >
       <AlertCircle className="w-6 h-6 text-amber-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
-      <p className="text-base font-semibold leading-relaxed">{getDisclaimer(language)}</p>
+      <p className="text-base font-medium leading-relaxed">{getDisclaimer(language)}</p>
     </div>
   );
 }

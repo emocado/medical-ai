@@ -10,9 +10,9 @@ import type { InteractionCheckResult, InteractionSeverity } from "@/lib/interact
 import type { MedicationEntry, ReportRecord } from "@/types";
 
 const SEVERITY_STYLE: Record<InteractionSeverity, string> = {
-  serious: "border-red-500 bg-red-50",
-  moderate: "border-amber-400 bg-amber-50",
-  minor: "border-slate-200 bg-slate-50",
+  serious: "border-2 border-red-500 bg-red-50",
+  moderate: "border-2 border-amber-400 bg-amber-50",
+  minor: "border border-transparent bg-canvas",
 };
 
 /**
@@ -55,10 +55,10 @@ export function InteractionCheck({
   }
 
   return (
-    <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
+    <section className="card p-5 sm:p-6 space-y-4">
       {known.map((k) => (
-        <div key={k.medicines.join("+")} role="alert" className="p-4 rounded-xl border-2 border-red-500 bg-red-50 space-y-1">
-          <p className="text-base font-black text-red-900 flex items-center gap-2">
+        <div key={k.medicines.join("+")} role="alert" className="p-4 rounded-2xl border-2 border-red-500 bg-red-50 space-y-1">
+          <p className="text-base font-bold text-red-900 flex items-center gap-2">
             <ShieldAlert className="w-6 h-6 text-red-700" aria-hidden="true" />
             {t("meds.knownWarning")}: {k.medicines.join(" + ")}
           </p>
@@ -70,7 +70,7 @@ export function InteractionCheck({
         type="button"
         onClick={runCheck}
         disabled={isChecking}
-        className="w-full py-4 px-6 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white disabled:bg-slate-200 disabled:text-slate-500"
+        className="btn btn-primary w-full min-h-[56px]"
       >
         {isChecking ? (
           <>
@@ -84,10 +84,10 @@ export function InteractionCheck({
           </>
         )}
       </button>
-      <p className="text-sm font-medium text-slate-600">{t("meds.checkHint")}</p>
+      <p className="text-sm font-medium text-ink-tertiary">{t("meds.checkHint")}</p>
 
       {error && (
-        <p role="alert" className="text-base font-semibold text-red-800 flex items-center gap-2">
+        <p role="alert" className="text-base font-semibold text-red-700 flex items-center gap-2">
           <AlertCircle className="w-5 h-5" aria-hidden="true" />
           {error}
         </p>
@@ -96,24 +96,24 @@ export function InteractionCheck({
       {result && (
         <div className="space-y-3" aria-live="polite">
           {result.findings.length === 0 && known.length === 0 && (
-            <p className="p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50 text-base font-semibold text-emerald-950">
+            <p className="p-4 rounded-2xl bg-emerald-50 ring-1 ring-inset ring-emerald-300 text-base font-semibold text-emerald-950">
               {t("meds.noProblems")}
             </p>
           )}
           {result.findings.map((f, i) => (
-            <div key={i} className={`p-4 rounded-xl border-2 space-y-1 ${SEVERITY_STYLE[f.severity]}`}>
+            <div key={i} className={`p-4 rounded-2xl space-y-1 ${SEVERITY_STYLE[f.severity]}`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-base font-bold text-slate-900">{f.medicines.join(" + ")}</p>
-                <span className="text-sm font-bold px-2.5 py-1 rounded-full bg-white border border-slate-300 flex items-center gap-1">
+                <p className="text-base font-bold text-ink">{f.medicines.join(" + ")}</p>
+                <span className="chip text-sm bg-white text-ink shadow-[0_0_0_1px_rgb(0_0_0/0.08)]">
                   {f.severity === "serious" && <AlertTriangle className="w-4 h-4 text-red-700" aria-hidden="true" />}
                   {t(`severity.${f.severity}`)}
                 </span>
               </div>
-              <p className="text-base text-slate-800">{f.explanation}</p>
-              <p className="text-base font-semibold text-slate-900">{f.advice}</p>
+              <p className="text-base text-ink-secondary">{f.explanation}</p>
+              <p className="text-base font-semibold text-ink">{f.advice}</p>
             </div>
           ))}
-          {result.summary && <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">{result.summary}</p>}
+          {result.summary && <p className="text-base text-ink-secondary leading-relaxed whitespace-pre-line">{result.summary}</p>}
         </div>
       )}
     </section>

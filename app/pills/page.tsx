@@ -134,21 +134,21 @@ export default function PillsPage() {
       <Header title={t("title.pills")} />
 
       {/* Upload / Capture Section */}
-      <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
+      <section className="card p-5 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Pill className="w-6 h-6 text-blue-800" aria-hidden="true" />
+          <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+            <Pill className="w-6 h-6 text-accent" aria-hidden="true" />
             {t("pills.check.title")}
           </h2>
           {latestReport && (
-            <span className="text-sm font-semibold bg-emerald-100 text-emerald-900 px-3 py-1 rounded-full flex items-center gap-1">
-              <Sparkles className="w-4 h-4 text-emerald-700" />
+            <span className="chip text-sm bg-emerald-100 text-emerald-900">
+              <Sparkles className="w-4 h-4 text-emerald-700" aria-hidden="true" />
               {t("pills.reportSynced")}
             </span>
           )}
         </div>
 
-        <p className="text-base text-slate-700 leading-relaxed">
+        <p className="text-base text-ink-secondary leading-relaxed">
           {t("pills.desc")}
         </p>
 
@@ -166,15 +166,11 @@ export default function PillsPage() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isAnalyzing}
-          className={`w-full py-4 px-6 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center space-x-3 transition-colors shadow-sm ${
-            isAnalyzing
-              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-              : "bg-blue-800 hover:bg-blue-900 text-white active:bg-blue-950"
-          }`}
+          className="btn btn-primary w-full min-h-[56px]"
         >
           {isAnalyzing ? (
             <>
-              <Loader2 className="w-6 h-6 animate-spin text-blue-900" aria-hidden="true" />
+              <Loader2 className="w-6 h-6 animate-spin" aria-hidden="true" />
               <span>{t("pills.analyzing")}</span>
             </>
           ) : (
@@ -190,7 +186,7 @@ export default function PillsPage() {
         {errorMessage && (
           <div
             role="alert"
-            className="p-4 rounded-xl bg-red-50 border-2 border-red-300 text-red-900 flex items-start space-x-2"
+            className="p-4 rounded-2xl bg-red-50 ring-1 ring-inset ring-red-300 text-red-900 flex items-start gap-2"
           >
             <AlertTriangle className="w-6 h-6 text-red-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span className="text-base font-medium">{errorMessage}</span>
@@ -202,23 +198,23 @@ export default function PillsPage() {
       {pillRecords.length > 1 && (
         <section
           aria-label={t("pills.history.aria")}
-          className="bg-white p-4 rounded-2xl border-2 border-slate-200 space-y-2"
+          className="card p-4 sm:p-5 space-y-2"
         >
-          <div className="flex items-center space-x-2 text-slate-800 font-bold text-base mb-1">
-            <History className="w-5 h-5 text-blue-800" aria-hidden="true" />
+          <div className="eyebrow flex items-center gap-2 mb-1">
+            <History className="w-5 h-5" aria-hidden="true" />
             <span>{t("pills.history.label")}</span>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
+          <div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-1" role="tablist">
             {pillRecords.map((r) => (
               <button
                 key={r.id}
                 role="tab"
                 aria-selected={r.id === activeRecord?.id}
                 onClick={() => setSelectedRecordId(r.id)}
-                className={`px-4 py-2 rounded-xl text-base font-semibold whitespace-nowrap min-h-[48px] border-2 transition-colors ${
+                className={`px-4 py-2 rounded-full text-base font-semibold whitespace-nowrap min-h-[48px] border transition-colors duration-150 tabular ${
                   r.id === activeRecord?.id
-                    ? "border-blue-800 bg-blue-100 text-blue-950"
-                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                    ? "border-accent bg-accent-soft text-accent-ink"
+                    : "border-transparent bg-canvas text-ink-secondary hover:bg-[#ececf0]"
                 }`}
               >
                 {r.analysis.pills.length === 1
@@ -239,7 +235,7 @@ export default function PillsPage() {
               type="button"
               onClick={() => window.confirm(t("confirm.deleteScan")) && handleDeleteScan(activeRecord.id)}
               aria-label={t("delete.scan.aria")}
-              className="px-3 py-2 rounded-xl min-h-[48px] flex items-center gap-1.5 text-base font-bold text-red-800 border-2 border-red-200 bg-white hover:bg-red-50"
+              className="btn text-base px-5 bg-red-50 text-red-700 hover:bg-red-100"
             >
               <Trash2 className="w-5 h-5" aria-hidden="true" />
               {t("common.delete")}
@@ -247,38 +243,38 @@ export default function PillsPage() {
           </div>
           {/* Cross-reference alert */}
           {analysis.crossRefWithReports && (
-            <div className="bg-blue-50 border-2 border-blue-400 p-4 rounded-2xl space-y-1">
-              <div className="flex items-center space-x-2 text-blue-950 font-bold text-lg">
-                <Sparkles className="w-5 h-5 text-blue-700" />
+            <div className="bg-accent-soft ring-1 ring-inset ring-accent/25 p-5 rounded-3xl space-y-1">
+              <div className="flex items-center gap-2 text-accent-ink font-bold text-lg">
+                <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />
                 <span>{t("pills.connection")}</span>
               </div>
-              <p className="text-base text-slate-800 leading-relaxed font-medium">
+              <p className="text-base text-ink-secondary leading-relaxed font-medium">
                 {analysis.crossRefWithReports}
               </p>
             </div>
           )}
 
           {/* Cards for each identified pill */}
-          <div className="space-y-4">
+          <div className={`grid gap-4 ${analysis.pills.length > 1 ? "xl:grid-cols-2 xl:items-start" : ""}`}>
             {analysis.pills.map((pill, idx) => (
               <article
                 key={idx}
-                className="bg-white rounded-2xl border-2 border-slate-300 p-5 shadow-sm space-y-4"
+                className="card p-5 sm:p-6 space-y-5"
               >
                 {pill.confidence === "low" && (
                   <div
                     role="note"
-                    className="p-3 rounded-xl bg-amber-50 border-2 border-amber-400 text-amber-950 text-base font-semibold flex items-start gap-2"
+                    className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-400 text-amber-950 text-base font-semibold flex items-start gap-2"
                   >
                     <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     {t("pills.lowConfidence")}
                   </div>
                 )}
-                <div className="border-b border-slate-200 pb-3">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="text-2xl font-black text-blue-950">{pill.name}</h3>
+                <div className="border-b border-black/[0.08] pb-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="text-2xl font-bold text-ink">{pill.name}</h3>
                     {pill.genericName && (
-                      <span className="text-base font-medium text-slate-600 italic">
+                      <span className="text-base font-medium text-ink-tertiary italic">
                         ({pill.genericName})
                       </span>
                     )}
@@ -287,32 +283,32 @@ export default function PillsPage() {
 
                 {/* Purpose */}
                 <div className="space-y-1">
-                  <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                    <Info className="w-5 h-5 text-blue-700" />
+                  <span className="eyebrow flex items-center gap-1.5">
+                    <Info className="w-5 h-5 text-accent" aria-hidden="true" />
                     {t("pills.purpose")}
                   </span>
-                  <p className="text-lg text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-200 leading-relaxed">
+                  <p className="well text-lg text-ink p-4 leading-relaxed">
                     {pill.purpose}
                   </p>
                 </div>
 
                 {/* Dosage */}
                 <div className="space-y-1">
-                  <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                    <Pill className="w-5 h-5 text-blue-700" />
+                  <span className="eyebrow flex items-center gap-1.5">
+                    <Pill className="w-5 h-5 text-accent" aria-hidden="true" />
                     {t("pills.howToTake")}
                   </span>
                   {pill.dosageSource === "not-visible" ? (
-                    <p className="text-lg font-semibold text-amber-950 bg-amber-50 p-3 rounded-xl border-2 border-amber-300 leading-relaxed">
+                    <p className="text-lg font-semibold text-amber-950 bg-amber-50 p-4 rounded-2xl ring-1 ring-inset ring-amber-300 leading-relaxed">
                       {t("pills.dosageNotVisible")}
                     </p>
                   ) : (
                     <>
-                      <p className="text-lg font-semibold text-blue-950 bg-blue-50 p-3 rounded-xl border border-blue-200 leading-relaxed">
+                      <p className="text-lg font-semibold text-accent-ink bg-accent-soft p-4 rounded-2xl leading-relaxed">
                         {pill.dosage}
                       </p>
                       {pill.dosageSource === "label" && (
-                        <p className="text-sm font-medium text-slate-600">{t("pills.fromLabel")}</p>
+                        <p className="text-sm font-medium text-ink-tertiary">{t("pills.fromLabel")}</p>
                       )}
                     </>
                   )}
@@ -321,15 +317,15 @@ export default function PillsPage() {
                 {/* Side Effects */}
                 {pill.sideEffects && pill.sideEffects.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                      <AlertTriangle className="w-5 h-5 text-amber-600" />
+                    <span className="eyebrow flex items-center gap-1.5">
+                      <AlertTriangle className="w-5 h-5 text-amber-600" aria-hidden="true" />
                       {t("pills.sideEffects")}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {pill.sideEffects.map((side, i) => (
                         <span
                           key={i}
-                          className="px-3 py-1.5 rounded-lg text-base font-semibold bg-amber-100 text-amber-950 border border-amber-300"
+                          className="chip bg-amber-50 text-amber-950 ring-1 ring-inset ring-amber-300"
                         >
                           {side}
                         </span>
@@ -341,15 +337,15 @@ export default function PillsPage() {
                 {/* Food Interactions */}
                 {pill.foodInteractions && pill.foodInteractions.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                      <Utensils className="w-5 h-5 text-red-600" />
+                    <span className="eyebrow flex items-center gap-1.5">
+                      <Utensils className="w-5 h-5 text-red-600" aria-hidden="true" />
                       {t("pills.foodInteractions")}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {pill.foodInteractions.map((food, i) => (
                         <span
                           key={i}
-                          className="px-3 py-1.5 rounded-lg text-base font-semibold bg-red-50 text-red-950 border border-red-200"
+                          className="chip bg-red-50 text-red-950 ring-1 ring-inset ring-red-200"
                         >
                           {t("pills.avoid", { item: food })}
                         </span>
@@ -361,15 +357,15 @@ export default function PillsPage() {
                 {/* Drug Interactions */}
                 {pill.drugInteractions && pill.drugInteractions.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                      <ShieldAlert className="w-5 h-5 text-slate-700" />
+                    <span className="eyebrow flex items-center gap-1.5">
+                      <ShieldAlert className="w-5 h-5 text-ink-secondary" aria-hidden="true" />
                       {t("pills.drugInteractions")}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {pill.drugInteractions.map((drug, i) => (
                         <span
                           key={i}
-                          className="px-3 py-1.5 rounded-lg text-base font-medium bg-slate-100 text-slate-900 border border-slate-300"
+                          className="chip font-medium bg-canvas text-ink ring-1 ring-inset ring-black/[0.08]"
                         >
                           {drug}
                         </span>
@@ -379,11 +375,11 @@ export default function PillsPage() {
                 )}
 
                 {/* Adding is the patient's confirmation that the identification is right. */}
-                <div className="border-t border-slate-200 pt-3 space-y-1">
+                <div className="border-t border-black/[0.08] pt-4 space-y-2">
                   {findSameMedication(medications, pill) ? (
                     <Link
                       href="/medicines"
-                      className="w-full py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-emerald-50 text-emerald-900 border-2 border-emerald-300"
+                      className="btn w-full min-h-[56px] bg-emerald-50 text-emerald-900 ring-1 ring-inset ring-emerald-300"
                     >
                       <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
                       {t("meds.added")}
@@ -393,12 +389,12 @@ export default function PillsPage() {
                       <button
                         type="button"
                         onClick={() => addToMedicines(pill)}
-                        className="w-full py-3 px-4 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white"
+                        className="btn btn-primary w-full min-h-[56px]"
                       >
                         <Plus className="w-6 h-6" aria-hidden="true" />
                         {t("meds.add")}
                       </button>
-                      <p className="text-sm font-medium text-slate-600 text-center">{t("meds.addHint")}</p>
+                      <p className="text-sm font-medium text-ink-tertiary text-center">{t("meds.addHint")}</p>
                     </>
                   )}
                 </div>
@@ -410,8 +406,8 @@ export default function PillsPage() {
         </div>
       ) : (
         !isAnalyzing && (
-          <div className="text-center py-10 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
-            <p className="text-lg font-medium text-slate-600">
+          <div className="text-center py-12 px-4 rounded-3xl border-2 border-dashed border-black/[0.12]">
+            <p className="text-lg font-medium text-ink-tertiary">
               {t("pills.empty")}
             </p>
           </div>

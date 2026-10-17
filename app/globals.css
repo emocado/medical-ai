@@ -3,20 +3,264 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 15, 23, 42; /* #0f172a - high contrast dark slate */
-  --background-rgb: 248, 250, 252; /* #f8fafc - light clean neutral */
+  --foreground-rgb: 29, 29, 31; /* #1d1d1f - near-black ink */
+  --background-rgb: 245, 245, 247; /* #f5f5f7 - soft gray canvas */
+  --sidebar-width: 280px;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
-  font-size: 1.125rem; /* 18px minimum base font */
-  line-height: 1.6;
-  -webkit-tap-highlight-color: transparent;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-rgb));
+    font-size: 1.125rem; /* 18px minimum base font */
+    line-height: 1.6;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: "kern", "liga", "calt";
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Elderly-safe touch target guarantee */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  :focus-visible {
+    outline: 3px solid #0066cc;
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgb(0 102 204 / 0.18);
+  }
 }
 
-/* Elderly-safe touch target guarantee */
-button, a, input, select, textarea {
-  min-height: 48px;
-  min-width: 48px;
+@layer components {
+  /* Surfaces: shadows for elevation; a transparent border keeps an edge in forced-colors mode. */
+  .card {
+    @apply rounded-3xl border border-transparent bg-white shadow-card;
+  }
+
+  .card-interactive {
+    @apply rounded-3xl border border-transparent bg-white shadow-card;
+    transition-property: box-shadow, scale;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  @media (hover: hover) {
+    .card-interactive:hover {
+      @apply shadow-card-hover;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card-interactive:active {
+      scale: 0.98;
+    }
+  }
+
+  /* Inset tile for content nested inside a card (radius = 24 - 8 inset). */
+  .well {
+    @apply rounded-2xl bg-canvas;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-full px-6 text-lg font-semibold;
+    min-height: 52px;
+    transition-property: scale, background-color, box-shadow, color, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white shadow-button;
+  }
+
+  .btn-secondary {
+    @apply bg-black/[0.06] text-ink;
+  }
+
+  .btn-tinted {
+    @apply bg-accent-soft text-accent-ink;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white shadow-button;
+  }
+
+  .btn-plain {
+    @apply bg-transparent text-accent;
+  }
+
+  @media (hover: hover) {
+    .btn-primary:not(:disabled):hover {
+      @apply bg-accent-hover;
+    }
+    .btn-secondary:not(:disabled):hover {
+      @apply bg-black/[0.09];
+    }
+    .btn-tinted:not(:disabled):hover {
+      @apply bg-[#dceafa];
+    }
+    .btn-danger:not(:disabled):hover {
+      @apply bg-red-700;
+    }
+    .btn-plain:not(:disabled):hover {
+      @apply bg-accent-soft;
+    }
+  }
+
+  .btn-primary:not(:disabled):active {
+    @apply bg-accent-pressed;
+  }
+
+  /* Press feedback: scale to 0.96 on pointer-down, never when disabled. */
+  @media (prefers-reduced-motion: no-preference) {
+    .btn:not(:disabled):active,
+    .press:not(:disabled):active {
+      scale: 0.96;
+    }
+  }
+
+  .press {
+    transition-property: scale, background-color, box-shadow, color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* Form fields keep a 3:1 boundary (#86868b on white). */
+  .field {
+    @apply w-full rounded-2xl border border-[#86868b] bg-white px-4 py-3 text-lg text-ink placeholder:text-ink-tertiary;
+    transition-property: border-color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  .field:focus {
+    @apply border-accent outline-none;
+    box-shadow: 0 0 0 4px rgb(0 102 204 / 0.18);
+  }
+
+  /* Small status pill. */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-base font-semibold;
+  }
+
+  /* Grouped-list section label, Apple Settings style. */
+  .eyebrow {
+    @apply text-sm font-semibold text-ink-tertiary;
+  }
+
+  /* Translucent chrome: content scrolls underneath. */
+  .material {
+    background: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .material-canvas {
+    background: rgb(245 245 247 / 0.8);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  /* Dimming scrim behind modal sheets. */
+  .scrim {
+    background: rgb(0 0 0 / 0.4);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .sheet {
+    @apply rounded-[28px] border border-transparent bg-white shadow-float;
+    overscroll-behavior: contain;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Contextual icon cross-fade: stack both icons in an .icon-swap and toggle .swap-in / .swap-out. */
+  .icon-swap {
+    display: grid;
+  }
+
+  .icon-swap > * {
+    grid-area: 1 / 1;
+    transition-property: opacity, scale, filter;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .swap-in {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+  }
+
+  .swap-out {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .swap-out {
+      scale: 1;
+      filter: none;
+    }
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material,
+  .material-canvas {
+    background: #ffffff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .scrim {
+    background: rgb(0 0 0 / 0.55);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .card,
+  .card-interactive,
+  .sheet {
+    border-color: #6e6e73;
+  }
 }

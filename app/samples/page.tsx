@@ -94,17 +94,17 @@ export default function SamplesPage() {
     <div className="space-y-6">
       <Header title={t("samples.title")} />
 
-      <section className="bg-violet-50 p-5 rounded-2xl border-2 border-violet-300 space-y-4">
-        <p className="text-base text-violet-950 font-medium leading-relaxed flex gap-2">
+      <section className="card p-5 sm:p-6 space-y-4 !bg-violet-50 ring-1 ring-inset ring-violet-200">
+        <p className="text-base text-violet-950 font-medium leading-relaxed flex gap-3">
           <FlaskConical className="w-6 h-6 text-violet-700 flex-shrink-0" aria-hidden="true" />
           {t("samples.intro")}
         </p>
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-2">
+          <h2 className="text-lg font-semibold text-ink flex items-center gap-2 mb-2">
             <ListChecks className="w-6 h-6 text-violet-700" aria-hidden="true" />
             {t("samples.steps.title")}
           </h2>
-          <ol className="list-decimal pl-6 space-y-2 text-base text-slate-800 leading-relaxed">
+          <ol className="list-decimal pl-6 space-y-2 text-base text-ink-secondary leading-relaxed marker:text-violet-700 marker:font-semibold">
             {STEPS.map((key) => (
               <li key={key}>{t(key)}</li>
             ))}
@@ -114,29 +114,29 @@ export default function SamplesPage() {
 
       {SECTIONS.map((section) => (
         <section key={section.title} className="space-y-3">
-          <h2 className="text-xl font-bold text-slate-900">{t(section.title)}</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <h2 className="text-xl font-bold text-ink">{t(section.title)}</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
             {section.items.map((item) => (
               <article
                 key={item.thumbnail}
-                className="bg-white rounded-2xl border-2 border-slate-300 overflow-hidden flex flex-col"
+                className="card overflow-hidden flex flex-col"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.thumbnail}
                   alt={t(item.label)}
-                  className="w-full h-36 object-cover object-top bg-slate-100"
+                  className="w-full h-36 lg:h-44 object-cover object-top bg-canvas outline outline-1 -outline-offset-1 outline-black/10"
                   loading="lazy"
                 />
-                <div className="p-3 space-y-2 flex-1 flex flex-col">
-                  <h3 className="text-base font-bold text-slate-900">{t(item.label)}</h3>
+                <div className="p-4 space-y-3 flex-1 flex flex-col">
+                  <h3 className="text-base font-semibold text-ink">{t(item.label)}</h3>
                   <div className="flex flex-wrap gap-2 mt-auto">
                     {item.downloads.map((d) => (
                       <a
                         key={d.href}
                         href={d.href}
                         download
-                        className="px-3 py-2 rounded-xl min-h-[48px] text-base font-bold bg-blue-800 hover:bg-blue-900 text-white flex items-center gap-1.5"
+                        className="btn btn-tinted text-base px-4 min-h-[48px]"
                       >
                         <Download className="w-5 h-5" aria-hidden="true" />
                         {t("samples.download", { type: d.type })}
@@ -151,12 +151,12 @@ export default function SamplesPage() {
       ))}
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-slate-900">{t("samples.section.mealTexts")}</h2>
-        <ul className="space-y-2">
+        <h2 className="text-xl font-bold text-ink">{t("samples.section.mealTexts")}</h2>
+        <ul className="grid gap-2 lg:grid-cols-2">
           {SAMPLE_MEAL_TEXTS.map((key) => (
             <li
               key={key}
-              className="bg-white p-3 rounded-xl border-2 border-slate-200 text-base text-slate-800 select-all"
+              className="card !rounded-2xl p-4 text-base text-ink-secondary select-all"
             >
               {t(key)}
             </li>

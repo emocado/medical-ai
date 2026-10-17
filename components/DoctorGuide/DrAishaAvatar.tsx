@@ -27,9 +27,9 @@ export function DrAishaAvatar({
     <div
       role="img"
       aria-label={`Dr. Aisha avatar - ${expression} expression`}
-      className={`relative inline-flex items-center justify-center rounded-full bg-gradient-to-b from-blue-100 to-teal-50 border-2 border-blue-600 shadow-md select-none shrink-0 overflow-hidden ${
+      className={`relative inline-flex items-center justify-center rounded-full bg-gradient-to-b from-accent-soft to-teal-50 border-2 border-white shadow-card select-none shrink-0 overflow-hidden ${
         sizeMap[size]
-      } ${isPulsing ? "ring-4 ring-blue-400 ring-opacity-75 animate-pulse" : ""} ${className}`}
+      } ${isPulsing ? "ring-4 ring-accent/30 motion-safe:animate-pulse" : ""} ${className}`}
     >
       <svg
         viewBox="0 0 100 100"
@@ -181,7 +181,7 @@ export function DrAishaAvatar({
       {/* Speaking sound waves badge when actively speaking */}
       {expression === "speaking" && (
         <span className="absolute bottom-1 right-1 flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
         </span>
       )}

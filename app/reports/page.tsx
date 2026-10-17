@@ -109,16 +109,16 @@ export default function ReportsPage() {
       <Header title={t("title.reports")} />
 
       {/* Upload Action */}
-      <section className="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-sm space-y-4">
+      <section className="card p-5 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <FileUp className="w-6 h-6 text-blue-800" aria-hidden="true" />
+          <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+            <FileUp className="w-6 h-6 text-accent" aria-hidden="true" />
             {t("reports.upload.title")}
           </h2>
-          <span className="text-base text-slate-600 font-medium">{t("reports.upload.formats")}</span>
+          <span className="text-base text-ink-tertiary font-medium">{t("reports.upload.formats")}</span>
         </div>
 
-        <p className="text-base text-slate-700 leading-relaxed">{t("reports.upload.desc")}</p>
+        <p className="text-base text-ink-secondary leading-relaxed">{t("reports.upload.desc")}</p>
 
         <input
           ref={fileInputRef}
@@ -133,15 +133,11 @@ export default function ReportsPage() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className={`w-full py-4 px-6 rounded-xl min-h-[56px] text-lg font-bold flex items-center justify-center space-x-3 transition-colors shadow-sm ${
-            isUploading
-              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-              : "bg-blue-800 hover:bg-blue-900 text-white active:bg-blue-950"
-          }`}
+          className="btn btn-primary w-full lg:w-auto lg:px-8 min-h-[56px]"
         >
           {isUploading ? (
             <>
-              <Loader2 className="w-6 h-6 animate-spin text-blue-900" aria-hidden="true" />
+              <Loader2 className="w-6 h-6 animate-spin" aria-hidden="true" />
               <span>{t("reports.upload.analyzing")}</span>
             </>
           ) : (
@@ -157,7 +153,7 @@ export default function ReportsPage() {
         {errorMessage && (
           <div
             role="alert"
-            className="p-4 rounded-xl bg-red-50 border-2 border-red-300 text-red-900 flex items-start space-x-2"
+            className="p-4 rounded-2xl bg-red-50 ring-1 ring-inset ring-red-300 text-red-900 flex items-start gap-2"
           >
             <AlertCircle className="w-6 h-6 text-red-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span className="text-base font-medium">{errorMessage}</span>
@@ -167,25 +163,22 @@ export default function ReportsPage() {
 
       {/* Report History / Selector if multiple reports exist */}
       {reports.length > 1 && (
-        <section
-          aria-label={t("reports.history.aria")}
-          className="bg-white p-4 rounded-2xl border-2 border-slate-200 space-y-2"
-        >
-          <div className="flex items-center space-x-2 text-slate-800 font-bold text-base mb-1">
-            <History className="w-5 h-5 text-blue-800" aria-hidden="true" />
+        <section aria-label={t("reports.history.aria")} className="space-y-2">
+          <div className="flex items-center gap-2 eyebrow px-1">
+            <History className="w-5 h-5" aria-hidden="true" />
             <span>{t("reports.history.label")}</span>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
+          <div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-1 -mx-1 px-1" role="tablist">
             {reports.map((r) => (
               <button
                 key={r.id}
                 role="tab"
                 aria-selected={r.id === activeReport?.id}
                 onClick={() => setSelectedReportId(r.id)}
-                className={`px-4 py-2 rounded-xl text-base font-semibold whitespace-nowrap min-h-[48px] border-2 transition-colors ${
+                className={`press px-4 py-2 rounded-full text-base font-semibold whitespace-nowrap min-h-[48px] border tabular ${
                   r.id === activeReport?.id
-                    ? "border-blue-800 bg-blue-100 text-blue-950"
-                    : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                    ? "border-accent bg-accent-soft text-accent-ink"
+                    : "border-transparent bg-white text-ink-secondary shadow-card hover:text-ink"
                 }`}
               >
                 {r.fileName.length > 18 ? `${r.fileName.slice(0, 16)}...` : r.fileName} ({r.date})
@@ -205,8 +198,8 @@ export default function ReportsPage() {
         />
       ) : (
         !isUploading && (
-          <div className="text-center py-8 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
-            <p className="text-lg font-medium text-slate-600">{t("reports.empty")}</p>
+          <div className="text-center py-10 px-4 rounded-3xl border-2 border-dashed border-black/15">
+            <p className="text-lg font-medium text-ink-tertiary">{t("reports.empty")}</p>
           </div>
         )
       )}
