@@ -19,11 +19,15 @@ import {
   AlertCircle,
   HelpCircle,
   Siren,
+  Trash2,
 } from "lucide-react";
 
 interface ReportViewProps {
   report: ReportRecord;
   language: Language;
+  onDelete?: () => void;
+  /** Lets the patient correct a misread test date (YYYY-MM-DD). */
+  onDateChange?: (date: string) => void;
 }
 
 const STATUS_STYLES: Record<
@@ -49,7 +53,7 @@ const STATUS_STYLES: Record<
   unknown: { label: "status.unknown", card: "border-slate-300 bg-white", chip: "text-slate-800 bg-slate-200", icon: HelpCircle },
 };
 
-export function ReportView({ report, language }: ReportViewProps) {
+export function ReportView({ report, language, onDelete, onDateChange }: ReportViewProps) {
   const t = useT();
   const summaryText = report.summary[language] || report.summary.en;
   const keyMarkerEntries = Object.entries(report.keyMarkers || {});
@@ -110,9 +114,33 @@ export function ReportView({ report, language }: ReportViewProps) {
           <FileText className="w-6 h-6 text-blue-800" aria-hidden="true" />
           <h3 className="text-xl font-bold text-slate-900 break-all">{report.fileName}</h3>
         </div>
-        <div className="flex items-center text-slate-700 text-base font-medium space-x-1">
-          <Calendar className="w-5 h-5 text-slate-500" aria-hidden="true" />
-          <time dateTime={report.date}>{report.date}</time>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-1.5 text-slate-700 text-base font-medium">
+            <Calendar className="w-5 h-5 text-slate-500" aria-hidden="true" />
+            <span className="sr-only">{t("report.testDate")}</span>
+            {onDateChange ? (
+              <input
+                type="date"
+                value={/^\d{4}-\d{2}-\d{2}$/.test(report.date) ? report.date : ""}
+                onChange={(e) => e.target.value && onDateChange(e.target.value)}
+                title={t("report.testDate")}
+                className="px-2 py-1 rounded-lg border-2 border-slate-300 text-base min-h-[48px] bg-white"
+              />
+            ) : (
+              <time dateTime={report.date}>{report.date}</time>
+            )}
+          </label>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => window.confirm(t("confirm.deleteReport")) && onDelete()}
+              aria-label={t("delete.report.aria")}
+              className="px-3 py-2 rounded-xl min-h-[48px] min-w-[48px] flex items-center gap-1.5 text-base font-bold text-red-800 border-2 border-red-200 hover:bg-red-50"
+            >
+              <Trash2 className="w-5 h-5" aria-hidden="true" />
+              {t("common.delete")}
+            </button>
+          )}
         </div>
       </div>
 

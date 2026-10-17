@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { errorMessageKey, postJson } from "@/lib/api-client";
 import { MedicalDisclaimer } from "@/components/Disclaimer";
 import { MealAdvisorModal } from "@/components/MealAdvisorModal";
 import { MealScoreChip } from "@/components/MealScoreChip";
+import { MarkerTrends } from "@/components/MarkerTrends";
+import { BackupSection } from "@/components/BackupSection";
 import { TranslationStatus } from "@/components/TranslationStatus";
 import { localizedAnalysis, useAutoTranslate } from "@/components/useAutoTranslate";
 import { ensureDisclaimer } from "@/lib/prompts";
-import { getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
+import { deleteMealRecord, getAllReports, getAllMealRecords, getAllPillRecords, saveMealRecord } from "@/lib/db";
 import {
   Clock,
   FileText,
@@ -24,13 +26,23 @@ import {
   ArrowRight,
   GitCompare,
   Plus,
+  Trash2,
 } from "lucide-react";
 import type { Language, ReportRecord, MealRecord, PillRecord } from "@/types";
 import type { DeltaComparisonResult } from "@/lib/delta-comparator";
+import { buildTrends, type ChangeVerdict } from "@/lib/trends";
+import type { StringKey } from "@/lib/i18n";
 
 type TimelineItem =
   | { type: "report"; item: ReportRecord; timestamp: number }
   | { type: "meal"; item: MealRecord; timestamp: number };
+
+const CHANGE_STYLES: Record<ChangeVerdict, { label: StringKey; card: string; chip: string }> = {
+  better: { label: "change.better", card: "border-emerald-300 bg-emerald-50/50", chip: "bg-emerald-100 text-emerald-950" },
+  worse: { label: "change.worse", card: "border-red-300 bg-red-50/50", chip: "bg-red-100 text-red-950" },
+  same: { label: "change.same", card: "border-slate-200 bg-slate-50", chip: "bg-slate-100 text-slate-900" },
+  unknown: { label: "change.unknown", card: "border-slate-200 bg-slate-50", chip: "bg-blue-100 text-blue-950" },
+};
 
 export default function TimelinePage() {
   const { language: lang } = useLanguage();
@@ -66,6 +78,11 @@ export default function TimelinePage() {
 
   function handleMealSaved(newMeal: MealRecord) {
     setMeals((prev) => [newMeal, ...prev]);
+  }
+
+  async function handleDeleteMeal(id: string) {
+    await deleteMealRecord(id);
+    setMeals((prev) => prev.filter((m) => m.id !== id));
   }
 
   function toggleReportSelection(id: string) {
@@ -110,7 +127,8 @@ export default function TimelinePage() {
     ...reports.map((r): TimelineItem => ({
       type: "report",
       item: r,
-      timestamp: r.createdAt || new Date(r.date).getTime(),
+      // Place reports by when the test was done, falling back to upload time.
+      timestamp: Number.isNaN(new Date(r.date).getTime()) ? r.createdAt : new Date(r.date).getTime(),
     })),
     ...meals.map((m): TimelineItem => ({
       type: "meal",
@@ -120,6 +138,7 @@ export default function TimelinePage() {
   ].sort((a, b) => b.timestamp - a.timestamp);
 
   const latestReport = reports.length > 0 ? reports[0] : null;
+  const trends = useMemo(() => buildTrends(reports), [reports]);
 
   const mealTranslation = useAutoTranslate(
     meals,
@@ -219,6 +238,8 @@ export default function TimelinePage() {
         )}
       </section>
 
+      {trends.length > 0 && <MarkerTrends trends={trends} />}
+
       <TranslationStatus status={deltaTranslation} onRetry={() => setDeltaRetry((n) => n + 1)} />
 
       {/* Delta Comparison Result Display */}
@@ -259,17 +280,24 @@ export default function TimelinePage() {
             <div className="space-y-3">
               <h4 className="text-lg font-bold text-slate-900">{t("timeline.markerChanges")}</h4>
               <div className="space-y-2.5">
-                {deltaResult.markerDeltas.map((delta, i) => (
+                {deltaResult.markerDeltas.map((delta, i) => {
+                  const style = CHANGE_STYLES[delta.change ?? "unknown"];
+                  return (
                   <div
                     key={i}
-                    className="p-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 space-y-2"
+                    className={`p-3.5 rounded-xl border-2 space-y-2 ${style.card}`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between gap-2">
                       <span className="text-lg font-bold text-slate-900">{delta.markerName}</span>
-                      <span className="text-base font-semibold px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-950">
-                        {delta.statusChange}
+                      <span className={`text-base font-bold px-2.5 py-0.5 rounded-md flex-shrink-0 ${style.chip}`}>
+                        {delta.change ? t(style.label) : delta.statusChange}
                       </span>
                     </div>
+                    {delta.previousStatus && delta.currentStatus && (
+                      <p className="text-sm font-semibold text-slate-600">
+                        {t(`status.${delta.previousStatus}`)} → {t(`status.${delta.currentStatus}`)}
+                      </p>
+                    )}
                     <div className="flex items-center space-x-3 text-base font-semibold text-slate-700">
                       <span>{t("timeline.previous", { value: delta.previousValue })}</span>
                       <ArrowRight className="w-4 h-4 text-slate-400" aria-hidden="true" />
@@ -281,7 +309,8 @@ export default function TimelinePage() {
                       </p>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -379,7 +408,18 @@ export default function TimelinePage() {
                       </div>
                     </div>
 
-                    <MealScoreChip score={mealAnalysis.healthScore} />
+                    <div className="flex flex-col items-end gap-2">
+                      <MealScoreChip score={mealAnalysis.healthScore} />
+                      <button
+                        type="button"
+                        onClick={() => window.confirm(t("confirm.deleteMeal")) && handleDeleteMeal(m.id)}
+                        aria-label={t("delete.meal.aria")}
+                        className="px-3 py-2 rounded-xl min-h-[48px] min-w-[48px] flex items-center gap-1.5 text-base font-bold text-red-800 border-2 border-red-200 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-5 h-5" aria-hidden="true" />
+                        {t("common.delete")}
+                      </button>
+                    </div>
                   </div>
 
                   <p className="text-base text-slate-700 leading-relaxed whitespace-pre-line">
@@ -391,6 +431,8 @@ export default function TimelinePage() {
           })
         )}
       </section>
+
+      <BackupSection onRestored={loadTimelineData} />
 
       {/* Meal Advisor Modal */}
       <MealAdvisorModal

@@ -1,7 +1,8 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
 import { buildHealthMatePrompt, ensureDisclaimer } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
-import type { Language, ReportRecord } from "@/types";
+import { compareMarkers, overallProgression, type ChangeVerdict, type MarkerComparison } from "./trends";
+import type { Language, MarkerStatus, ReportRecord } from "@/types";
 
 export interface MarkerDelta {
   markerName: string;
@@ -9,6 +10,10 @@ export interface MarkerDelta {
   currentValue: string | number;
   statusChange: string;
   interpretation: string;
+  /** Set when the change was computed from the reports rather than described by the AI. */
+  change?: ChangeVerdict;
+  previousStatus?: MarkerStatus;
+  currentStatus?: MarkerStatus;
 }
 
 export interface DeltaComparisonResult {
@@ -49,6 +54,40 @@ export function parseDeltaResponse(rawText: string, language: Language = "en"): 
   };
 }
 
+function formatValue(marker: { value: string | number; unit?: string }): string {
+  return `${marker.value}${marker.unit ? ` ${marker.unit}` : ""}`;
+}
+
+/**
+ * Combines the computed comparison (which values changed, and whether that is
+ * better or worse) with the AI's plain-language wording. The numbers, verdicts
+ * and overall progression always come from the computation; the AI only
+ * contributes the summary and per-marker explanations.
+ */
+export function mergeDelta(
+  comparisons: MarkerComparison[],
+  narrative: DeltaComparisonResult
+): DeltaComparisonResult {
+  const interpretations = new Map(
+    narrative.markerDeltas.map((d) => [d.markerName.trim().toLowerCase(), d.interpretation])
+  );
+
+  return {
+    progression: comparisons.length > 0 ? overallProgression(comparisons) : narrative.progression,
+    summary: narrative.summary,
+    markerDeltas: comparisons.map((c) => ({
+      markerName: c.name,
+      previousValue: formatValue(c.previous),
+      currentValue: formatValue(c.current),
+      statusChange: `${c.previous.status ?? "unknown"} -> ${c.current.status ?? "unknown"}`,
+      interpretation: interpretations.get(c.name.trim().toLowerCase()) ?? "",
+      change: c.change,
+      previousStatus: c.previous.status,
+      currentStatus: c.current.status,
+    })),
+  };
+}
+
 export async function compareReportsWithGemini(params: {
   reportA: ReportRecord;
   reportB: ReportRecord;
@@ -64,29 +103,34 @@ export async function compareReportsWithGemini(params: {
   const olderSummary = older.summary[params.language || "en"] || older.summary.en;
   const newerSummary = newer.summary[params.language || "en"] || newer.summary.en;
 
+  const comparisons = compareMarkers(older, newer);
+  const progression = overallProgression(comparisons);
+  const facts = comparisons
+    .map(
+      (c) =>
+        `- ${c.name}: ${formatValue(c.previous)} (${c.previous.status ?? "unknown"}) -> ${formatValue(c.current)} (${c.current.status ?? "unknown"}); change: ${c.change}`
+    )
+    .join("\n");
+
   const systemPrompt = buildHealthMatePrompt({
     language: params.language,
     extraInstructions: `You are comparing two medical reports across different dates for an elderly patient to evaluate their health progression.
 
 Earlier Report (${older.date}, file: ${older.fileName}):
 Summary: ${olderSummary}
-Key Markers: ${JSON.stringify(older.keyMarkers)}
 
 Later Report (${newer.date}, file: ${newer.fileName}):
 Summary: ${newerSummary}
-Key Markers: ${JSON.stringify(newer.keyMarkers)}
 
-Evaluate:
-1. "progression": exactly one of "improving", "stable", "declining", or "mixed"
-2. "summary": A clear, comforting, plain-language progression explanation for the elderly patient explaining whether they are getting better, staying stable, or need extra attention.
-3. "markerDeltas": array of key marker comparisons, each with:
-   - "markerName": e.g. "Fasting Glucose"
-   - "previousValue": value from earlier report
-   - "currentValue": value from later report
-   - "statusChange": e.g. "High -> Normal" or "Improved"
-   - "interpretation": concise explanation of what this difference means.
+These changes were calculated from the two reports. Treat them as facts; do not recalculate them or contradict them:
+${facts || "(No markers appear in both reports.)"}
+Overall: ${progression}
 
-Return ONLY valid JSON matching { "progression", "summary", "markerDeltas": [...] }.`,
+Write:
+1. "summary": a clear, honest, plain-language explanation for the elderly patient of what got better, what got worse and what to discuss with their doctor. Do not call a worsening result fine.
+2. "markerDeltas": for each marker listed above, { "markerName": the exact name as listed, "interpretation": one short sentence on what this change means for them }.
+
+Return ONLY valid JSON matching { "summary", "markerDeltas": [...] }.`,
   });
 
   const response = await client.models.generateContent({
@@ -97,6 +141,5 @@ Return ONLY valid JSON matching { "progression", "summary", "markerDeltas": [...
     },
   });
 
-  const responseText = response.text || "";
-  return parseDeltaResponse(responseText, params.language);
+  return mergeDelta(comparisons, parseDeltaResponse(response.text || "", params.language));
 }

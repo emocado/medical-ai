@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { useLanguage, useT } from "@/components/LanguageProvider";
 import { ReportView } from "@/components/ReportView";
 import { ChatInterface } from "@/components/ChatInterface";
-import { getAllReports, saveReport, getAllPillRecords } from "@/lib/db";
+import { deleteReport, getAllReports, saveReport, getAllPillRecords, sortReportsNewestFirst } from "@/lib/db";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { loadSampleFile, type SampleFile } from "@/lib/samples";
 import { SampleChips } from "@/components/SampleChips";
@@ -70,7 +70,7 @@ export default function ReportsPage() {
       });
       await saveReport(analyzedReport);
 
-      setReports((prev) => [analyzedReport, ...prev]);
+      setReports((prev) => sortReportsNewestFirst([analyzedReport, ...prev]));
       setSelectedReportId(analyzedReport.id);
     } catch (err) {
       console.error("Upload/analysis failed:", err);
@@ -81,6 +81,18 @@ export default function ReportsPage() {
   }
 
   const activeReport = reports.find((r) => r.id === selectedReportId) || reports[0];
+
+  async function handleDeleteReport(id: string) {
+    await deleteReport(id);
+    setReports((prev) => prev.filter((r) => r.id !== id));
+    setSelectedReportId(null);
+  }
+
+  async function handleDateChange(report: ReportRecord, date: string) {
+    const updated = { ...report, date };
+    await saveReport(updated);
+    setReports((prev) => sortReportsNewestFirst(prev.map((r) => (r.id === report.id ? updated : r))));
+  }
 
   return (
     <div className="space-y-6">
@@ -175,7 +187,12 @@ export default function ReportsPage() {
 
       {/* Display Active Report */}
       {activeReport ? (
-        <ReportView report={activeReport} language={lang} />
+        <ReportView
+          report={activeReport}
+          language={lang}
+          onDelete={() => handleDeleteReport(activeReport.id)}
+          onDateChange={(date) => handleDateChange(activeReport, date)}
+        />
       ) : (
         !isUploading && (
           <div className="text-center py-8 px-4 bg-white rounded-2xl border-2 border-dashed border-slate-300">
