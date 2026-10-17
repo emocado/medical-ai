@@ -17,6 +17,7 @@ import { saveMealRecord } from "@/lib/db";
 import { errorMessageKey, fileToBase64, postJson } from "@/lib/api-client";
 import { loadSampleFile, SAMPLE_MEAL_TEXTS, type SampleFile } from "@/lib/samples";
 import { SampleChips } from "./SampleChips";
+import { MealScoreChip } from "./MealScoreChip";
 import type { Language, MealRecord, PillRecord, ReportRecord } from "@/types";
 
 interface MealAdvisorModalProps {
@@ -261,17 +262,7 @@ export function MealAdvisorModal({
               <h4 className="text-lg font-bold text-slate-900">
                 {t("meal.dishes", { dishes: analysisResult.analysis.dishes.join(", ") })}
               </h4>
-              <span
-                className={`px-3 py-1.5 rounded-full text-base font-black ${
-                  analysisResult.analysis.healthScore >= 70
-                    ? "bg-emerald-100 text-emerald-950 border border-emerald-300"
-                    : analysisResult.analysis.healthScore >= 50
-                    ? "bg-amber-100 text-amber-950 border border-amber-300"
-                    : "bg-red-100 text-red-950 border border-red-300"
-                }`}
-              >
-                {t("meal.score", { score: analysisResult.analysis.healthScore })}
-              </span>
+              <MealScoreChip score={analysisResult.analysis.healthScore} />
             </div>
 
             <div className="text-lg text-slate-800 leading-relaxed bg-white p-4 rounded-xl border border-slate-200 whitespace-pre-line font-medium">

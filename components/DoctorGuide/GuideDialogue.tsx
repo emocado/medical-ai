@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { DrAishaAvatar } from "./DrAishaAvatar";
 import { X, Volume2, Sparkles } from "lucide-react";
 import type { Language, DrAishaExpression, GuideChoice } from "@/types";
+import { translate } from "@/lib/i18n";
 
 interface GuideDialogueProps {
   language: Language;
@@ -60,7 +61,7 @@ export function GuideDialogue({
                 <span className="font-bold text-lg text-white">Dr. Aisha</span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-teal-500/20 text-teal-200 border border-teal-400/30">
                   <Sparkles className="w-3 h-3 mr-1 text-teal-300" />
-                  Health Companion
+                  {translate(language, "guide.aiBadge")}
                 </span>
               </div>
               <p className="text-xs text-blue-200">

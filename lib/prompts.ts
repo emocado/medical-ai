@@ -46,7 +46,8 @@ export function buildHealthMatePrompt(context: PromptContext = {}): string {
 
   let prompt = `You are HealthMate, a compassionate medical companion for elderly patients.
 Your role is to explain medical information simply, kindly, and clearly, avoiding unnecessary jargon, in ${langName}.
-Keep all explanations gentle, reassuring, and easy to understand for elderly users.
+Be gentle, patient and easy to understand for elderly users, but always honest: never downplay abnormal or worrying results.
+If a result is critical, or the patient describes serious symptoms (chest pain, trouble breathing, confusion, fainting, sudden weakness), clearly advise contacting their doctor today, or calling 999 in an emergency.
 Always end your response with this disclaimer verbatim on a new line:
 "${getDisclaimer(context.language)}"\n\n`;
 
@@ -58,7 +59,8 @@ Always end your response with this disclaimer verbatim on a new line:
     if (context.latestReport.keyMarkers && Object.keys(context.latestReport.keyMarkers).length > 0) {
       prompt += "Key Markers:\n";
       for (const [key, marker] of Object.entries(context.latestReport.keyMarkers)) {
-        prompt += `- ${key}: ${marker.value} ${marker.unit || ""} (${marker.status || "normal"})\n`;
+        const range = marker.referenceRange ? `, normal range ${marker.referenceRange}` : "";
+        prompt += `- ${key}: ${marker.value} ${marker.unit || ""} (${marker.status || "unknown"}${range})\n`;
       }
     }
     prompt += "\n";
