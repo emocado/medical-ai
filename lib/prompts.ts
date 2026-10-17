@@ -1,4 +1,4 @@
-import type { Language, ReportRecord, PillRecord } from "@/types";
+import type { Language, ReportRecord, PillRecord, MedicationEntry } from "@/types";
 
 export const MEDICAL_DISCLAIMERS: Record<Language, string> = {
   en: "This is not a substitute for professional medical advice. Please consult your doctor.",
@@ -38,6 +38,8 @@ interface PromptContext {
   language?: Language;
   latestReport?: ReportRecord | null;
   knownPills?: PillRecord[] | null;
+  /** Confirmed medicines; preferred over pill scans when present. */
+  medications?: MedicationEntry[] | null;
   extraInstructions?: string;
 }
 
@@ -66,7 +68,16 @@ Always end your response with this disclaimer verbatim on a new line:
     prompt += "\n";
   }
 
-  if (context.knownPills && context.knownPills.length > 0) {
+  const activeMeds = (context.medications || []).filter((m) => m.active);
+  if (activeMeds.length > 0) {
+    // The confirmed list is the source of truth; old pill scans are ignored once it exists.
+    prompt += `=== MEDICINES THE PATIENT CONFIRMS THEY CURRENTLY TAKE ===\n`;
+    for (const med of activeMeds) {
+      const dose = med.analysis.dosage || "dose not recorded; follow the pharmacy label";
+      prompt += `- ${med.name} (${med.genericName}), ${dose}, taken: ${med.schedule.join(", ")}. Purpose: ${med.analysis.purpose}. Food interactions: ${med.analysis.foodInteractions.join(", ") || "none listed"}\n`;
+    }
+    prompt += "\n";
+  } else if (context.knownPills && context.knownPills.length > 0) {
     prompt += `=== USER'S CURRENT MEDICATIONS ===\n`;
     for (const record of context.knownPills) {
       for (const pill of record.analysis.pills) {

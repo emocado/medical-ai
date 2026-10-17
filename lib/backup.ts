@@ -1,4 +1,4 @@
-import type { MealRecord, PillRecord, ReportRecord } from "@/types";
+import type { DoseLog, MealRecord, MedicationEntry, PillRecord, ReportRecord } from "@/types";
 
 export const BACKUP_FORMAT = "healthmate-backup";
 export const BACKUP_VERSION = 1;
@@ -10,12 +10,16 @@ export interface HealthMateBackup {
   reports: ReportRecord[];
   pills: PillRecord[];
   meals: MealRecord[];
+  medications: MedicationEntry[];
+  doses: DoseLog[];
 }
 
 export function createBackup(data: {
   reports: ReportRecord[];
   pills: PillRecord[];
   meals: MealRecord[];
+  medications: MedicationEntry[];
+  doses: DoseLog[];
 }): HealthMateBackup {
   return {
     format: BACKUP_FORMAT,
@@ -54,6 +58,8 @@ export function parseBackup(text: string): HealthMateBackup {
     reports: list(data.reports) as ReportRecord[],
     pills: list(data.pills) as PillRecord[],
     meals: list(data.meals) as MealRecord[],
+    medications: list(data.medications) as MedicationEntry[],
+    doses: (Array.isArray(data.doses) ? data.doses.filter((d: any) => d && typeof d.key === "string") : []) as DoseLog[],
   };
 }
 

@@ -1,7 +1,7 @@
 import { getGeminiClient, GEMINI_FLASH_MODEL } from "./gemini";
 import { buildHealthMatePrompt } from "./prompts";
 import { cleanJsonText } from "./report-analyzer";
-import type { Language, PillInfo, PillRecord, ReportRecord } from "@/types";
+import type { Language, MedicationEntry, PillInfo, PillRecord, ReportRecord } from "@/types";
 
 export function parsePillResponse(
   rawText: string,
@@ -53,12 +53,14 @@ export async function analyzePillImage(params: {
   imageBase64: string;
   mimeType: string;
   latestReport?: ReportRecord | null;
+  medications?: MedicationEntry[] | null;
   language?: Language;
 }): Promise<PillRecord> {
   const client = getGeminiClient();
   const systemPrompt = buildHealthMatePrompt({
     language: params.language,
     latestReport: params.latestReport,
+    medications: params.medications,
     extraInstructions: `You are identifying medications and pills from a photograph for an elderly patient.
 Carefully examine any pills, blister packs, prescription labels, or boxes visible.
 Return a structured JSON object with:
@@ -71,7 +73,7 @@ Return a structured JSON object with:
    - "confidence": how sure you are of the identification: "high" if the drug name is clearly printed on a label or box, "medium" if partly readable, "low" if identified only from the pill's appearance
    - "sideEffects": Array of key symptoms or side effects the patient should watch out for
    - "foodInteractions": Array of foods, drinks, or herbs to avoid while taking this pill (e.g. "Grapefruit", "Alcohol")
-   - "drugInteractions": Array of other medications or substances to watch out for
+   - "drugInteractions": Array of other medications or substances to watch out for. If the patient's current medicines are listed above, name any of THEM that interact with this pill first, and say how serious it is.
 2. "crossRefWithReports": If recent health reports are provided in the context, explicitly explain how these pills connect to the patient's existing health conditions (e.g. "Prescribed for the high blood pressure noted on your recent hospital report").
 
 Return ONLY valid JSON matching { "pills": [...], "crossRefWithReports": "..." }.`,
